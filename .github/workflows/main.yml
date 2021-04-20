@@ -29,7 +29,7 @@ jobs:
         run: yarn
 
       - name: Linting & Testing
-        run: yarn run lint && yarn run test
+        run: yarn run lint
 
       - name: Vercel Action
         uses: amondnet/vercel-action@v20.0.0
