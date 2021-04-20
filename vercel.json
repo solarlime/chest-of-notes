@@ -1,0 +1,12 @@
+{
+  "version": 2,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/index.html"
+    }
+  ],
+  "github": {
+    "enabled": false
+  }
+}
