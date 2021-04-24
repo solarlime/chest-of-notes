@@ -82,13 +82,13 @@ button {
     justify-content: center;
     width: 80%;
     height: 80%;
+    box-sizing: border-box;
+    padding: 5px 0;
+    border-top: 1px solid white;
+    border-bottom: 1px solid white;
 }
 
 .add-list-item {
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
     margin: 0 0 10px 0;
 }
 
@@ -96,7 +96,7 @@ button {
     margin: 0;
 }
 
-.add-list-item-button {
+.add-list-item-button, .main-go-to-add-button {
     position: absolute;
     display: flex;
     align-items: center;
@@ -107,16 +107,12 @@ button {
     height: 100%;
 }
 
-.add-list-item-button-svg {
+.add-list-item-button-svg, .main-go-to-add-button-svg {
     fill: #FFFFFF;
     width: 40%;
 }
 
-.main-list-wrapper {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
+.main-list {
     width: 100%;
     height: calc(100% - var(--button) - 20% - 20% - 10px);
     box-sizing: border-box;
@@ -136,6 +132,10 @@ button {
 }
 
 .main-go-to-add, .add-list-item {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     width: var(--circle);
     max-width: 120px;
     background: #9c1428;
