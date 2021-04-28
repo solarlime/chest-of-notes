@@ -182,3 +182,45 @@ button {
     height: calc(100% - 20% - 10px);
     min-height: calc(100% - 80px - 10px);
 }
+
+.notes-list-item-header-wrapper {
+    display: flex;
+    flex-wrap: nowrap;
+}
+
+.notes-list-item-header, .main-list-item-header {
+    font-size: 1rem;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.checkbox {
+    position: absolute;
+    left: -9999px;
+}
+
+.spoiler {
+    display: flex;
+    flex-shrink: 0;
+    width: 15px;
+    margin-left: 5px;
+}
+
+.spoiler-svg {
+    fill: #000000;
+    width: 100%;
+    cursor: pointer;
+}
+
+.checkbox:checked ~ .notes-list-item-header-wrapper .spoiler-svg {
+    transform: rotate(180deg);
+}
+
+.checkbox:checked ~ .notes-list-item-description {
+    display: block;
+}
+
+.notes-list-item-description {
+    display: none;
+    font-size: 0.9rem;
+}
