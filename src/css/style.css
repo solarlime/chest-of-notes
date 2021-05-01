@@ -372,6 +372,6 @@ button {
 
     .footer {
         width: 1290px;
-        margin: 0 calc(calc(100vw - 1290px) / 2);
+        margin: 0 calc(calc(100% - 1290px) / 2);
     }
 }
