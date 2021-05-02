@@ -1,3 +1,5 @@
+import Page from "./page";
+
 export default class App {
   static init() {
     /**
@@ -9,8 +11,8 @@ export default class App {
     });
     window.dispatchEvent(new Event('resize'));
 
-    const main = document.querySelector('.main');
-    main.scrollIntoView();
+    const page = new Page();
+    page.addEventListeners();
 
     console.log('init');
   }

@@ -287,6 +287,49 @@ button {
     max-height: 50px;
 }
 
+.about {
+    position: absolute;
+    visibility: hidden;
+    opacity: 0;
+    padding: 10px;
+    border-radius: 10px;
+    background: white;
+}
+
+.active {
+    animation: appear 4s linear;
+}
+
+@keyframes appear {
+    1% {
+        visibility: visible;
+        opacity: 0;
+    }
+
+    25% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    75% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    100% {
+        visibility: visible;
+        opacity: 0;
+    }
+}
+
+a {
+    color: #9c1428;
+}
+
+a:visited {
+    color: #9c1428;
+}
+
 @media (min-width: 600px) {
     html {
         font-size: calc(1vmin  * 2.5);
