@@ -146,6 +146,14 @@ button {
     width: 40%;
 }
 
+.back {
+    background: white;
+}
+
+.back-button-svg {
+    fill: #9c1428;
+}
+
 .notes-list {
     width: 100%;
     height: auto;
@@ -184,6 +192,10 @@ button {
     border-radius: 50%;
     border: 0;
     box-shadow: rgba(0, 0, 0, 0.4) 0 3px;
+}
+
+.back {
+    background: white;
 }
 
 .notes-go-to-add {
