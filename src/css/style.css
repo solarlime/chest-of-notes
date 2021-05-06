@@ -180,7 +180,7 @@ button {
     box-shadow: rgba(0, 0, 0, 0.4) 0 3px;
 }
 
-.add-list-item, .notes-go-to-add {
+.add-list-item, .notes-go-to-add, .modal-add-media-form-wrapper {
     position: relative;
     display: flex;
     align-items: center;
@@ -205,7 +205,7 @@ button {
     margin-bottom: 10px;
 }
 
-.add-list-item:after, .notes-go-to-add:after {
+.add-list-item:after, .notes-go-to-add:after, .modal-add-media-form-wrapper:after {
     content: "";
     display: block;
     padding-top: 100%;
@@ -268,6 +268,33 @@ button {
 .notes-list-item-description {
     display: none;
     font-size: 0.9rem;
+}
+
+.modal-add {
+    position: absolute;
+    /*visibility: hidden;*/
+    top: calc(calc(var(--height) - 10vh) * 0.15);
+    left: 10%;
+    height: calc(calc(var(--height) - 10vh) * 0.85);
+    width: 80%;
+    background: white;
+    z-index: 999;
+}
+
+.modal-add-media-form {
+    display: flex;
+    justify-content: space-between;
+}
+
+.modal-add-media-form-start, .modal-add-media-form-stop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-add-media-form-start-svg, .modal-add-media-form-stop-svg {
+    fill: #FFFFFF;
+    width: 40%;
 }
 
 .footer {
@@ -340,6 +367,11 @@ a:visited {
         font-size: calc(1vmin  * 2.5);
     }
 
+    .app {
+        align-items: center;
+        justify-content: center;
+    }
+
     .header {
         display: none;
         width: 23%;
@@ -394,6 +426,13 @@ a:visited {
 
     .notes-list-item-header {
         margin-bottom: 10px;
+    }
+
+    .modal-add {
+        top: unset;
+        left: unset;
+        width: auto;
+        height: auto;
     }
 
     .footer {
