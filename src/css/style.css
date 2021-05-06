@@ -270,6 +270,17 @@ button {
     font-size: 0.9rem;
 }
 
+.modal-add {
+    position: absolute;
+    visibility: hidden;
+    top: calc(calc(var(--height) - 10vh) * 0.15);
+    left: 10%;
+    height: calc(calc(var(--height) - 10vh) * 0.85);
+    width: 80%;
+    background: white;
+    z-index: 999;
+}
+
 .footer {
     display: flex;
     align-items: center;
@@ -340,6 +351,11 @@ a:visited {
         font-size: calc(1vmin  * 2.5);
     }
 
+    .app {
+        align-items: center;
+        justify-content: center;
+    }
+
     .header {
         display: none;
         width: 23%;
@@ -394,6 +410,13 @@ a:visited {
 
     .notes-list-item-header {
         margin-bottom: 10px;
+    }
+
+    .modal-add {
+        top: unset;
+        left: unset;
+        width: auto;
+        height: auto;
     }
 
     .footer {
