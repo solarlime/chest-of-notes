@@ -26,6 +26,10 @@ body {
     overflow: hidden;
 }
 
+section, footer {
+    filter: blur(5px);
+}
+
 ul {
     list-style: none;
 }
@@ -270,29 +274,56 @@ button {
     font-size: 0.9rem;
 }
 
+.hidden {
+    display: none;
+}
+
 .modal-add {
     position: absolute;
     /*visibility: hidden;*/
-    top: calc(calc(var(--height) - 10vh) * 0.15);
-    left: 10%;
-    height: calc(calc(var(--height) - 10vh) * 0.85);
-    width: 80%;
+    top: 50%;
+    left: 50%;
+    min-width: 150px;
+    transform: translate(-50%, -50%);
     background: white;
+    border-radius: 10px;
     z-index: 999;
+    box-shadow: rgba(0, 0, 0, 0.4) 0 3px;
 }
 
-.modal-add-media-form {
+.modal-add-form {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px;
+    width: 100%;
+    height: 100%;
+    box-sizing: border-box;
 }
 
-.modal-add-media-form-start, .modal-add-media-form-stop {
+.modal-add-form-input, .modal-add-form-text-area {
+    width: 100%;
+    border: 1px solid #2fa693;
+    box-sizing: border-box;
+    resize: none;
+}
+
+.modal-add-form-media {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+}
+
+.modal-add-media-form-start, .modal-add-media-form-stop, .modal-add-media-form-save {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
 }
 
-.modal-add-media-form-start-svg, .modal-add-media-form-stop-svg {
+.modal-add-media-form-start-svg, .modal-add-media-form-stop-svg, .modal-add-media-form-save-svg {
     fill: #FFFFFF;
     width: 40%;
 }
@@ -426,13 +457,6 @@ a:visited {
 
     .notes-list-item-header {
         margin-bottom: 10px;
-    }
-
-    .modal-add {
-        top: unset;
-        left: unset;
-        width: auto;
-        height: auto;
     }
 
     .footer {
