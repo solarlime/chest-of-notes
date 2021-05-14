@@ -107,10 +107,14 @@
     </section>
     <aside class="modal-add">
         <form class="modal-add-form">
-            <input type="text" class="modal-add-form-input">
+            <label for="modal-add-form-input" class="modal-add-form-header">Place the name for a new note</label>
+            <input id="modal-add-form-input" type="text">
             <div class="modal-add-form-text">
-                <textarea class="modal-add-form-text-area"></textarea>
+                <label for="modal-add-form-text-area" class="modal-add-form-description-text">and place some text below</label>
+                <textarea id="modal-add-form-text-area"></textarea>
             </div>
+            <p class="modal-add-form-description-media">and start recording.</p>
+            <p class="modal-add-form-description-both">Don't forget to save!</p>
             <div class="modal-add-form-media">
                 <div class="modal-add-media-form-wrapper">
                     <button class="modal-add-media-form-start" type="button">

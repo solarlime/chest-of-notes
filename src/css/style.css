@@ -274,20 +274,19 @@ button {
     font-size: 0.9rem;
 }
 
-.hidden {
-    display: none;
-}
-
 .modal-add {
     position: absolute;
     /*visibility: hidden;*/
     top: 50%;
     left: 50%;
     min-width: 150px;
+    width: 40%;
+    max-width: 300px;
     transform: translate(-50%, -50%);
     background: white;
     border-radius: 10px;
     z-index: 999;
+    font-size: 0.6rem;
     box-shadow: rgba(0, 0, 0, 0.4) 0 3px;
 }
 
@@ -301,19 +300,55 @@ button {
     box-sizing: border-box;
 }
 
-.modal-add-form-input, .modal-add-form-text-area {
+#modal-add-form-input, #modal-add-form-text-area {
     width: 100%;
     border: 1px solid #2fa693;
     box-sizing: border-box;
     resize: none;
 }
 
+#modal-add-form-input:focus, #modal-add-form-text-area:focus {
+    outline: 1px solid #2fa693;
+}
+
+#modal-add-form-text-area {
+    margin-bottom: 10px;
+}
+
+#modal-add-form-input {
+    margin: 10px 0;
+}
+
 .modal-add-form-media {
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     width: 100%;
     height: 100%;
+    padding-top: 10px;
+}
+
+.modal-add-form-header, .modal-add-form-description-media, .modal-add-form-description-text {
+    text-align: center;
+}
+
+.modal-add-form-description-text {
+    margin-bottom: 10px;
+}
+
+.modal-add-form-text {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.modal-add-media-form-wrapper {
+    width: 35%;
+    margin-right: calc(50% - 35%);
+}
+
+.modal-add-media-form-wrapper:last-child {
+    margin-right: 0;
 }
 
 .modal-add-media-form-start, .modal-add-media-form-stop, .modal-add-media-form-save {
@@ -357,6 +392,10 @@ button {
 
 .active {
     animation: appear 4s linear;
+}
+
+.hidden {
+    display: none;
 }
 
 @keyframes appear {
@@ -457,6 +496,18 @@ a:visited {
 
     .notes-list-item-header {
         margin-bottom: 10px;
+    }
+
+    .modal-add {
+        font-size: 1rem;
+    }
+
+    #modal-add-form-input {
+        text-align: center;
+    }
+
+    .modal-add-media-form-wrapper {
+        width: 70px;
     }
 
     .footer {
