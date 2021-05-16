@@ -15,7 +15,7 @@
         <div class="pseudo-header">Chest of notes</div>
         <ul class="add-list">
             <li class="add-list-item">
-                <button class="add-list-item-button">
+                <button class="add-list-item-button audio-button">
                     <svg class="add-list-item-button-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 435.2 435.2"  xml:space="preserve">
                         <g><g><path d="M356.864,224.768c0-8.704-6.656-15.36-15.36-15.36s-15.36,6.656-15.36,15.36c0,59.904-48.64,108.544-108.544,108.544    c-59.904,0-108.544-48.64-108.544-108.544c0-8.704-6.656-15.36-15.36-15.36c-8.704,0-15.36,6.656-15.36,15.36    c0,71.168,53.248,131.072,123.904,138.752v40.96h-55.808c-8.704,0-15.36,6.656-15.36,15.36s6.656,15.36,15.36,15.36h142.336    c8.704,0,15.36-6.656,15.36-15.36s-6.656-15.36-15.36-15.36H232.96v-40.96C303.616,355.84,356.864,295.936,356.864,224.768z"/></g></g>
                         <g><g><path d="M217.6,0c-47.104,0-85.504,38.4-85.504,85.504v138.752c0,47.616,38.4,85.504,85.504,86.016    c47.104,0,85.504-38.4,85.504-85.504V85.504C303.104,38.4,264.704,0,217.6,0z"/></g></g>
@@ -23,14 +23,14 @@
                 </button>
             </li>
             <li class="add-list-item">
-                <button class="add-list-item-button">
+                <button class="add-list-item-button video-button">
                     <svg class="add-list-item-button-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 455.168 455.168" xml:space="preserve">
                         <g><g><path d="M446.464,118.528c-5.12-3.072-11.264-3.072-16.384,0l-82.944,50.176v-10.752c0-33.28-27.136-60.416-60.416-60.416H60.416    C27.136,97.536,0,124.672,0,157.952v139.264c0,33.28,27.136,60.416,60.416,60.416H286.72c33.28,0,60.416-27.136,60.416-60.416    v-15.872l82.944,49.664c7.68,4.608,17.92,2.048,22.528-5.632c1.536-2.56,2.56-5.632,2.56-8.704V132.864    C454.656,127.232,451.584,121.6,446.464,118.528z"/></g></g>
                     </svg>
                 </button>
             </li>
             <li class="add-list-item">
-                <button class="add-list-item-button">
+                <button class="add-list-item-button text-button">
                     <svg class="add-list-item-button-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 394.69 394.69" xml:space="preserve">
                         <g><g><rect x="67.071" y="127.783" transform="matrix(0.7071 -0.7071 0.7071 0.7071 -81.2718 197.5973)" width="261.629" height="138.239"/></g></g>
                         <g><g><path d="M388.801,78.658L316.609,5.442c-7.168-7.168-18.432-7.168-25.088-0.512c0,0,0,0-0.512,0.512l-31.744,31.744l97.792,98.304    l31.744-31.744C395.969,96.578,395.969,85.314,388.801,78.658z"/></g></g>
@@ -116,33 +116,40 @@
             <p class="modal-add-form-description-media">and start recording.</p>
             <p class="modal-add-form-description-both">Don't forget to save!</p>
             <div class="modal-add-form-media">
-                <div class="modal-add-media-form-wrapper">
-                    <button class="modal-add-media-form-start" type="button">
+                <button class="modal-add-media-form-wrapper start">
+                    <div class="modal-add-media-form-start" type="button">
                         <svg class="modal-add-media-form-start-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 320.001 320.001" xml:space="preserve">
-                        <path d="M295.84,146.049l-256-144c-4.96-2.784-11.008-2.72-15.904,0.128C19.008,5.057,16,10.305,16,16.001v288  c0,5.696,3.008,10.944,7.936,13.824c2.496,1.44,5.28,2.176,8.064,2.176c2.688,0,5.408-0.672,7.84-2.048l256-144  c5.024-2.848,8.16-8.16,8.16-13.952S300.864,148.897,295.84,146.049z"/>
-                    </svg>
-                    </button>
-                </div>
-                <div class="modal-add-media-form-wrapper">
-                    <button class="modal-add-media-form-stop" type="button">
+                            <path d="M295.84,146.049l-256-144c-4.96-2.784-11.008-2.72-15.904,0.128C19.008,5.057,16,10.305,16,16.001v288  c0,5.696,3.008,10.944,7.936,13.824c2.496,1.44,5.28,2.176,8.064,2.176c2.688,0,5.408-0.672,7.84-2.048l256-144  c5.024-2.848,8.16-8.16,8.16-13.952S300.864,148.897,295.84,146.049z"/>
+                        </svg>
+                    </div>
+                </button>
+                <button class="modal-add-media-form-wrapper stop">
+                    <div class="modal-add-media-form-stop" type="button">
                         <svg class="modal-add-media-form-stop-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" viewBox="0 0 320 320">
                             <path d="m288 0h-256c-17.632 0-32 14.368-32 32v256c0 17.632 14.368 32 32 32h256c17.632 0 32-14.368 32-32v-256c0-17.632-14.368-32-32-32z"/>
                         </svg>
-                    </button>
-                </div>
-                <div class="modal-add-media-form-wrapper">
-                    <button class="modal-add-media-form-save" type="button">
+                    </div>
+                </button>
+                <button class="modal-add-media-form-wrapper save">
+                    <div class="modal-add-media-form-save" type="button">
                         <svg class="modal-add-media-form-save-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 399.36 399.36" xml:space="preserve">
                             <g><g>
                                 <path d="M393.728,60.416L321.024,3.072C318.464,1.024,314.88,0,311.296,0H15.36C6.656,0,0,6.656,0,15.36V384    c0,8.704,6.656,15.36,15.36,15.36H384c8.704,0,15.36-6.656,15.36-15.36V72.704C399.36,68.096,397.312,63.488,393.728,60.416z     M189.44,327.68c-36.864,0-66.56-29.696-66.56-66.56c0-36.864,29.696-66.56,66.56-66.56S256,224.256,256,261.12    C256,297.984,226.304,327.68,189.44,327.68z M268.8,130.56H110.08V30.72H268.8V130.56z"/>
                             </g></g>
                         </svg>
-                    </button>
-                </div>
+                    </div>
+                </button>
+                <button class="modal-add-media-form-wrapper close">
+                    <div class="modal-add-media-form-close" type="button">
+                        <svg class="modal-add-media-form-close-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" x="0px" y="0px" viewBox="0 0 399.36 399.36" xml:space="preserve">
+                            <g><g>
+                                <path d="M393.728,60.416L321.024,3.072C318.464,1.024,314.88,0,311.296,0H15.36C6.656,0,0,6.656,0,15.36V384    c0,8.704,6.656,15.36,15.36,15.36H384c8.704,0,15.36-6.656,15.36-15.36V72.704C399.36,68.096,397.312,63.488,393.728,60.416z     M189.44,327.68c-36.864,0-66.56-29.696-66.56-66.56c0-36.864,29.696-66.56,66.56-66.56S256,224.256,256,261.12    C256,297.984,226.304,327.68,189.44,327.68z M268.8,130.56H110.08V30.72H268.8V130.56z"/>
+                            </g></g>
+                        </svg>
+                    </div>
+                </button>
             </div>
         </form>
-
-
     </aside>
     <footer class="footer">
         <svg class="footer-logo" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">

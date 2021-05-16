@@ -26,8 +26,18 @@ body {
     overflow: hidden;
 }
 
-section, footer {
-    filter: blur(5px);
+.blur {
+    animation: blur 0.5s linear forwards;
+}
+
+@keyframes blur {
+    from {
+        filter: none;
+    }
+
+    to {
+        filter: blur(5px);
+    }
 }
 
 ul {
@@ -69,7 +79,6 @@ button {
         visibility: hidden;
         opacity: 0;
     }
-
 }
 
 .app {
@@ -274,13 +283,37 @@ button {
     font-size: 0.9rem;
 }
 
+@keyframes appear {
+    0% {
+        visibility: hidden;
+        opacity: 0;
+    }
+
+    1% {
+        visibility: visible;
+        opacity: 0;
+    }
+    100% {
+        visibility: visible;
+        opacity: 1;
+    }
+}
+
+.modal-active {
+    animation: appear 0.5s linear forwards;
+}
+
+.modal-inactive {
+    animation: disappear 0.5s linear forwards;
+}
+
 .modal-add {
     position: absolute;
-    /*visibility: hidden;*/
+    visibility: hidden;
     top: 50%;
     left: 50%;
     min-width: 150px;
-    width: 40%;
+    width: 50%;
     max-width: 300px;
     transform: translate(-50%, -50%);
     background: white;
@@ -343,8 +376,8 @@ button {
 }
 
 .modal-add-media-form-wrapper {
-    width: 35%;
-    margin-right: calc(50% - 35%);
+    width: 22%;
+    margin-right: 4%;
 }
 
 .modal-add-media-form-wrapper:last-child {
@@ -391,14 +424,14 @@ button {
 }
 
 .active {
-    animation: appear 4s linear;
+    animation: easteregg 4s linear;
 }
 
 .hidden {
     display: none;
 }
 
-@keyframes appear {
+@keyframes easteregg {
     1% {
         visibility: visible;
         opacity: 0;
