@@ -1,3 +1,5 @@
+/* eslint-disable no-param-reassign */
+
 export default class Page {
   constructor() {
     this.page = document.body;
@@ -8,6 +10,7 @@ export default class Page {
     this.audioButton = this.page.querySelector('button.audio-button');
     this.videoButton = this.page.querySelector('button.video-button');
     this.textButton = this.page.querySelector('button.text-button');
+    this.background = this.page.querySelectorAll('section, footer');
     this.modalAdd = this.page.querySelector('.modal-add');
     this.modalCloseButton = this.page.querySelector('button.close');
     this.footerLogo = this.page.querySelector('.footer-logo');
@@ -30,23 +33,42 @@ export default class Page {
     /**
      * A listener for an 'add' button
      */
-    this.addButton.addEventListener('click', () => this.add.scrollIntoView({ behavior: 'smooth' }));
+    this.addButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.add.scrollIntoView({ behavior: 'smooth' });
+    });
 
     /**
      * A listener for a 'back' button
      */
-    this.backButton.addEventListener('click', () => this.notes.scrollIntoView({ behavior: 'smooth' }));
+    this.backButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.notes.scrollIntoView({ behavior: 'smooth' });
+    });
 
     /**
      * Listeners to open the content modal
      */
     [this.audioButton, this.videoButton, this.textButton].forEach((button) => button.addEventListener('click', (event) => {
-      console.log(event);
-      this.page.querySelectorAll('section, footer').forEach((item) => item.classList.add('blur'));
-      this.modalAdd.classList.add('modal-active');
+      event.preventDefault();
+      const notNew = Array.from(this.background).find((item) => item.classList.contains('remove-blur'));
+      if (notNew) {
+        this.background.forEach((item) => item.classList.toggle('blur'));
+        this.background.forEach((item) => item.classList.toggle('remove-blur'));
+        this.modalAdd.classList.toggle('modal-active');
+        this.modalAdd.classList.toggle('modal-inactive');
+      } else {
+        this.background.forEach((item) => item.classList.add('blur'));
+        this.modalAdd.classList.add('modal-active');
+      }
     }));
 
-    this.modalCloseButton.addEventListener();
-
+    this.modalCloseButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.background.forEach((item) => item.classList.toggle('blur'));
+      this.background.forEach((item) => item.classList.toggle('remove-blur'));
+      this.modalAdd.classList.toggle('modal-active');
+      this.modalAdd.classList.toggle('modal-inactive');
+    });
   }
 }

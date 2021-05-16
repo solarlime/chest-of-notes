@@ -14,6 +14,6 @@ export default class App {
     const page = new Page();
     page.addEventListeners();
 
-    console.log('init');
+    console.log('Initiated!');
   }
 }

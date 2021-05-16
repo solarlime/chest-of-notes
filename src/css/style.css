@@ -40,6 +40,20 @@ body {
     }
 }
 
+.remove-blur {
+    animation: remove-blur 0.5s linear forwards;
+}
+
+@keyframes remove-blur {
+    from {
+        filter: blur(5px);
+    }
+
+    to {
+        filter: none;
+    }
+}
+
 ul {
     list-style: none;
 }
@@ -299,6 +313,22 @@ button {
     }
 }
 
+@keyframes disappear {
+    0% {
+        visibility: visible;
+        opacity: 1;
+    }
+
+    99% {
+        visibility: visible;
+        opacity: 0;
+    }
+    100% {
+        visibility: hidden;
+        opacity: 0;
+    }
+}
+
 .modal-active {
     animation: appear 0.5s linear forwards;
 }
@@ -384,14 +414,14 @@ button {
     margin-right: 0;
 }
 
-.modal-add-media-form-start, .modal-add-media-form-stop, .modal-add-media-form-save {
+.modal-add-media-form-start, .modal-add-media-form-stop, .modal-add-media-form-save, .modal-add-media-form-close {
     display: flex;
     align-items: center;
     justify-content: center;
     width: 100%;
 }
 
-.modal-add-media-form-start-svg, .modal-add-media-form-stop-svg, .modal-add-media-form-save-svg {
+.modal-add-media-form-start-svg, .modal-add-media-form-stop-svg, .modal-add-media-form-save-svg, .modal-add-media-form-close-svg {
     fill: #FFFFFF;
     width: 40%;
 }
@@ -412,6 +442,7 @@ button {
 .footer-logo {
     height: 60%;
     max-height: 50px;
+    cursor: pointer;
 }
 
 .about {
