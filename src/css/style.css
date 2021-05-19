@@ -199,12 +199,18 @@ button {
 .notes-list-item {
     width: 100%;
     min-height: 50px;
+    max-height: 100%;
     background: white;
     padding: 5px;
     margin: 0 0 10px 0;
     border-radius: 5px;
     box-sizing: border-box;
     box-shadow: rgba(0, 0, 0, 0.4) 0 3px;
+}
+
+.notes-list-item-description {
+    display: block;
+    font-size: 0.9rem;
 }
 
 .add-list-item, .notes-go-to-add, .modal-add-media-form-wrapper {
@@ -288,13 +294,15 @@ button {
     transform: rotate(180deg);
 }
 
-.checkbox:checked ~ .notes-list-item-description {
-    display: block;
+.checkbox:not(:checked) ~ .notes-list-item-description {
+    max-height: 0;
+    overflow: hidden;
+    transition: all 0.5s linear 0s;
 }
 
-.notes-list-item-description {
-    display: none;
-    font-size: 0.9rem;
+.checkbox:checked ~ .notes-list-item-description {
+    max-height: 50vh;
+    transition: all 0.5s linear 0s;
 }
 
 @keyframes appear {
