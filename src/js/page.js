@@ -87,20 +87,20 @@ export default class Page {
       }
     }));
 
-    this.modalSaveButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      console.log('wow');
-      fetch('/api/server/mongo', {
-        cache: 'no-cache',
-      }).then((result) => console.log(result));
-    });
-
-    // this.modalSaveButton.addEventListener('click', async (event) => {
+    // this.modalSaveButton.addEventListener('click', (event) => {
     //   event.preventDefault();
-    //   await fetch('/api/server/mongo', {
+    //   console.log('wow');
+    //   fetch('/api/server/mongo', {
     //     cache: 'no-cache',
-    //   });
+    //   }).then((result) => console.log(result));
     // });
+
+    this.modalSaveButton.addEventListener('click', async (event) => {
+      event.preventDefault();
+      await fetch('/api/server/mongo', {
+        cache: 'no-cache',
+      });
+    });
 
 
     /**

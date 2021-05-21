@@ -6,6 +6,12 @@
       "destination": "/index.html"
     }
   ],
+  "rewrites": [
+    {
+      "source": "/api/server/:action_level_1",
+      "destination": "/api/server"
+    }
+  ],
   "github": {
     "enabled": false
   }

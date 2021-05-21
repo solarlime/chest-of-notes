@@ -78,70 +78,70 @@ app.use(async (ctx, next) => {
   console.log(result);
   ctx.response.body = JSON.stringify(result);
 });
-
-/**
- * Service function. Returns an array of users
- * @param col
- * @returns {Promise<*>}
- */
-async function getUsers(col) {
-  const data = await col.find().toArray();
-  return data.map((item) => {
-    const { name } = item;
-    return name;
-  });
-}
-
-/**
- * Middleware to add a new user (if doesn't exist)
- */
-router.post(routes.updateUsers, async (ctx) => {
-  const { col } = ctx.state;
-  try {
-    const document = ctx.request.body;
-    const findUser = await col.findOne({ name: document.name });
-    if (findUser) {
-      throw new Error('This user has already connected!');
-    }
-    await col.insertOne(document);
-    return { status: 'Added', data: await getUsers(col) };
-  } catch (e) {
-    return { status: 'Not added', data: e.message };
-  }
-});
-
-/**
- * Middleware to delete a user. It's also possible to drop the whole DB.
- * Use it only to fix the errors!
- */
-router.post(routes.deleteUsers, async (ctx) => {
-  const { col } = ctx.state;
-  try {
-    const document = ctx.request.body;
-    if (!document.name) {
-      if (await col.findOne({})) {
-        await col.drop();
-        return { status: 'Removed all', data: '' };
-      }
-      return { status: 'Already all removed', data: '' };
-    }
-    await col.deleteMany({ name: document.name });
-    return { status: 'Removed', data: '' };
-  } catch (e) {
-    return { status: 'Not removed', data: e.message };
-  }
-});
-
-/**
- * Middleware to return users. A wrapper for getUsers
- */
-router.get(routes.fetchUsers, async (ctx) => {
-  const { col } = ctx.state;
-  return {
-    status: 'Fetched',
-    data: await getUsers(col),
-  };
-});
+//
+// /**
+//  * Service function. Returns an array of users
+//  * @param col
+//  * @returns {Promise<*>}
+//  */
+// async function getUsers(col) {
+//   const data = await col.find().toArray();
+//   return data.map((item) => {
+//     const { name } = item;
+//     return name;
+//   });
+// }
+//
+// /**
+//  * Middleware to add a new user (if doesn't exist)
+//  */
+// router.post(routes.updateUsers, async (ctx) => {
+//   const { col } = ctx.state;
+//   try {
+//     const document = ctx.request.body;
+//     const findUser = await col.findOne({ name: document.name });
+//     if (findUser) {
+//       throw new Error('This user has already connected!');
+//     }
+//     await col.insertOne(document);
+//     return { status: 'Added', data: await getUsers(col) };
+//   } catch (e) {
+//     return { status: 'Not added', data: e.message };
+//   }
+// });
+//
+// /**
+//  * Middleware to delete a user. It's also possible to drop the whole DB.
+//  * Use it only to fix the errors!
+//  */
+// router.post(routes.deleteUsers, async (ctx) => {
+//   const { col } = ctx.state;
+//   try {
+//     const document = ctx.request.body;
+//     if (!document.name) {
+//       if (await col.findOne({})) {
+//         await col.drop();
+//         return { status: 'Removed all', data: '' };
+//       }
+//       return { status: 'Already all removed', data: '' };
+//     }
+//     await col.deleteMany({ name: document.name });
+//     return { status: 'Removed', data: '' };
+//   } catch (e) {
+//     return { status: 'Not removed', data: e.message };
+//   }
+// });
+//
+// /**
+//  * Middleware to return users. A wrapper for getUsers
+//  */
+// router.get(routes.fetchUsers, async (ctx) => {
+//   const { col } = ctx.state;
+//   return {
+//     status: 'Fetched',
+//     data: await getUsers(col),
+//   };
+// });
 
 app.use(router.routes())
   .use(router.allowedMethods());
