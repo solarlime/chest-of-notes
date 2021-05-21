@@ -302,6 +302,7 @@ button {
 
 .checkbox:checked ~ .notes-list-item-description {
     max-height: 50vh;
+    overflow: hidden;
     transition: all 0.5s linear 0s;
 }
 
@@ -383,10 +384,12 @@ button {
 }
 
 #modal-add-form-text-area {
+    height: 4rem;
     margin-bottom: 10px;
 }
 
 #modal-add-form-input {
+    height: 2rem;
     margin: 10px 0;
 }
 
@@ -411,6 +414,7 @@ button {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 100%;
 }
 
 .modal-add-media-form-wrapper {
