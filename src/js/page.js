@@ -97,8 +97,11 @@ export default class Page {
 
     this.modalSaveButton.addEventListener('click', async (event) => {
       event.preventDefault();
-      await fetch('/api/server/mongo', {
-        cache: 'no-cache',
+      const res = await fetch('/api/server/mongo/update', {
+        method: 'POST',
+        body: JSON.stringify({
+          id: '123456', name: 'Sample note', type: 'text', content: 'Sample description',
+        }),
       });
     });
 

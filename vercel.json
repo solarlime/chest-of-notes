@@ -10,6 +10,14 @@
     {
       "source": "/api/server/:action_level_1",
       "destination": "/api/server"
+    },
+    {
+      "source": "/api/server/:action_level_1/:action_level_2",
+      "destination": "/api/server"
+    },
+    {
+      "source": "/api/server/:action_level_1/:action_level_2/:action_level_3",
+      "destination": "/api/server"
     }
   ],
   "github": {

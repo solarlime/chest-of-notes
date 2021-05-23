@@ -13,7 +13,7 @@ const app = new Koa();
 const prefix = '/api/server';
 const router = new Router({ prefix });
 const url = process.env.MONGO_URL;
-const dbName = 'simple-chat';
+const dbName = 'chest-of-notes';
 
 /**
  * Define the routes for our convenience
@@ -60,7 +60,7 @@ app.use(async (ctx, next) => {
       console.log('Connected correctly to server');
       const db = client.db(dbName);
 
-      const col = db.collection('names');
+      const col = db.collection('notes');
       // Save col in ctx.state for sending it to middlewares
       ctx.state.col = col;
       const res = await next();
@@ -78,7 +78,7 @@ app.use(async (ctx, next) => {
   console.log(result);
   ctx.response.body = JSON.stringify(result);
 });
-//
+
 // /**
 //  * Service function. Returns an array of users
 //  * @param col
@@ -91,24 +91,23 @@ app.use(async (ctx, next) => {
 //     return name;
 //   });
 // }
-//
-// /**
-//  * Middleware to add a new user (if doesn't exist)
-//  */
-// router.post(routes.updateUsers, async (ctx) => {
-//   const { col } = ctx.state;
-//   try {
-//     const document = ctx.request.body;
-//     const findUser = await col.findOne({ name: document.name });
-//     if (findUser) {
-//       throw new Error('This user has already connected!');
-//     }
-//     await col.insertOne(document);
-//     return { status: 'Added', data: await getUsers(col) };
-//   } catch (e) {
-//     return { status: 'Not added', data: e.message };
-//   }
-// });
+
+/**
+ * Middleware to add a note
+ */
+router.post(routes.update, async (ctx) => {
+  console.log('middleware');
+  const { col } = ctx.state;
+  try {
+    const document = JSON.parse(ctx.request.body);
+    await col.insertOne({
+      id: document.id, name: document.name, type: document.type, content: document.content,
+    });
+    return { status: 'Added', data: document };
+  } catch (e) {
+    return { status: 'Not added', data: e.message };
+  }
+});
 //
 // /**
 //  * Middleware to delete a user. It's also possible to drop the whole DB.
