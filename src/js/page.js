@@ -97,6 +97,7 @@ export default class Page {
 
     this.modalSaveButton.addEventListener('click', async (event) => {
       event.preventDefault();
+      // eslint-disable-next-line no-unused-vars
       const res = await fetch('/api/server/mongo/update', {
         method: 'POST',
         body: JSON.stringify({
@@ -104,7 +105,6 @@ export default class Page {
         }),
       });
     });
-
 
     /**
      * Listeners to close the content modal
