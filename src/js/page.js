@@ -87,23 +87,44 @@ export default class Page {
       }
     }));
 
-    // this.modalSaveButton.addEventListener('click', (event) => {
-    //   event.preventDefault();
-    //   console.log('wow');
-    //   fetch('/api/server/mongo', {
-    //     cache: 'no-cache',
-    //   }).then((result) => console.log(result));
-    // });
-
     this.modalSaveButton.addEventListener('click', async (event) => {
       event.preventDefault();
-      // eslint-disable-next-line no-unused-vars
-      const res = await fetch('/api/server/mongo/update', {
+      const res = await fetch('https://nginx.solarlime.dev/chest-of-notes/mongo/update', {
         method: 'POST',
         body: JSON.stringify({
           id: '123456', name: 'Sample note', type: 'text', content: 'Sample description',
         }),
       });
+      const result = await res.json();
+      console.log(result);
+    });
+
+    this.modalStartButton.addEventListener('click', async () => {
+      if (!navigator.mediaDevices) {
+        return;
+      }
+      try {
+        this.audio = this.modalAdd.querySelector('#audio');
+        this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        this.mediaRecorder = new MediaRecorder(this.stream, { type: 'audio/mp4' });
+        this.voice = [];
+        this.mediaRecorder.start();
+
+        this.mediaRecorder.addEventListener('dataavailable', (event) => {
+          this.voice.push(event.data);
+          if (this.mediaRecorder.state === 'inactive') {
+            this.voiceBlob = new Blob(this.voice, { type: 'audio/mp4' });
+            this.audio.src = URL.createObjectURL(this.voiceBlob);
+            this.audio.controls = true;
+          }
+        });
+      } catch (e) {
+        console.log(e);
+      }
+    });
+
+    this.modalStopButton.addEventListener('click', () => {
+      this.mediaRecorder.stop();
     });
 
     /**
