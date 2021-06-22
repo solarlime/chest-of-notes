@@ -105,7 +105,7 @@
             </div>
         </div>
     </section>
-    <aside class="modal-add">
+    <aside class="modal-add" style="visibility: visible">
         <form class="modal-add-form">
             <label for="modal-add-form-input" class="modal-add-form-header">Place the name for a new note</label>
             <input id="modal-add-form-input" type="text">
@@ -115,6 +115,14 @@
             </div>
             <p class="modal-add-form-description-media">and start recording.</p>
             <p class="modal-add-form-description-both">Don't forget to save!</p>
+            <div id="player" class="hidden">
+                <button id="play" type="button"></button>
+                <button id="pause" type="button"></button>
+                <button id="back" type="button"></button>
+                <button id="forward" type="button"></button>
+                <span id="time">00:00 </span>
+                <span id="duration">00:00</span>
+            </div>
             <audio id="audio">Your browser does not support the <code>audio</code> element.</audio>
             <div class="modal-add-form-media">
                 <button class="modal-add-media-form-wrapper start" type="button">
@@ -124,7 +132,7 @@
                         </svg>
                     </div>
                 </button>
-                <button class="modal-add-media-form-wrapper stop" type="button">
+                <button class="modal-add-media-form-wrapper stop hidden" type="button">
                     <div class="modal-add-media-form-stop">
                         <svg class="modal-add-media-form-stop-svg" xmlns="http://www.w3.org/2000/svg" id="Capa_1" viewBox="0 0 320 320">
                             <path d="m288 0h-256c-17.632 0-32 14.368-32 32v256c0 17.632 14.368 32 32 32h256c17.632 0 32-14.368 32-32v-256c0-17.632-14.368-32-32-32z"/>
