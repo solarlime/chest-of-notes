@@ -105,7 +105,7 @@
             </div>
         </div>
     </section>
-    <aside class="modal-add" style="visibility: visible">
+    <aside class="modal-add">
         <form class="modal-add-form">
             <label for="modal-add-form-input" class="modal-add-form-header">Place the name for a new note</label>
             <input id="modal-add-form-input" type="text">
@@ -116,14 +116,17 @@
             <p class="modal-add-form-description-media">and start recording.</p>
             <p class="modal-add-form-description-both">Don't forget to save!</p>
             <div id="player" class="hidden">
-                <button id="play" type="button"></button>
-                <button id="pause" type="button"></button>
-                <button id="back" type="button"></button>
-                <button id="forward" type="button"></button>
-                <span id="time">00:00 </span>
-                <span id="duration">00:00</span>
+                <p id="controls">
+                    <button id="play" type="button"></button>
+                    <button id="pause" type="button" class="hidden"></button>
+                    <button id="back" type="button"></button>
+                    <button id="forward" type="button"></button>
+                </p>
+                <p id="times">
+                    <span id="time">00:00</span>
+                    <span id="duration">00:00</span>
+                </p>
             </div>
-            <audio id="audio">Your browser does not support the <code>audio</code> element.</audio>
             <div class="modal-add-form-media">
                 <button class="modal-add-media-form-wrapper start" type="button">
                     <div class="modal-add-media-form-start">

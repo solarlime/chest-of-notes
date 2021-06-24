@@ -449,6 +449,7 @@ button {
     border: #2fa693 1px solid;
     border-radius: 10px;
     box-sizing: border-box;
+    font-size: 0.7rem;
 }
 
 #play, #pause, #back, #forward {
@@ -457,6 +458,7 @@ button {
     background-repeat: no-repeat;
     background-position: center;
     width: 1.5rem;
+    padding-right: 5px;
     height: 1.5rem;
     border-radius: 50%;
 }
@@ -477,6 +479,13 @@ button {
     background-image: url("../img/fast-forward.png");
 }
 
+video {
+    width: 100%;
+    margin-top: 10px;
+    box-sizing: border-box;
+    border: #2fa693 1px solid;
+    border-radius: 10px;
+}
 
 .footer {
     display: flex;

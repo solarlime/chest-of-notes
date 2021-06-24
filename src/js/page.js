@@ -1,5 +1,5 @@
 /* eslint-disable no-param-reassign */
-import { formatTime } from './utils';
+import { formatTime, addMediaElement } from './utils';
 
 export default class Page {
   constructor() {
@@ -21,7 +21,6 @@ export default class Page {
     this.modalCloseButton = this.page.querySelector('button.close');
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
-    this.audio = this.modalAdd.querySelector('#audio');
     this.player = this.modalAdd.querySelector('#player');
     this.play = this.modalAdd.querySelector('button#play');
     this.pause = this.modalAdd.querySelector('button#pause');
@@ -69,10 +68,14 @@ export default class Page {
       switch (button) {
         case this.audioButton: {
           this.modalTextForm.classList.add('hidden');
+          this.media = addMediaElement('audio', this.player);
+          this.addMediaElementListeners();
           break;
         }
         case this.videoButton: {
           this.modalTextForm.classList.add('hidden');
+          this.media = addMediaElement('video', this.player);
+          this.addMediaElementListeners();
           break;
         }
         case this.textButton: {
@@ -113,8 +116,9 @@ export default class Page {
         return;
       }
       try {
-        this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
-        this.mediaRecorder = new MediaRecorder(this.stream, { type: 'audio/mp4' });
+        const tag = this.media.tagName.toLowerCase();
+        this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
+        this.mediaRecorder = new MediaRecorder(this.stream, { type: `${tag}/mp4` });
         this.voice = [];
         this.mediaRecorder.start();
         this.modalStartButton.classList.add('hidden');
@@ -124,22 +128,12 @@ export default class Page {
           this.voice.push(event.data);
           if (this.mediaRecorder.state === 'inactive') {
             this.voiceBlob = new Blob(this.voice, { type: 'audio/mp4' });
-            this.audio.src = URL.createObjectURL(this.voiceBlob);
+            this.media.src = URL.createObjectURL(this.voiceBlob);
           }
         });
       } catch (e) {
         console.log(e);
       }
-    });
-
-    this.audio.addEventListener('canplay', () => {
-      this.duration.textContent = formatTime(this.audio.duration);
-      this.player.classList.remove('hidden');
-    });
-
-    this.audio.addEventListener('timeupdate', () => {
-      const time = formatTime(this.audio.currentTime);
-      if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
     });
 
     this.modalStopButton.addEventListener('click', () => {
@@ -148,26 +142,32 @@ export default class Page {
     });
 
     this.play.addEventListener('click', () => {
-      this.audio.play();
+      this.media.play();
+      this.play.classList.add('hidden');
+      this.pause.classList.remove('hidden');
     });
 
     this.pause.addEventListener('click', () => {
-      this.audio.pause();
+      this.media.pause();
+      this.pause.classList.add('hidden');
+      this.play.classList.remove('hidden');
     });
 
     this.back.addEventListener('click', () => {
-      if (this.audio.currentTime > 5) {
-        this.audio.currentTime -= 5;
+      if (this.media.currentTime > 5) {
+        this.media.currentTime -= 5;
       } else {
-        this.audio.currentTime = 0;
+        this.media.currentTime = 0;
       }
     });
 
     this.forward.addEventListener('click', () => {
-      if (this.audio.currentTime < this.audio.duration - 5) {
-        this.audio.currentTime += 5;
+      if (this.media.currentTime < this.media.duration - 5) {
+        this.media.currentTime += 5;
       } else {
-        this.audio.currentTime = this.audio.duration;
+        this.media.currentTime = this.media.duration;
+        this.pause.classList.add('hidden');
+        this.play.classList.remove('hidden');
       }
     });
 
@@ -180,11 +180,29 @@ export default class Page {
       this.background.forEach((item) => item.classList.toggle('remove-blur'));
       this.modalAdd.classList.toggle('modal-active');
       this.modalAdd.classList.toggle('modal-inactive');
+      if (this.media) this.media.remove();
       setTimeout(() => {
         // eslint-disable-next-line max-len
         [this.modalTextForm, this.modalStartButton, this.modalFormDescriptionMedia]
           .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
       }, 500);
+    });
+  }
+
+  addMediaElementListeners() {
+    this.media.addEventListener('canplay', () => {
+      this.duration.textContent = formatTime(this.media.duration);
+      this.player.classList.remove('hidden');
+    });
+
+    this.media.addEventListener('timeupdate', () => {
+      const time = formatTime(this.media.currentTime);
+      if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
+    });
+
+    this.media.addEventListener('ended', () => {
+      this.pause.classList.add('hidden');
+      this.play.classList.remove('hidden');
     });
   }
 }
