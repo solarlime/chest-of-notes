@@ -440,7 +440,7 @@ button {
     width: 40%;
 }
 
-#player {
+.modal-player {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -452,7 +452,7 @@ button {
     font-size: 0.7rem;
 }
 
-#play, #pause, #back, #forward {
+.modal-player-play, .modal-player-pause, .modal-player-back, .modal-player-forward {
     background-color: #2fa693;
     background-size: 40%;
     background-repeat: no-repeat;
@@ -463,19 +463,19 @@ button {
     border-radius: 50%;
 }
 
-#play {
+.modal-player-play {
     background-image: url("../img/play.png");
 }
 
-#pause {
+.modal-player-pause {
     background-image: url("../img/pause.png");
 }
 
-#back {
+.modal-player-back {
     background-image: url("../img/rewind.png");
 }
 
-#forward {
+.modal-player-forward {
     background-image: url("../img/fast-forward.png");
 }
 

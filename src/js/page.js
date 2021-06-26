@@ -21,13 +21,13 @@ export default class Page {
     this.modalCloseButton = this.page.querySelector('button.close');
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
-    this.player = this.modalAdd.querySelector('#player');
-    this.play = this.modalAdd.querySelector('button#play');
-    this.pause = this.modalAdd.querySelector('button#pause');
-    this.back = this.modalAdd.querySelector('button#back');
-    this.forward = this.modalAdd.querySelector('button#forward');
-    this.time = this.modalAdd.querySelector('#time');
-    this.duration = this.modalAdd.querySelector('#duration');
+    this.player = this.modalAdd.querySelector('.modal-player');
+    this.play = this.modalAdd.querySelector('button.modal-player-play');
+    this.pause = this.modalAdd.querySelector('button.modal-player-pause');
+    this.back = this.modalAdd.querySelector('button.modal-player-back');
+    this.forward = this.modalAdd.querySelector('button.modal-player-forward');
+    this.time = this.modalAdd.querySelector('.modal-player-time');
+    this.duration = this.modalAdd.querySelector('.modal-player-duration');
 
     this.notes.scrollIntoView();
   }
@@ -69,13 +69,11 @@ export default class Page {
         case this.audioButton: {
           this.modalTextForm.classList.add('hidden');
           this.media = addMediaElement('audio', this.player);
-          this.addMediaElementListeners();
           break;
         }
         case this.videoButton: {
           this.modalTextForm.classList.add('hidden');
           this.media = addMediaElement('video', this.player);
-          this.addMediaElementListeners();
           break;
         }
         case this.textButton: {
@@ -119,16 +117,21 @@ export default class Page {
         const tag = this.media.tagName.toLowerCase();
         this.stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
         this.mediaRecorder = new MediaRecorder(this.stream, { type: `${tag}/mp4` });
-        this.voice = [];
+        const pipeline = [];
         this.mediaRecorder.start();
         this.modalStartButton.classList.add('hidden');
         this.modalStopButton.classList.remove('hidden');
+        if (tag === 'video') {
+          this.media.srcObject = this.stream;
+          this.media.play();
+        }
 
         this.mediaRecorder.addEventListener('dataavailable', (event) => {
-          this.voice.push(event.data);
+          pipeline.push(event.data);
           if (this.mediaRecorder.state === 'inactive') {
-            this.voiceBlob = new Blob(this.voice, { type: 'audio/mp4' });
-            this.media.src = URL.createObjectURL(this.voiceBlob);
+            this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
+            this.media.src = URL.createObjectURL(this.pipeBlob);
+            this.media.srcObject = null;
           }
         });
       } catch (e) {
@@ -138,6 +141,7 @@ export default class Page {
 
     this.modalStopButton.addEventListener('click', () => {
       this.mediaRecorder.stop();
+      this.addMediaElementListeners();
       this.modalStopButton.classList.add('hidden');
     });
 
@@ -180,7 +184,12 @@ export default class Page {
       this.background.forEach((item) => item.classList.toggle('remove-blur'));
       this.modalAdd.classList.toggle('modal-active');
       this.modalAdd.classList.toggle('modal-inactive');
-      if (this.media) this.media.remove();
+      if (this.media) {
+        this.media.remove();
+        this.time.textContent = '00:00';
+        this.duration.textContent = '00:00';
+        this.player.classList.add('hidden');
+      }
       setTimeout(() => {
         // eslint-disable-next-line max-len
         [this.modalTextForm, this.modalStartButton, this.modalFormDescriptionMedia]
