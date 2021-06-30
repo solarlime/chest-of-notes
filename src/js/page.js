@@ -1,4 +1,5 @@
 /* eslint-disable no-param-reassign */
+import uniqid from 'uniqid';
 import { formatTime, addMediaElement } from './utils';
 
 export default class Page {
@@ -13,7 +14,9 @@ export default class Page {
     this.textButton = this.page.querySelector('button.text-button');
     this.background = this.page.querySelectorAll('section, footer');
     this.modalAdd = this.page.querySelector('.modal-add');
-    this.modalTextForm = this.page.querySelector('.modal-add-form-text');
+    this.modalFormName = this.modalAdd.querySelector('#modal-add-form-input');
+    this.modalFormTextArea = this.modalAdd.querySelector('#modal-add-form-text-area');
+    this.modalFormText = this.page.querySelector('.modal-add-form-text');
     this.modalFormDescriptionMedia = this.page.querySelector('.modal-add-form-description-media');
     this.modalStartButton = this.page.querySelector('button.start');
     this.modalStopButton = this.page.querySelector('button.stop');
@@ -67,17 +70,20 @@ export default class Page {
 
       switch (button) {
         case this.audioButton: {
-          this.modalTextForm.classList.add('hidden');
-          this.media = addMediaElement('audio', this.player);
+          this.modalFormText.classList.add('hidden');
+          this.type = 'audio';
+          this.media = addMediaElement(this.type, this.player);
           break;
         }
         case this.videoButton: {
-          this.modalTextForm.classList.add('hidden');
-          this.media = addMediaElement('video', this.player);
+          this.modalFormText.classList.add('hidden');
+          this.type = 'video';
+          this.media = addMediaElement(this.type, this.player);
           break;
         }
         case this.textButton: {
           [this.modalStartButton, this.modalStopButton, this.modalFormDescriptionMedia].forEach((item) => item.classList.add('hidden'));
+          this.type = 'text';
           break;
         }
         default: {
@@ -99,11 +105,18 @@ export default class Page {
 
     this.modalSaveButton.addEventListener('click', async (event) => {
       event.preventDefault();
-      const res = await fetch('https://nginx.solarlime.dev/chest-of-notes/mongo/update', {
+      const formData = new FormData();
+      const id = uniqid();
+      const data = {
+        id,
+        name: this.modalFormName.value,
+        type: this.type,
+        content: (this.type === 'text') ? this.modalFormTextArea.value : new File([this.pipeBlob], `${id}.mp4`),
+      };
+      Object.entries(data).forEach((item) => formData.append(item[0], item[1]));
+      const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
         method: 'POST',
-        body: JSON.stringify({
-          id: '123456', name: 'Sample note', type: 'text', content: 'Sample description',
-        }),
+        body: formData,
       });
       const result = await res.json();
       console.log(result);
@@ -192,7 +205,7 @@ export default class Page {
       }
       setTimeout(() => {
         // eslint-disable-next-line max-len
-        [this.modalTextForm, this.modalStartButton, this.modalFormDescriptionMedia]
+        [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
           .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
       }, 500);
     });
