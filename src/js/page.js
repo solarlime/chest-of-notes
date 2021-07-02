@@ -103,23 +103,29 @@ export default class Page {
       }
     }));
 
-    this.modalSaveButton.addEventListener('click', async (event) => {
+    this.modalSaveButton.addEventListener('click', (event) => {
       event.preventDefault();
-      const formData = new FormData();
       const id = uniqid();
       const data = {
         id,
         name: this.modalFormName.value,
         type: this.type,
-        content: (this.type === 'text') ? this.modalFormTextArea.value : new File([this.pipeBlob], `${id}.mp4`),
       };
-      Object.entries(data).forEach((item) => formData.append(item[0], item[1]));
-      const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
-        method: 'POST',
-        body: formData,
+
+      const fileReader = new FileReader();
+
+      fileReader.addEventListener('loadend', async () => {
+        data.content = fileReader.result;
+        console.log(data);
+        const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
+          method: 'POST',
+          body: JSON.stringify(data),
+        });
+        const result = await res.json();
+        console.log(result);
       });
-      const result = await res.json();
-      console.log(result);
+
+      fileReader.readAsDataURL(new File([this.pipeBlob], `${id}.mp4`));
     });
 
     this.modalStartButton.addEventListener('click', async () => {
