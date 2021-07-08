@@ -103,7 +103,7 @@ export default class Page {
       }
     }));
 
-    this.modalSaveButton.addEventListener('click', (event) => {
+    this.modalSaveButton.addEventListener('click', async (event) => {
       event.preventDefault();
       const id = uniqid();
       const data = {
@@ -112,10 +112,7 @@ export default class Page {
         type: this.type,
       };
 
-      const fileReader = new FileReader();
-
-      fileReader.addEventListener('loadend', async () => {
-        data.content = fileReader.result;
+      const send = async () => {
         console.log(data);
         const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
           method: 'POST',
@@ -123,9 +120,25 @@ export default class Page {
         });
         const result = await res.json();
         console.log(result);
-      });
+      };
 
-      fileReader.readAsDataURL(new File([this.pipeBlob], `${id}.mp4`));
+      const fileSend = async (callback) => {
+        const fileReader = new FileReader();
+
+        fileReader.addEventListener('loadend', async () => {
+          data.content = fileReader.result;
+          await callback();
+        });
+
+        fileReader.readAsDataURL(new File([this.pipeBlob], `${id}.mp4`));
+      };
+
+      if (data.type === 'text') {
+        data.content = this.modalFormTextArea.value;
+        await send();
+      } else {
+        await fileSend(send);
+      }
     });
 
     this.modalStartButton.addEventListener('click', async () => {
