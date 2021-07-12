@@ -263,6 +263,7 @@ button {
 .notes-list-item-header-wrapper {
     display: flex;
     flex-wrap: nowrap;
+    justify-content: space-between;
 }
 
 .notes-list-item-header {

@@ -22,6 +22,7 @@ export default class Page {
     this.modalStopButton = this.page.querySelector('button.stop');
     this.modalSaveButton = this.page.querySelector('button.save');
     this.modalCloseButton = this.page.querySelector('button.close');
+    this.notesList = this.page.querySelector('.notes-list');
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
     this.player = this.modalAdd.querySelector('.modal-player');
@@ -114,12 +115,12 @@ export default class Page {
 
       const send = async () => {
         console.log(data);
-        const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
-          method: 'POST',
-          body: JSON.stringify(data),
-        });
-        const result = await res.json();
-        console.log(result);
+        // const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
+        //   method: 'POST',
+        //   body: JSON.stringify(data),
+        // });
+        // const result = await res.json();
+        // console.log(result);
       };
 
       const fileSend = async (callback) => {
@@ -138,6 +139,15 @@ export default class Page {
         await send();
       } else {
         await fileSend(send);
+      }
+
+      this.modalCloseButton.dispatchEvent(new Event('click'));
+      const { notesListItem, isText } = renderNewNote(this.notesList, data);
+
+      if (!isText) {
+        const mediaContent = notesListItem.querySelector('.notes-list-item-description');
+        this.data = data;
+        mediaContent.addEventListener('click', () => this[`${data.type}Button`].dispatchEvent(new Event('click')));
       }
     });
 
@@ -221,6 +231,9 @@ export default class Page {
         this.time.textContent = '00:00';
         this.duration.textContent = '00:00';
         this.player.classList.add('hidden');
+      }
+      if (!event.isTrusted) {
+        [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
       }
       setTimeout(() => {
         // eslint-disable-next-line max-len
