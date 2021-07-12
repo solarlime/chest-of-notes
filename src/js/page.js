@@ -1,6 +1,6 @@
 /* eslint-disable no-param-reassign */
 import uniqid from 'uniqid';
-import { formatTime, addMediaElement } from './utils';
+import { formatTime, addMediaElement, renderNewNote } from './utils';
 
 export default class Page {
   constructor() {
@@ -14,6 +14,7 @@ export default class Page {
     this.textButton = this.page.querySelector('button.text-button');
     this.background = this.page.querySelectorAll('section, footer');
     this.modalAdd = this.page.querySelector('.modal-add');
+    this.modalAddForm = this.page.querySelector('.modal-add-form');
     this.modalFormName = this.modalAdd.querySelector('#modal-add-form-input');
     this.modalFormTextArea = this.modalAdd.querySelector('#modal-add-form-text-area');
     this.modalFormText = this.page.querySelector('.modal-add-form-text');
@@ -90,6 +91,26 @@ export default class Page {
         default: {
           console.log('Hmm, something else happened!');
         }
+      }
+
+      if (!event.isTrusted) {
+        for (const item of this.modalAddForm.children) {
+          if ((item.id === 'media')) {
+            item.classList.remove('hidden');
+          } else {
+            item.classList.add('hidden');
+          }
+        }
+        this.player.style.order = '1';
+        this.media.src = this.data.content;
+        this.addMediaElementListeners();
+
+        this.modalAdd.addEventListener('click', (e) => {
+          if (e.target === this.modalAdd) {
+            this.pause.dispatchEvent(new Event('click'));
+            this.modalCloseButton.dispatchEvent(new Event('click'));
+          }
+        });
       }
 
       const notNew = Array.from(this.background).find((item) => item.classList.contains('remove-blur'));
