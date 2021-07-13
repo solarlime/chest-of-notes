@@ -127,13 +127,14 @@ export default class Page {
           }
         }
         this.player.style.order = '1';
-        this.media.src = this.data.content;
+        this.media.src = this.dataContent;
         this.addMediaElementListeners();
 
         const listener = (evt) => {
           if (evt.target === this.modalAdd) {
             this.pause.dispatchEvent(new Event('click'));
             this.modalCloseButton.dispatchEvent(new Event('click'));
+            this.player.style.order = '';
             this.modalAdd.removeEventListener('click', listener);
           }
         };
@@ -174,13 +175,15 @@ export default class Page {
 
       const fileSend = async (callback) => {
         const fileReader = new FileReader();
-
-        fileReader.addEventListener('loadend', async () => {
-          data.content = fileReader.result;
-          await callback();
-        });
-
         fileReader.readAsDataURL(new File([this.pipeBlob], `${id}.mp4`));
+
+        await new Promise((resolve) => {
+          fileReader.addEventListener('loadend', async () => {
+            data.content = fileReader.result;
+            await callback();
+            resolve();
+          });
+        });
       };
 
       if (data.type === 'text') {
@@ -195,8 +198,11 @@ export default class Page {
 
       if (!isText) {
         const mediaContent = notesListItem.querySelector('.notes-list-item-description');
-        this.data = data;
-        mediaContent.addEventListener('click', () => this[`${data.type}Button`].dispatchEvent(new Event('click')));
+        mediaContent.parentElement.setAttribute('data-content', data.content);
+        mediaContent.addEventListener('click', () => {
+          this.dataContent = mediaContent.parentElement.getAttribute('data-content');
+          this[`${data.type}Button`].dispatchEvent(new Event('click'));
+        });
       }
     });
 
