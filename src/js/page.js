@@ -13,19 +13,21 @@ export default class Page {
     this.videoButton = this.page.querySelector('button.video-button');
     this.textButton = this.page.querySelector('button.text-button');
     this.background = this.page.querySelectorAll('section, footer');
+
     this.modalAdd = this.page.querySelector('.modal-add');
     this.modalAddForm = this.page.querySelector('.modal-add-form');
+    this.modalAddFormHeader = this.page.querySelector('.modal-add-form-header');
     this.modalFormName = this.modalAdd.querySelector('#modal-add-form-input');
     this.modalFormTextArea = this.modalAdd.querySelector('#modal-add-form-text-area');
     this.modalFormText = this.page.querySelector('.modal-add-form-text');
+    this.modalFormDescriptionBoth = this.page.querySelector('.modal-add-form-description-both');
     this.modalFormDescriptionMedia = this.page.querySelector('.modal-add-form-description-media');
+    this.modalFormMedia = this.page.querySelector('.modal-add-form-media');
     this.modalStartButton = this.page.querySelector('button.start');
     this.modalStopButton = this.page.querySelector('button.stop');
     this.modalSaveButton = this.page.querySelector('button.save');
     this.modalCloseButton = this.page.querySelector('button.close');
-    this.notesList = this.page.querySelector('.notes-list');
-    this.footerLogo = this.page.querySelector('.footer-logo');
-    this.about = this.page.querySelector('.about');
+
     this.player = this.modalAdd.querySelector('.modal-player');
     this.play = this.modalAdd.querySelector('button.modal-player-play');
     this.pause = this.modalAdd.querySelector('button.modal-player-pause');
@@ -33,6 +35,10 @@ export default class Page {
     this.forward = this.modalAdd.querySelector('button.modal-player-forward');
     this.time = this.modalAdd.querySelector('.modal-player-time');
     this.duration = this.modalAdd.querySelector('.modal-player-duration');
+
+    this.notesList = this.page.querySelector('.notes-list');
+    this.footerLogo = this.page.querySelector('.footer-logo');
+    this.about = this.page.querySelector('.about');
 
     this.notes.scrollIntoView();
   }
@@ -72,19 +78,38 @@ export default class Page {
 
       switch (button) {
         case this.audioButton: {
-          this.modalFormText.classList.add('hidden');
+          [
+            this.modalAddFormHeader,
+            this.modalFormName,
+            this.modalFormMedia,
+            this.modalFormDescriptionMedia,
+            this.modalFormDescriptionBoth,
+          ].forEach((item) => item.classList.remove('hidden'));
           this.type = 'audio';
           this.media = addMediaElement(this.type, this.player);
           break;
         }
         case this.videoButton: {
-          this.modalFormText.classList.add('hidden');
+          [
+            this.modalAddFormHeader,
+            this.modalFormName,
+            this.modalFormMedia,
+            this.modalFormDescriptionMedia,
+            this.modalFormDescriptionBoth,
+          ].forEach((item) => item.classList.remove('hidden'));
           this.type = 'video';
           this.media = addMediaElement(this.type, this.player);
           break;
         }
         case this.textButton: {
-          [this.modalStartButton, this.modalStopButton, this.modalFormDescriptionMedia].forEach((item) => item.classList.add('hidden'));
+          [
+            this.modalAddFormHeader,
+            this.modalFormName,
+            this.modalFormText,
+            this.modalFormMedia,
+            this.modalFormDescriptionBoth,
+          ].forEach((item) => item.classList.remove('hidden'));
+          [this.modalStartButton, this.modalStopButton].forEach((item) => item.classList.add('hidden'));
           this.type = 'text';
           break;
         }
@@ -105,12 +130,15 @@ export default class Page {
         this.media.src = this.data.content;
         this.addMediaElementListeners();
 
-        this.modalAdd.addEventListener('click', (e) => {
-          if (e.target === this.modalAdd) {
+        const listener = (evt) => {
+          if (evt.target === this.modalAdd) {
             this.pause.dispatchEvent(new Event('click'));
             this.modalCloseButton.dispatchEvent(new Event('click'));
+            this.modalAdd.removeEventListener('click', listener);
           }
-        });
+        };
+
+        this.modalAdd.addEventListener('click', listener);
       }
 
       const notNew = Array.from(this.background).find((item) => item.classList.contains('remove-blur'));
@@ -260,6 +288,9 @@ export default class Page {
         // eslint-disable-next-line max-len
         [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
           .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
+        for (const item of this.modalAddForm.children) {
+          item.classList.add('hidden');
+        }
       }, 500);
     });
   }
