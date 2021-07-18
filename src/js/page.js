@@ -303,12 +303,12 @@ export default class Page {
 
   addMediaElementListeners() {
     this.media.addEventListener('canplay', () => {
-      this.duration.textContent = formatTime(this.media.duration);
+      this.duration.textContent = formatTime(parseInt(this.media.duration, 10));
       this.player.classList.remove('hidden');
     });
 
     this.media.addEventListener('timeupdate', () => {
-      const time = formatTime(this.media.currentTime);
+      const time = formatTime(parseInt(this.media.currentTime, 10));
       if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
     });
 
