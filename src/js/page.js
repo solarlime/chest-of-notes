@@ -282,7 +282,7 @@ export default class Page {
       this.modalAdd.classList.toggle('modal-active');
       this.modalAdd.classList.toggle('modal-inactive');
       if (this.media) {
-        this.media.remove();
+        this.media = null;
         this.time.textContent = '00:00';
         this.duration.textContent = '00:00';
         this.player.classList.add('hidden');
@@ -308,8 +308,10 @@ export default class Page {
     });
 
     this.media.addEventListener('timeupdate', () => {
-      const time = formatTime(parseInt(this.media.currentTime, 10));
-      if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
+      if (this.duration.textContent !== '00:00') {
+        const time = formatTime(parseInt(this.media.currentTime, 10));
+        if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
+      }
     });
 
     this.media.addEventListener('ended', () => {
