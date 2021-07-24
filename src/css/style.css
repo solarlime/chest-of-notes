@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Allura&family=Josefin+Sans:wght@300;400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Allura&family=PT+Serif&family=PT+Sans:wght@300;400&display=swap');
 
 :root {
     --font-accent: "Allura", Brush Script MT, cursive;
-    --font-common: "Josefin Sans", Tahoma, sans-serif;
+    --font-header: "PT Serif", Georgia, serif;
+    --font-common: "PT Sans", Tahoma, sans-serif;
     --height: calc(var(--vh, 1vh) * 100);
     --button: 50px;
     --circle: 25%;
@@ -211,7 +212,7 @@ button {
 
 .notes-list-item-description {
     display: block;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
 }
 
 .add-list-item, .notes-go-to-add, .modal-add-media-form-wrapper {
@@ -268,6 +269,7 @@ button {
 
 .notes-list-item-header {
     font-size: 1rem;
+    font-family: var(--font-header);
     font-weight: 400;
     margin-bottom: 5px;
 }
