@@ -120,7 +120,7 @@ export default class Page {
 
       if (!event.isTrusted) {
         for (const item of this.modalAddForm.children) {
-          if ((item.id === 'media')) {
+          if ((item.id === 'media') || (item.classList.contains('modal-player'))) {
             item.classList.remove('hidden');
           } else {
             item.classList.add('hidden');
@@ -303,8 +303,20 @@ export default class Page {
 
   addMediaElementListeners() {
     this.media.addEventListener('canplay', () => {
+      // A bugfix for Chromium: it can't get the duration
+      if (this.media.duration === Infinity) {
+        const listener = () => {
+          this.media.currentTime = 0;
+          this.media.removeEventListener('timeupdate', listener);
+        };
+
+        this.media.addEventListener('timeupdate', listener);
+        this.media.currentTime = 1e101;
+      }
       this.duration.textContent = formatTime(parseInt(this.media.duration, 10));
-      this.player.classList.remove('hidden');
+      if (this.player.classList.contains('hidden')) {
+        this.player.classList.remove('hidden');
+      }
     });
 
     this.media.addEventListener('timeupdate', () => {
