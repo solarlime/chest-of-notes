@@ -1310,6 +1310,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/runtime@npm:7.11.2":
+  version: 7.11.2
+  resolution: "@babel/runtime@npm:7.11.2"
+  dependencies:
+    regenerator-runtime: ^0.13.4
+  checksum: 2f127ad60a0f0568faa0044e5b48329d8166c7fd3a0a3ce774070010a1c441ebf5570f526dd6bb26e214fb1a01bb987ab6a4c3f60a00f04d02448939f4c61e1e
+  languageName: node
+  linkType: hard
+
 "@babel/runtime@npm:^7.8.4":
   version: 7.13.16
   resolution: "@babel/runtime@npm:7.13.16"
@@ -2495,6 +2504,7 @@ __metadata:
     eslint-import-resolver-node: ^0.3.4
     eslint-plugin-import: ^2.22.1
     file-loader: ^6.2.0
+    get-blob-duration: ^1.2.0
     html-loader: ^2.1.2
     html-webpack-plugin: ^5.3.1
     mini-css-extract-plugin: ^1.5.0
@@ -4234,6 +4244,15 @@ fsevents@~2.3.1:
   version: 1.0.0-beta.2
   resolution: "gensync@npm:1.0.0-beta.2"
   checksum: d523437689c97b3aba9c5cdeca4677d5fff9a29d620db693fea40d852bad63563110f16979d0170248439dbcd2ecee0780fb2533d3f0519f019081aa10767c60
+  languageName: node
+  linkType: hard
+
+"get-blob-duration@npm:^1.2.0":
+  version: 1.2.0
+  resolution: "get-blob-duration@npm:1.2.0"
+  dependencies:
+    "@babel/runtime": 7.11.2
+  checksum: 237ff9619648f30485f509f67b6580cb08cbb1b3d71b128cbc9a17c77ffd022f55712966a3a64ee0e16d9a76c9ec2bbfc9339a693eacbe0b874924b7c1dc3ee6
   languageName: node
   linkType: hard
 

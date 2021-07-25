@@ -203,7 +203,7 @@ button {
     min-height: 50px;
     max-height: 100%;
     background: white;
-    padding: 5px;
+    padding: 10px;
     margin: 0 0 10px 0;
     border-radius: 5px;
     box-sizing: border-box;
@@ -383,6 +383,7 @@ button {
     border-radius: 10px;
     box-sizing: border-box;
     resize: none;
+    text-align: center;
 }
 
 #modal-add-form-input:focus, #modal-add-form-text-area:focus {
@@ -630,10 +631,6 @@ a:visited {
 
     .modal-add {
         font-size: 1rem;
-    }
-
-    #modal-add-form-input {
-        text-align: center;
     }
 
     .modal-add-media-form-wrapper {

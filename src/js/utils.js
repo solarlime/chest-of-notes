@@ -1,3 +1,6 @@
+/* eslint-disable no-param-reassign */
+import uniqid from 'uniqid';
+
 export function formatTime(rawTime) {
   const time = Math.floor(rawTime);
   const hours = Math.floor(time / 3600);
@@ -12,6 +15,60 @@ export function addMediaElement(type, rootElement) {
   element.textContent = `Your browser does not support the <code>${type}</code> element.`;
   rootElement.after(element);
   return element;
+}
+
+export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea) {
+  const id = uniqid();
+  const data = {
+    id,
+    name: modalFormName.value,
+    type,
+  };
+
+  const send = async () => {
+    console.log(data);
+    // const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
+    //   method: 'POST',
+    //   body: JSON.stringify(data),
+    // });
+    // const result = await res.json();
+    // console.log(result);
+  };
+
+  const fileSend = async (callback) => {
+    const fileReader = new FileReader();
+    fileReader.readAsDataURL(new File([pipeBlob], `${id}.mp4`));
+
+    await new Promise((resolve) => {
+      fileReader.addEventListener('loadend', async () => {
+        data.content = fileReader.result;
+        await callback();
+        resolve();
+      });
+    });
+  };
+
+  if (data.type === 'text') {
+    data.content = modalFormTextArea.value;
+    await send();
+  } else {
+    await fileSend(send);
+  }
+  return data;
+}
+
+export async function recordSomeMedia(media) {
+  const tag = media.tagName.toLowerCase();
+  const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
+  const mediaRecorder = new MediaRecorder(stream, { type: `${tag}/mp4` });
+  const pipeline = [];
+  mediaRecorder.start();
+  if (tag === 'video') {
+    media.srcObject = stream;
+    media.muted = true;
+    media.play();
+  }
+  return { mediaRecorder, pipeline };
 }
 
 export function renderNewNote(notesList, data) {
