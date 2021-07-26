@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import getBlobDuration from 'get-blob-duration';
+import validator from 'validator';
 import {
   addMediaElement, formatTime, recordSomeMedia, renderNewNote, sendData,
 } from './utils';
@@ -60,6 +61,27 @@ export default class Modal {
         // });
       }
     };
+
+    /**
+     * A wrapper for validating the note's header strings
+     */
+    const validatorWrapper = () => {
+      const string = this.modalFormName.value.trim();
+      if (validator.isEmpty(string)) {
+        this.modalSaveButton.disabled = true;
+      } else {
+        this.modalSaveButton.disabled = false;
+      }
+    };
+    this.modalFormName.addEventListener('input', validatorWrapper);
+
+    /**
+     * A wrapper to prevent submitting
+     */
+    this.preventSubmit = (event) => {
+      event.preventDefault();
+    };
+    this.modalAddForm.addEventListener('submit', this.preventSubmit);
 
     switch (button) {
       case audioButton: {
@@ -173,6 +195,7 @@ export default class Modal {
         this.duration.textContent = '00:00';
         this.player.classList.add('hidden');
       }
+      this.modalSaveButton.disabled = true;
       // Clean the fields after saving
       if (!event.isTrusted) {
         [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
@@ -191,8 +214,11 @@ export default class Modal {
       // After closing remove listeners
       this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
       this.modalCloseButton.removeEventListener('click', closeModal);
-      [this.play, this.pause, this.back, this.forward]
-        .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
+      this.modalAddForm.removeEventListener('submit', this.preventSubmit);
+      if (this.listenerFunctions) {
+        [this.play, this.pause, this.back, this.forward]
+          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
+      }
     };
     this.modalCloseButton.addEventListener('click', closeModal);
   }

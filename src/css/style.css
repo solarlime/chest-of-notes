@@ -268,9 +268,9 @@ button {
 }
 
 .notes-list-item-header {
-    font-size: 1rem;
+    font-size: 0.8rem;
     font-family: var(--font-header);
-    font-weight: 400;
+    font-weight: 600;
     margin-bottom: 5px;
 }
 
@@ -409,7 +409,7 @@ button {
     padding-top: 10px;
 }
 
-.modal-add-form-header, .modal-add-form-description-media, .modal-add-form-description-text {
+.modal-add-form-header, .modal-add-form-description-media, .modal-add-form-description-text, .modal-add-form-description-both {
     text-align: center;
 }
 
@@ -431,6 +431,11 @@ button {
 
 .modal-add-media-form-wrapper:last-child {
     margin-right: 0;
+}
+
+.save:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
 }
 
 .modal-add-media-form-start, .modal-add-media-form-stop, .modal-add-media-form-save, .modal-add-media-form-close {
