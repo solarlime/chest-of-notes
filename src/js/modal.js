@@ -67,11 +67,8 @@ export default class Modal {
      */
     const validatorWrapper = () => {
       const string = this.modalFormName.value.trim();
-      if (validator.isEmpty(string)) {
-        this.modalSaveButton.disabled = true;
-      } else {
-        this.modalSaveButton.disabled = false;
-      }
+      this.modalSaveButton.disabled = validator.isEmpty(string)
+          || !validator.isLength(string, { min: 1, max: 60 });
     };
     this.modalFormName.addEventListener('input', validatorWrapper);
 
@@ -188,6 +185,11 @@ export default class Modal {
       this.background.forEach((item) => item.classList.toggle('remove-blur'));
       this.modalAdd.classList.toggle('modal-active');
       this.modalAdd.classList.toggle('modal-inactive');
+      if (this.listenerFunctions) {
+        [this.play, this.pause, this.back, this.forward]
+          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
+        ['play', 'pause'].forEach((evt, i) => this.media.removeEventListener(evt, this.listenerFunctions[i]));
+      }
       if (this.media) {
         this.media.remove();
         this.media = null;
@@ -215,10 +217,6 @@ export default class Modal {
       this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
       this.modalCloseButton.removeEventListener('click', closeModal);
       this.modalAddForm.removeEventListener('submit', this.preventSubmit);
-      if (this.listenerFunctions) {
-        [this.play, this.pause, this.back, this.forward]
-          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
-      }
     };
     this.modalCloseButton.addEventListener('click', closeModal);
   }
@@ -258,6 +256,9 @@ export default class Modal {
     this.pause.addEventListener('click', pause);
     this.back.addEventListener('click', back);
     this.forward.addEventListener('click', forward);
+
+    this.media.addEventListener('play', play);
+    this.media.addEventListener('pause', pause);
     return [play, pause, back, forward];
   }
 
