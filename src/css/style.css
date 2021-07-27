@@ -215,6 +215,12 @@ button {
     font-size: 0.8rem;
 }
 
+.media-content {
+    color: #2fa693;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 .add-list-item, .notes-go-to-add, .modal-add-media-form-wrapper {
     position: relative;
     display: flex;

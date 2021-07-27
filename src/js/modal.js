@@ -54,12 +54,74 @@ export default class Modal {
 
       if (!isText) {
         const mediaContent = notesListItem.querySelector('.notes-list-item-description');
+        mediaContent.classList.add('media-content');
         mediaContent.parentElement.setAttribute('data-content', data.content);
-        // mediaContent.addEventListener('click', () => {
-        //   this.dataContent = mediaContent.parentElement.getAttribute('data-content');
-        //   this[`${data.type}Button`].dispatchEvent(new Event('click'));
-        // });
+        const newNoteListener = () => {
+          this.dataContent = mediaContent.parentElement.getAttribute('data-content');
+          console.log(this.dataContent);
+        };
+        mediaContent.addEventListener('click', newNoteListener);
       }
+    };
+
+    /**
+     * A function to close the content modal
+     */
+    this.closeModal = (event) => {
+      event.preventDefault();
+      this.background.forEach((item) => item.classList.toggle('blur'));
+      this.background.forEach((item) => item.classList.toggle('remove-blur'));
+      this.modalAdd.classList.toggle('modal-active');
+      this.modalAdd.classList.toggle('modal-inactive');
+      // Stop media recording if it's not stopped (early closing)
+      if (this.mediaRecorder) {
+        this.mediaRecorder.stop();
+        this.mediaRecorder.removeEventListener('dataavailable', this.recorder);
+      }
+      // Pause, if the media was playing
+      this.pause.dispatchEvent(new Event('click'));
+      // Remove player's listeners
+      if (this.listenerFunctions) {
+        [this.play, this.pause, this.back, this.forward]
+          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
+        ['play', 'pause'].forEach((evt, i) => this.media.removeEventListener(evt, this.listenerFunctions[i]));
+        this.listenerFunctions = null;
+      }
+      // Remove the media element
+      if (this.media) {
+        this.media.remove();
+        this.media = null;
+        this.time.textContent = '00:00';
+        this.duration.textContent = '00:00';
+        this.player.classList.add('hidden');
+      }
+      // Clean the fields after saving
+      if (!event.isTrusted) {
+        [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
+      }
+      // Give some time for an animation to end
+      setTimeout(() => {
+        // eslint-disable-next-line max-len
+        [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
+          .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
+        if (!this.modalStopButton.classList.contains('hidden')) {
+          this.modalStopButton.classList.add('hidden');
+        }
+        for (const item of this.modalAddForm.children) {
+          item.classList.add('hidden');
+        }
+        // Disable the save button by default
+        this.modalSaveButton.disabled = true;
+        if (this.modalSaveButton.classList.contains('hidden')) {
+          this.modalSaveButton.classList.remove('hidden');
+        }
+      }, 500);
+      // After closing remove listeners
+      this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
+      this.modalStopButton.removeEventListener('click', this.stopListener);
+      this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
+      this.modalCloseButton.removeEventListener('click', this.closeModal);
+      this.modalAddForm.removeEventListener('submit', this.preventSubmit);
     };
 
     /**
@@ -117,13 +179,17 @@ export default class Modal {
         [this.modalStartButton, this.modalStopButton].forEach((item) => item.classList.add('hidden'));
         this.type = 'text';
         this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
+        this.modalCloseButton.addEventListener('click', this.closeModal);
         break;
       }
       default: {
         console.log('Hmm, something else happened!');
       }
     }
-    return this.modalAdd;
+    if (this.modalFormName.value.trim()) {
+      this.modalSaveButton.disabled = false;
+    }
+    return { modalAdd: this.modalAdd, type: this.type };
   }
 
   /**
@@ -133,31 +199,35 @@ export default class Modal {
     /**
      * A wrapper for a media recording function
      */
-    const mediaRecorderWrapper = async () => {
+    this.mediaRecorderWrapper = async () => {
       if (!navigator.mediaDevices) {
         alert('Your browser can\'t deal with media functions!');
         return;
       }
       try {
         const { mediaRecorder, pipeline } = await recordSomeMedia(this.media);
+        this.mediaRecorder = mediaRecorder;
         this.modalStartButton.classList.add('hidden');
         this.modalStopButton.classList.remove('hidden');
 
         // Collect the data into a Blob
-        mediaRecorder.addEventListener('dataavailable', (event) => {
+        this.recorder = (event) => {
           pipeline.push(event.data);
-          if (mediaRecorder.state === 'inactive') {
-            this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
-            this.media.src = URL.createObjectURL(this.pipeBlob);
-            this.media.srcObject = null;
+          if (this.mediaRecorder.state === 'inactive') {
+            if (this.media) {
+              this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
+              this.media.src = URL.createObjectURL(this.pipeBlob);
+              this.media.srcObject = null;
+            }
           }
-        });
+        };
+        this.mediaRecorder.addEventListener('dataavailable', this.recorder);
 
         /**
          * A wrapper for a 'stop recording' function
          */
-        const stopListener = () => {
-          mediaRecorder.stop();
+        this.stopListener = () => {
+          this.mediaRecorder.stop();
           this.modalStopButton.classList.add('hidden');
           this.modalSaveButton.classList.remove('hidden');
           this.addMediaElementListeners();
@@ -165,60 +235,17 @@ export default class Modal {
 
           this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
           // After saving remove a listener for stopping
-          this.modalStopButton.removeEventListener('click', stopListener);
+          this.modalStopButton.removeEventListener('click', this.stopListener);
         };
-        this.modalStopButton.addEventListener('click', stopListener);
+        this.modalStopButton.addEventListener('click', this.stopListener);
         // After stopping remove a listener for recording
-        this.modalStartButton.removeEventListener('click', mediaRecorderWrapper);
+        this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
       } catch (e) {
         console.log(e);
       }
     };
-    this.modalStartButton.addEventListener('click', mediaRecorderWrapper);
-
-    /**
-     * A function to close the content modal
-     */
-    const closeModal = (event) => {
-      event.preventDefault();
-      this.background.forEach((item) => item.classList.toggle('blur'));
-      this.background.forEach((item) => item.classList.toggle('remove-blur'));
-      this.modalAdd.classList.toggle('modal-active');
-      this.modalAdd.classList.toggle('modal-inactive');
-      if (this.listenerFunctions) {
-        [this.play, this.pause, this.back, this.forward]
-          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
-        ['play', 'pause'].forEach((evt, i) => this.media.removeEventListener(evt, this.listenerFunctions[i]));
-      }
-      if (this.media) {
-        this.media.remove();
-        this.media = null;
-        this.time.textContent = '00:00';
-        this.duration.textContent = '00:00';
-        this.player.classList.add('hidden');
-      }
-      this.modalSaveButton.disabled = true;
-      // Clean the fields after saving
-      if (!event.isTrusted) {
-        [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
-      }
-      setTimeout(() => {
-        // eslint-disable-next-line max-len
-        [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
-          .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
-        if (!this.modalStopButton.classList.contains('hidden')) {
-          this.modalStopButton.classList.add('hidden');
-        }
-        for (const item of this.modalAddForm.children) {
-          item.classList.add('hidden');
-        }
-      }, 500);
-      // After closing remove listeners
-      this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
-      this.modalCloseButton.removeEventListener('click', closeModal);
-      this.modalAddForm.removeEventListener('submit', this.preventSubmit);
-    };
-    this.modalCloseButton.addEventListener('click', closeModal);
+    this.modalStartButton.addEventListener('click', this.mediaRecorderWrapper);
+    this.modalCloseButton.addEventListener('click', this.closeModal);
   }
 
   /**

@@ -56,7 +56,7 @@ export default class Page {
       const listener = (event) => {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
-        const modalAdd = this.modal.openModal(button, contentButtons);
+        const { modalAdd, type } = this.modal.openModal(button, contentButtons);
         const notNew = Array.from(this.background).find((item) => item.classList.contains('remove-blur'));
         if (notNew) {
           this.background.forEach((item) => item.classList.toggle('blur'));
@@ -67,7 +67,9 @@ export default class Page {
           this.background.forEach((item) => item.classList.add('blur'));
           modalAdd.classList.add('modal-active');
         }
-        this.modal.addModalButtonListeners();
+        if (type !== 'text') {
+          this.modal.addModalButtonListeners();
+        }
       };
       button.addEventListener('click', listener);
     });
