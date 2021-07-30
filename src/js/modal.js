@@ -1,9 +1,7 @@
 /* eslint-disable no-param-reassign */
-import getBlobDuration from 'get-blob-duration';
 import validator from 'validator';
-import {
-  addMediaElement, formatTime, recordSomeMedia, renderNewNote, sendData,
-} from './utils';
+import Media from './media';
+import { recordSomeMedia, renderNewNote, sendData } from './utils';
 
 export default class Modal {
   constructor(page) {
@@ -23,14 +21,6 @@ export default class Modal {
 
     this.media = null;
     this.pipeBlob = null;
-    this.listenerFunctions = null;
-    this.player = this.modalAdd.querySelector('.modal-player');
-    this.play = this.modalAdd.querySelector('button.modal-player-play');
-    this.pause = this.modalAdd.querySelector('button.modal-player-pause');
-    this.back = this.modalAdd.querySelector('button.modal-player-back');
-    this.forward = this.modalAdd.querySelector('button.modal-player-forward');
-    this.time = this.modalAdd.querySelector('.modal-player-time');
-    this.duration = this.modalAdd.querySelector('.modal-player-duration');
 
     this.background = page.querySelectorAll('section, footer');
     this.notesList = page.querySelector('.notes-list');
@@ -73,27 +63,12 @@ export default class Modal {
       this.background.forEach((item) => item.classList.toggle('remove-blur'));
       this.modalAdd.classList.toggle('modal-active');
       this.modalAdd.classList.toggle('modal-inactive');
+
+      if (this.media) this.media.removeMedia();
       // Stop media recording if it's not stopped (early closing)
       if (this.mediaRecorder) {
         this.mediaRecorder.stop();
         this.mediaRecorder.removeEventListener('dataavailable', this.recorder);
-      }
-      // Pause, if the media was playing
-      this.pause.dispatchEvent(new Event('click'));
-      // Remove player's listeners
-      if (this.listenerFunctions) {
-        [this.play, this.pause, this.back, this.forward]
-          .forEach((element, i) => element.removeEventListener('click', this.listenerFunctions[i]));
-        ['play', 'pause'].forEach((evt, i) => this.media.removeEventListener(evt, this.listenerFunctions[i]));
-        this.listenerFunctions = null;
-      }
-      // Remove the media element
-      if (this.media) {
-        this.media.remove();
-        this.media = null;
-        this.time.textContent = '00:00';
-        this.duration.textContent = '00:00';
-        this.player.classList.add('hidden');
       }
       // Clean the fields after saving
       if (!event.isTrusted) {
@@ -151,7 +126,8 @@ export default class Modal {
           this.modalFormDescriptionBoth,
         ].forEach((item) => item.classList.remove('hidden'));
         this.type = 'audio';
-        this.media = addMediaElement(this.type, this.player);
+        this.media = new Media(this.modalAdd, 'modal', this.type);
+        this.mediaElement = this.media.mediaElement;
         this.modalSaveButton.classList.add('hidden');
         break;
       }
@@ -164,7 +140,8 @@ export default class Modal {
           this.modalFormDescriptionBoth,
         ].forEach((item) => item.classList.remove('hidden'));
         this.type = 'video';
-        this.media = addMediaElement(this.type, this.player);
+        this.media = new Media(this.modalAdd, 'modal', this.type);
+        this.mediaElement = this.media.mediaElement;
         this.modalSaveButton.classList.add('hidden');
         break;
       }
@@ -205,7 +182,7 @@ export default class Modal {
         return;
       }
       try {
-        const { mediaRecorder, pipeline } = await recordSomeMedia(this.media);
+        const { mediaRecorder, pipeline } = await recordSomeMedia(this.mediaElement);
         this.mediaRecorder = mediaRecorder;
         this.modalStartButton.classList.add('hidden');
         this.modalStopButton.classList.remove('hidden');
@@ -214,10 +191,10 @@ export default class Modal {
         this.recorder = (event) => {
           pipeline.push(event.data);
           if (this.mediaRecorder.state === 'inactive') {
-            if (this.media) {
+            if (this.media.mediaElement) {
               this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
-              this.media.src = URL.createObjectURL(this.pipeBlob);
-              this.media.srcObject = null;
+              this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
+              this.mediaElement.srcObject = null;
             }
           }
         };
@@ -230,8 +207,10 @@ export default class Modal {
           this.mediaRecorder.stop();
           this.modalStopButton.classList.add('hidden');
           this.modalSaveButton.classList.remove('hidden');
-          this.addMediaElementListeners();
-          this.listenerFunctions = this.addPlayerListeners();
+          this.media.addMediaElementListeners(this.pipeBlob);
+          // this.addMediaElementListeners();
+          // this.listenerFunctions = this.addPlayerListeners();
+          this.media.addPlayerListeners();
 
           this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
           // After saving remove a listener for stopping
@@ -246,76 +225,5 @@ export default class Modal {
     };
     this.modalStartButton.addEventListener('click', this.mediaRecorderWrapper);
     this.modalCloseButton.addEventListener('click', this.closeModal);
-  }
-
-  /**
-   * A function for adding listeners to player buttons
-   */
-  addPlayerListeners() {
-    const play = () => {
-      this.media.play();
-      this.play.classList.add('hidden');
-      this.pause.classList.remove('hidden');
-    };
-    const pause = () => {
-      this.media.pause();
-      this.pause.classList.add('hidden');
-      this.play.classList.remove('hidden');
-    };
-    const back = () => {
-      if (this.media.currentTime > 5) {
-        this.media.currentTime -= 5;
-      } else {
-        this.media.currentTime = 0;
-      }
-    };
-    const forward = () => {
-      if (this.media.currentTime < this.media.duration - 5) {
-        this.media.currentTime += 5;
-      } else {
-        this.media.currentTime = this.media.duration;
-        this.pause.classList.add('hidden');
-        this.play.classList.remove('hidden');
-      }
-    };
-
-    this.play.addEventListener('click', play);
-    this.pause.addEventListener('click', pause);
-    this.back.addEventListener('click', back);
-    this.forward.addEventListener('click', forward);
-
-    this.media.addEventListener('play', play);
-    this.media.addEventListener('pause', pause);
-    return [play, pause, back, forward];
-  }
-
-  addMediaElementListeners() {
-    const canplay = () => {
-      // A bugfix for Chromium: it can't get the duration
-      if (this.media.duration === Infinity) {
-        (async () => {
-          const duration = await getBlobDuration(this.pipeBlob);
-          this.duration.textContent = formatTime(parseInt(duration, 10));
-        })();
-      } else {
-        this.duration.textContent = formatTime(parseInt(this.media.duration, 10));
-      }
-      if (this.player.classList.contains('hidden')) {
-        this.player.classList.remove('hidden');
-      }
-    };
-    const timeupdate = () => {
-      if (this.duration.textContent !== '00:00') {
-        const time = formatTime(parseInt(this.media.currentTime, 10));
-        if (this.time.textContent !== `${time} `) this.time.textContent = `${time} `;
-      }
-    };
-    const ended = () => {
-      this.pause.classList.add('hidden');
-      this.play.classList.remove('hidden');
-    };
-    this.media.addEventListener('canplay', canplay);
-    this.media.addEventListener('timeupdate', timeupdate);
-    this.media.addEventListener('ended', ended);
   }
 }
