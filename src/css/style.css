@@ -356,7 +356,7 @@ button {
     animation: disappear 0.5s linear forwards;
 }
 
-.modal-add {
+.modal-add, .preview {
     position: fixed;
     visibility: hidden;
     width: 100%;
@@ -364,7 +364,7 @@ button {
     font-size: 0.6rem;
 }
 
-.modal-add-form {
+.modal-add-form, .preview-container {
     position: absolute;
     top: 50%;
     left: 50%;
@@ -381,6 +381,10 @@ button {
     align-items: center;
     padding: 10px;
     box-sizing: border-box;
+}
+
+.preview-container {
+    max-width: none;
 }
 
 #modal-add-form-input, #modal-add-form-text-area {
@@ -456,7 +460,7 @@ button {
     width: 40%;
 }
 
-.modal-player {
+.modal-player, .preview-player {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -469,7 +473,8 @@ button {
     font-size: 0.7rem;
 }
 
-.modal-player-play, .modal-player-pause, .modal-player-back, .modal-player-forward {
+.modal-player-play, .modal-player-pause, .modal-player-back, .modal-player-forward,
+.preview-player-play, .preview-player-pause, .preview-player-back, .preview-player-forward {
     background-color: #2fa693;
     background-size: 40%;
     background-repeat: no-repeat;
@@ -480,28 +485,32 @@ button {
     border-radius: 50%;
 }
 
-.modal-player-play {
+.modal-player-play, .preview-player-play {
     background-image: url("../img/play.png");
 }
 
-.modal-player-pause {
+.modal-player-pause, .preview-player-pause {
     background-image: url("../img/pause.png");
 }
 
-.modal-player-back {
+.modal-player-back, .preview-player-back {
     background-image: url("../img/rewind.png");
 }
 
-.modal-player-forward {
+.modal-player-forward, .preview-player-forward {
     background-image: url("../img/fast-forward.png");
 }
 
 video {
     width: 100%;
-    margin-top: 10px;
+    /*margin-top: 10px;*/
     box-sizing: border-box;
     border: #2fa693 1px solid;
     border-radius: 10px;
+}
+
+.preview-container video {
+    margin-top: 0;
 }
 
 .footer {
