@@ -1,5 +1,7 @@
 /* eslint-disable no-param-reassign */
 import Modal from './modal';
+import Preview from './preview';
+import { animateOpening } from './utils';
 
 export default class Page {
   constructor() {
@@ -47,6 +49,12 @@ export default class Page {
       this.notes.scrollIntoView({ behavior: 'smooth' });
     });
 
+    const previewListener = (dataType, dataContent) => {
+      const previewWrapper = this.page.querySelector('.preview');
+      const preview = new Preview(previewWrapper, dataType, dataContent);
+      animateOpening(previewWrapper, this.background);
+    };
+
     /**
      * A listener to open the content modal
      */
@@ -56,17 +64,8 @@ export default class Page {
       const listener = (event) => {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
-        const { modalAdd, type } = this.modal.openModal(button, contentButtons);
-        const notNew = Array.from(this.background).find((item) => item.classList.contains('remove-blur'));
-        if (notNew) {
-          this.background.forEach((item) => item.classList.toggle('blur'));
-          this.background.forEach((item) => item.classList.toggle('remove-blur'));
-          modalAdd.classList.toggle('modal-active');
-          modalAdd.classList.toggle('modal-inactive');
-        } else {
-          this.background.forEach((item) => item.classList.add('blur'));
-          modalAdd.classList.add('modal-active');
-        }
+        const { modalAdd, type } = this.modal.openModal(button, contentButtons, previewListener);
+        animateOpening(modalAdd, this.background);
         if (type !== 'text') {
           this.modal.addModalButtonListeners();
         }

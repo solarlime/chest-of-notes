@@ -29,7 +29,7 @@ export default class Modal {
   /**
    * A function to resolve, what appearance is needed for an adding modal now
    */
-  openModal(button, contentButtons) {
+  openModal(button, contentButtons, previewListener) {
     const [audioButton, videoButton, textButton] = contentButtons;
 
     /**
@@ -45,10 +45,12 @@ export default class Modal {
       if (!isText) {
         const mediaContent = notesListItem.querySelector('.notes-list-item-description');
         mediaContent.classList.add('media-content');
+        mediaContent.parentElement.setAttribute('data-type', data.type);
         mediaContent.parentElement.setAttribute('data-content', data.content);
         const newNoteListener = () => {
           this.dataContent = mediaContent.parentElement.getAttribute('data-content');
-          console.log(this.dataContent);
+          this.dataType = mediaContent.parentElement.getAttribute('data-type');
+          previewListener(this.dataType, this.dataContent);
         };
         mediaContent.addEventListener('click', newNoteListener);
       }
@@ -208,8 +210,6 @@ export default class Modal {
           this.modalStopButton.classList.add('hidden');
           this.modalSaveButton.classList.remove('hidden');
           this.media.addMediaElementListeners(this.pipeBlob);
-          // this.addMediaElementListeners();
-          // this.listenerFunctions = this.addPlayerListeners();
           this.media.addPlayerListeners();
 
           this.modalSaveButton.addEventListener('click', this.sendDataWrapper);

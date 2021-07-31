@@ -12,16 +12,16 @@ export default class Media {
     this.time = wrapper.querySelector(`.${type}-player-time`);
     this.duration = wrapper.querySelector(`.${type}-player-duration`);
 
-    this.mediaElement = this.addMediaElement(mediaType);
+    this.mediaElement = this.addMediaElement(type, mediaType);
   }
 
   /**
    * A function for adding a media element
    */
-  addMediaElement(type) {
-    const element = document.createElement(type);
-    element.id = 'media';
-    element.textContent = `Your browser does not support the <code>${type}</code> element.`;
+  addMediaElement(type, mediaType) {
+    const element = document.createElement(mediaType);
+    element.id = `${type}-media`;
+    element.textContent = `Your browser does not support the <code>${mediaType}</code> element.`;
     this.player.after(element);
     return element;
   }
@@ -31,6 +31,9 @@ export default class Media {
    */
   addPlayerListeners() {
     const play = () => {
+      if (this.mediaElement.muted) {
+        this.mediaElement.muted = false;
+      }
       this.mediaElement.play();
       this.play.classList.add('hidden');
       this.pause.classList.remove('hidden');

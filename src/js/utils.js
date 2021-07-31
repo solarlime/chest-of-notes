@@ -9,6 +9,19 @@ export function formatTime(rawTime) {
   return (`${((hours < 10) && (hours > 0)) ? '0' : ''}${(hours > 0) ? `${hours}:` : ''}${(minutes < 10) ? '0' : ''}${minutes}:${(seconds < 10) ? '0' : ''}${seconds}`);
 }
 
+export function animateOpening(modal, background) {
+  const notNew = Array.from(background).find((item) => item.classList.contains('remove-blur'));
+  if (notNew && modal.classList.contains('modal-add')) {
+    background.forEach((item) => item.classList.toggle('blur'));
+    background.forEach((item) => item.classList.toggle('remove-blur'));
+    modal.classList.toggle('modal-active');
+    modal.classList.toggle('modal-inactive');
+  } else {
+    background.forEach((item) => item.classList.add('blur'));
+    modal.classList.add('modal-active');
+  }
+}
+
 export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea) {
   const id = uniqid();
   const data = {
