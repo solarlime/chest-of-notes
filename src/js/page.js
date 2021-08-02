@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import Modal from './modal';
 import Preview from './preview';
-import { animateOpening } from './utils';
+import { animateModals } from './utils';
 
 export default class Page {
   constructor() {
@@ -52,7 +52,15 @@ export default class Page {
     const previewListener = (dataType, dataContent) => {
       const previewWrapper = this.page.querySelector('.preview');
       const preview = new Preview(previewWrapper, dataType, dataContent);
-      animateOpening(previewWrapper, this.background);
+      animateModals(previewWrapper, this.background, 'open');
+
+      const closeListener = (event) => {
+        if (event.target.classList.contains('preview')) {
+          preview.closeModal(this.background);
+          previewWrapper.removeEventListener('click', closeListener);
+        }
+      };
+      previewWrapper.addEventListener('click', closeListener);
     };
 
     /**
@@ -65,7 +73,7 @@ export default class Page {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
         const { modalAdd, type } = this.modal.openModal(button, contentButtons, previewListener);
-        animateOpening(modalAdd, this.background);
+        animateModals(modalAdd, this.background, 'open');
         if (type !== 'text') {
           this.modal.addModalButtonListeners();
         }

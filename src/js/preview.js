@@ -1,4 +1,5 @@
 import Media from './media';
+import { animateModals } from './utils';
 
 export default class Preview {
   constructor(preview, fileType, fileUrl = null) {
@@ -9,5 +10,10 @@ export default class Preview {
     this.media.mediaElement.src = fileUrl;
     this.media.addMediaElementListeners(fileUrl);
     this.media.addPlayerListeners();
+  }
+
+  closeModal(background) {
+    animateModals(this.preview, background, 'close');
+    if (this.media) this.media.removeMedia();
   }
 }

@@ -1,7 +1,9 @@
 /* eslint-disable no-param-reassign */
 import validator from 'validator';
 import Media from './media';
-import { recordSomeMedia, renderNewNote, sendData } from './utils';
+import {
+  animateModals, recordSomeMedia, renderNewNote, sendData,
+} from './utils';
 
 export default class Modal {
   constructor(page) {
@@ -61,15 +63,12 @@ export default class Modal {
      */
     this.closeModal = (event) => {
       event.preventDefault();
-      this.background.forEach((item) => item.classList.toggle('blur'));
-      this.background.forEach((item) => item.classList.toggle('remove-blur'));
-      this.modalAdd.classList.toggle('modal-active');
-      this.modalAdd.classList.toggle('modal-inactive');
+      animateModals(this.modalAdd, this.background, 'close');
 
       if (this.media) this.media.removeMedia();
       // Stop media recording if it's not stopped (early closing)
       if (this.mediaRecorder) {
-        this.mediaRecorder.stop();
+        if (this.mediaRecorder.state !== 'inactive') this.mediaRecorder.stop();
         this.mediaRecorder.removeEventListener('dataavailable', this.recorder);
       }
       // Clean the fields after saving
@@ -197,6 +196,8 @@ export default class Modal {
               this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
               this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
               this.mediaElement.srcObject = null;
+              this.media.addMediaElementListeners(this.mediaElement.src);
+              this.media.addPlayerListeners();
             }
           }
         };
@@ -209,8 +210,6 @@ export default class Modal {
           this.mediaRecorder.stop();
           this.modalStopButton.classList.add('hidden');
           this.modalSaveButton.classList.remove('hidden');
-          this.media.addMediaElementListeners(this.pipeBlob);
-          this.media.addPlayerListeners();
 
           this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
           // After saving remove a listener for stopping

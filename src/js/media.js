@@ -30,18 +30,26 @@ export default class Media {
    * A function for adding listeners to player buttons
    */
   addPlayerListeners() {
-    const play = () => {
-      if (this.mediaElement.muted) {
-        this.mediaElement.muted = false;
+    const play = async () => {
+      try {
+        if (this.mediaElement.muted) {
+          this.mediaElement.muted = false;
+        }
+        await this.mediaElement.play();
+        this.play.classList.add('hidden');
+        this.pause.classList.remove('hidden');
+      } catch (e) {
+        console.log('Playing error: ', e.message);
       }
-      this.mediaElement.play();
-      this.play.classList.add('hidden');
-      this.pause.classList.remove('hidden');
     };
-    const pause = () => {
-      this.mediaElement.pause();
-      this.pause.classList.add('hidden');
-      this.play.classList.remove('hidden');
+    const pause = async () => {
+      try {
+        await this.mediaElement.pause();
+        this.pause.classList.add('hidden');
+        this.play.classList.remove('hidden');
+      } catch (e) {
+        console.log('Pausing error: ', e.message);
+      }
     };
     const back = () => {
       if (this.mediaElement.currentTime > 5) {
@@ -74,12 +82,12 @@ export default class Media {
   /**
    * A function for adding listeners to a media element
    */
-  addMediaElementListeners(pipeBlob) {
+  addMediaElementListeners(fileUrl) {
     const canplay = () => {
       // A bugfix for Chromium: it can't get the duration
       if (this.mediaElement.duration === Infinity) {
         (async () => {
-          const duration = await getBlobDuration(pipeBlob);
+          const duration = await getBlobDuration(fileUrl);
           this.duration.textContent = formatTime(parseInt(duration, 10));
         })();
       } else {
