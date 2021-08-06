@@ -60,7 +60,7 @@ export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea)
 
   const fileSend = async (callback) => {
     const fileReader = new FileReader();
-    fileReader.readAsDataURL(new File([pipeBlob], `${id}.mp4`));
+    fileReader.readAsDataURL(new File([pipeBlob], `${id}.mp4`, { type: `${data.type}/mp4` }));
 
     await new Promise((resolve) => {
       fileReader.addEventListener('loadend', async () => {
