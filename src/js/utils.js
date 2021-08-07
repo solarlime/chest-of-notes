@@ -23,6 +23,9 @@ export function animateModals(modal, background, action) {
           background.forEach((item) => item.classList.remove('remove-blur'));
         }
         background.forEach((item) => item.classList.add('blur'));
+        if (modal.classList.contains('modal-inactive')) {
+          modal.classList.remove('modal-inactive');
+        }
         modal.classList.add('modal-active');
       }
       break;
