@@ -112,7 +112,7 @@ export function renderNewNote(notesList, data) {
     + '                            </svg>\n'
     + '                        </label>\n'
     + '                    </div>\n'
-    + `                    <p class="notes-list-item-description ${(!data.content) ? 'hidden' : ''}">${(isText !== 'media') ? isText : 'Click to open the media!'}</p>`;
+    + `                    <p class="notes-list-item-description${(!data.content) ? ' hidden' : ''}">${(isText !== 'media') ? isText : 'Click to open the media!'}</p>`;
   notesList.append(notesListItem);
   return { notesListItem, isText };
 }

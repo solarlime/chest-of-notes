@@ -44,7 +44,7 @@ export default class Modal {
       this.modalCloseButton.dispatchEvent(new Event('click'));
       const { notesListItem, isText } = renderNewNote(this.notesList, data);
 
-      if (!isText) {
+      if (isText === 'media') {
         const mediaContent = notesListItem.querySelector('.notes-list-item-description');
         mediaContent.classList.add('media-content');
         mediaContent.parentElement.setAttribute('data-type', data.type);
