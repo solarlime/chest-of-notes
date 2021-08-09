@@ -1,7 +1,7 @@
 import Page from './page';
 
 export default class App {
-  static init() {
+  static async init() {
     /**
      * A listener for resizing. Works good for mobiles
      */
@@ -11,9 +11,20 @@ export default class App {
     });
     window.dispatchEvent(new Event('resize'));
 
-    const page = new Page();
-    page.addEventListeners();
+    try {
+      // const res = await fetch('http://localhost:3001/chest-of-notes/mongo/fetch/all', {
+      //   method: 'GET',
+      // });
+      // const result = await res.json();
+      const result = { status: 'Fetched', data: [] };
+      console.log(result);
+      const page = new Page(result.data);
+      page.addEventListeners();
 
-    console.log('Initiated!');
+      console.log('Initiated!');
+    } catch (e) {
+      alert(`An error occurred: ${e.message} The page will be reloaded.`);
+      window.location.reload();
+    }
   }
 }

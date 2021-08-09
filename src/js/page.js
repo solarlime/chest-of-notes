@@ -1,13 +1,16 @@
 /* eslint-disable no-param-reassign */
 import Modal from './modal';
 import Preview from './preview';
-import { animateModals } from './utils';
+import { animateModals, renderNewNote } from './utils';
 
 export default class Page {
-  constructor() {
+  constructor(fetchedData) {
+    this.fetchedData = fetchedData;
     this.page = document.body;
     this.add = this.page.querySelector('.add');
     this.notes = this.page.querySelector('.notes');
+    this.emptyList = this.page.querySelector('.notes-empty-list');
+    this.notesList = this.page.querySelector('.notes-list');
     this.addButton = this.page.querySelector('button.notes-go-to-add-button');
     this.backButton = this.page.querySelector('button.back-button');
     this.audioButton = this.page.querySelector('button.audio-button');
@@ -18,6 +21,13 @@ export default class Page {
     this.modal = new Modal(this.page);
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
+
+    if (this.fetchedData.length) {
+      [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+      this.fetchedData.forEach((note) => {
+        renderNewNote(this.notesList, note, this.previewListener);
+      });
+    }
 
     this.notes.scrollIntoView();
   }
@@ -49,7 +59,7 @@ export default class Page {
       this.notes.scrollIntoView({ behavior: 'smooth' });
     });
 
-    const previewListener = (dataType, dataContent) => {
+    this.previewListener = (dataType, dataContent) => {
       const previewWrapper = this.page.querySelector('.preview');
       const preview = new Preview(previewWrapper, dataType, dataContent);
       animateModals(previewWrapper, this.background, 'open');
@@ -72,7 +82,8 @@ export default class Page {
       const listener = (event) => {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
-        const { modalAdd, type } = this.modal.openModal(button, contentButtons, previewListener);
+        // eslint-disable-next-line max-len
+        const { modalAdd, type } = this.modal.openModal(button, contentButtons, this.previewListener);
         animateModals(modalAdd, this.background, 'open');
         if (type !== 'text') {
           this.modal.addModalButtonListeners();

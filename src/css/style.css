@@ -184,14 +184,22 @@ button {
     fill: #9c1428;
 }
 
-.notes-list {
+.notes-list, .notes-empty-list {
     width: 100%;
     height: auto;
-    max-height: calc(100% - var(--button) - 20% - 20% - 10px);
+    max-height: calc(100% - 20% - 10px - 10px);
+    min-height: calc(100% - 80px - 10px - 10px);
     box-sizing: border-box;
     margin: 0 0 10px 0;
     overflow-y: scroll;
     scrollbar-width: none;
+}
+
+.notes-empty-list {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--font-header);
 }
 
 .notes-list::-webkit-scrollbar {
@@ -260,11 +268,6 @@ button {
     width: 100%;
     font-family: var(--font-accent);
     font-size: 2rem;
-}
-
-.notes-list {
-    max-height: calc(100% - 20% - 10px - 10px);
-    min-height: calc(100% - 80px - 10px - 10px);
 }
 
 .notes-list-item-header-wrapper {
