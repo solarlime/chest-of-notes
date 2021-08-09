@@ -97,7 +97,7 @@ export async function recordSomeMedia(media) {
   return { mediaRecorder, pipeline };
 }
 
-export function renderNewNote(notesList, data) {
+export function renderNewNote(notesList, data, previewListener) {
   const isText = (data.type === 'text') ? data.content : 'media';
   const notesListItem = document.createElement('li');
   notesListItem.classList.add('notes-list-item');
@@ -114,5 +114,17 @@ export function renderNewNote(notesList, data) {
     + '                    </div>\n'
     + `                    <p class="notes-list-item-description${(!data.content) ? ' hidden' : ''}">${(isText !== 'media') ? isText : 'Click to open the media!'}</p>`;
   notesList.append(notesListItem);
-  return { notesListItem, isText };
+
+  if (isText === 'media') {
+    const mediaContent = notesListItem.querySelector('.notes-list-item-description');
+    mediaContent.classList.add('media-content');
+    mediaContent.parentElement.setAttribute('data-type', data.type);
+    mediaContent.parentElement.setAttribute('data-content', data.content);
+    const newNoteListener = () => {
+      this.dataContent = mediaContent.parentElement.getAttribute('data-content');
+      this.dataType = mediaContent.parentElement.getAttribute('data-type');
+      previewListener(this.dataType, this.dataContent);
+    };
+    mediaContent.addEventListener('click', newNoteListener);
+  }
 }

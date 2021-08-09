@@ -42,20 +42,7 @@ export default class Modal {
       // eslint-disable-next-line max-len
       const data = await sendData(this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
       this.modalCloseButton.dispatchEvent(new Event('click'));
-      const { notesListItem, isText } = renderNewNote(this.notesList, data);
-
-      if (isText === 'media') {
-        const mediaContent = notesListItem.querySelector('.notes-list-item-description');
-        mediaContent.classList.add('media-content');
-        mediaContent.parentElement.setAttribute('data-type', data.type);
-        mediaContent.parentElement.setAttribute('data-content', data.content);
-        const newNoteListener = () => {
-          this.dataContent = mediaContent.parentElement.getAttribute('data-content');
-          this.dataType = mediaContent.parentElement.getAttribute('data-type');
-          previewListener(this.dataType, this.dataContent);
-        };
-        mediaContent.addEventListener('click', newNoteListener);
-      }
+      renderNewNote(this.notesList, data, previewListener);
     };
 
     /**
