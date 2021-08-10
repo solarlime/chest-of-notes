@@ -118,12 +118,8 @@ export function renderNewNote(notesList, data, previewListener) {
   if (isText === 'media') {
     const mediaContent = notesListItem.querySelector('.notes-list-item-description');
     mediaContent.classList.add('media-content');
-    mediaContent.parentElement.setAttribute('data-type', data.type);
-    mediaContent.parentElement.setAttribute('data-content', data.content);
     const newNoteListener = () => {
-      this.dataContent = mediaContent.parentElement.getAttribute('data-content');
-      this.dataType = mediaContent.parentElement.getAttribute('data-type');
-      previewListener(this.dataType, this.dataContent);
+      previewListener(data.type, data.content, data.id);
     };
     mediaContent.addEventListener('click', newNoteListener);
   }

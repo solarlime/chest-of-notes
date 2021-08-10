@@ -22,6 +22,20 @@ export default class Page {
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
+    this.previewListener = (dataType, dataContent) => {
+      const previewWrapper = this.page.querySelector('.preview');
+      const preview = new Preview(previewWrapper, dataType, dataContent);
+      animateModals(previewWrapper, this.background, 'open');
+
+      const closeListener = (event) => {
+        if (event.target.classList.contains('preview')) {
+          preview.closeModal(this.background);
+          previewWrapper.removeEventListener('click', closeListener);
+        }
+      };
+      previewWrapper.addEventListener('click', closeListener);
+    };
+
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
@@ -60,20 +74,6 @@ export default class Page {
       event.preventDefault();
       this.notes.scrollIntoView({ behavior: 'smooth' });
     });
-
-    this.previewListener = (dataType, dataContent) => {
-      const previewWrapper = this.page.querySelector('.preview');
-      const preview = new Preview(previewWrapper, dataType, dataContent);
-      animateModals(previewWrapper, this.background, 'open');
-
-      const closeListener = (event) => {
-        if (event.target.classList.contains('preview')) {
-          preview.closeModal(this.background);
-          previewWrapper.removeEventListener('click', closeListener);
-        }
-      };
-      previewWrapper.addEventListener('click', closeListener);
-    };
 
     /**
      * A listener to open the content modal
