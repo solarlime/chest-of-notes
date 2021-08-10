@@ -27,6 +27,8 @@ export default class Page {
       this.fetchedData.forEach((note) => {
         renderNewNote(this.notesList, note, this.previewListener);
       });
+    } else {
+      this.emptyList.style.visibility = 'visible';
     }
 
     this.notes.scrollIntoView();

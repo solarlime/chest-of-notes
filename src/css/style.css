@@ -200,6 +200,7 @@ button {
     align-items: center;
     justify-content: center;
     font-family: var(--font-header);
+    visibility: hidden;
 }
 
 .notes-list::-webkit-scrollbar {

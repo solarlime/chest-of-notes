@@ -26,6 +26,7 @@ export default class Modal {
 
     this.background = page.querySelectorAll('section, footer');
     this.notesList = page.querySelector('.notes-list');
+    this.emptyList = page.querySelector('.notes-empty-list');
   }
 
   /**
@@ -42,6 +43,10 @@ export default class Modal {
       // eslint-disable-next-line max-len
       const data = await sendData(this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
       this.modalCloseButton.dispatchEvent(new Event('click'));
+      if (!this.emptyList.classList.contains('hidden')) {
+        this.emptyList.style.visibility = '';
+        [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+      }
       renderNewNote(this.notesList, data, previewListener);
     };
 
