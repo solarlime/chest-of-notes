@@ -22,9 +22,9 @@ export default class Page {
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
-    this.previewListener = (dataType, dataContent) => {
+    this.previewListener = (dataType, dataContent, dataId) => {
       const previewWrapper = this.page.querySelector('.preview');
-      const preview = new Preview(previewWrapper, dataType, dataContent);
+      const preview = new Preview(previewWrapper, dataId, dataType, dataContent);
       animateModals(previewWrapper, this.background, 'open');
 
       const closeListener = (event) => {
