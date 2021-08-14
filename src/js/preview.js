@@ -7,6 +7,9 @@ export default class Preview {
     this.preview = preview;
     this.media = new Media(this.preview, 'preview', fileType);
     this.media.player.style.order = '1';
+    if (this.media.player.classList.contains('hidden')) {
+      this.media.player.classList.remove('hidden');
+    }
     if (this.fileUrl !== 'media') {
       this.media.mediaElement.src = fileUrl;
     } else {
