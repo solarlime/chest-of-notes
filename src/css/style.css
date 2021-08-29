@@ -203,7 +203,7 @@ button {
     visibility: hidden;
 }
 
-.notes-list::-webkit-scrollbar {
+.notes-empty-list::-webkit-scrollbar, .notes-list::-webkit-scrollbar {
     display: none;
 }
 
