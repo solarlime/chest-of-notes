@@ -185,7 +185,7 @@ export default class Modal {
           pipeline.push(event.data);
           if (this.mediaRecorder.state === 'inactive') {
             if (this.media.mediaElement) {
-              this.pipeBlob = new Blob(pipeline, { type: 'audio/mp4' });
+              this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
               this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
               this.mediaElement.srcObject = null;
               this.media.addMediaElementListeners(this.mediaElement.src);

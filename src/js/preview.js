@@ -13,13 +13,18 @@ export default class Preview {
     if (this.fileUrl !== 'media') {
       this.media.mediaElement.src = fileUrl;
     } else {
+      this.media.mediaElement.prepend((() => {
+        const source = document.createElement('source');
+        source.setAttribute('src', `http://localhost:3001/chest-of-notes/mongo/fetch/one/${fileId}`);
+        source.setAttribute('type', `${this.media.mediaElement.tagName.toLowerCase()}/mp4`);
+        return source;
+      })());
       try {
-        fetch('http://localhost:3001/chest-of-notes/mongo/fetch/one', {
+        fetch(`http://localhost:3001/chest-of-notes/mongo/fetch/one/${fileId}`, {
           method: 'GET',
-        }).then((result) => result.json())
-          .then((result) => {
-            console.log(result);
-          });
+        }).then((result) => {
+          console.log(result);
+        });
       } catch (e) {
         console.log('Can\'t fetch the data!');
       }

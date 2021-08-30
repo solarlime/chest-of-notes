@@ -51,42 +51,27 @@ export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea)
     type,
   };
 
-  const send = async () => {
-    console.log(data);
-    // const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
-    //   method: 'POST',
-    //   body: JSON.stringify(data),
-    // });
-    // const result = await res.json();
-    // console.log(result);
-  };
-
-  const fileSend = async (callback) => {
-    const fileReader = new FileReader();
-    fileReader.readAsDataURL(new File([pipeBlob], `${id}.mp4`, { type: `${data.type}/mp4` }));
-
-    await new Promise((resolve) => {
-      fileReader.addEventListener('loadend', async () => {
-        data.content = fileReader.result;
-        await callback();
-        resolve();
-      });
-    });
-  };
-
+  const formData = new FormData();
+  Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
   if (data.type === 'text') {
-    data.content = modalFormTextArea.value;
-    await send();
+    formData.set('content', modalFormTextArea.value);
   } else {
-    await fileSend(send);
+    formData.set('content', pipeBlob);
   }
+
+  const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
+    method: 'POST',
+    body: formData,
+  });
+  const result = await res.json();
+  console.log(result);
   return data;
 }
 
 export async function recordSomeMedia(media) {
   const tag = media.tagName.toLowerCase();
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
-  const mediaRecorder = new MediaRecorder(stream, { type: `${tag}/mp4` });
+  const mediaRecorder = new MediaRecorder(stream);
   const pipeline = [];
   mediaRecorder.start();
   if (tag === 'video') {
