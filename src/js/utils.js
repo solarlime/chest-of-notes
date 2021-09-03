@@ -49,6 +49,7 @@ export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea)
     id,
     name: modalFormName.value,
     type,
+    content: URL.createObjectURL(pipeBlob),
   };
 
   const formData = new FormData();

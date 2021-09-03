@@ -19,15 +19,6 @@ export default class Preview {
         source.setAttribute('type', `${this.media.mediaElement.tagName.toLowerCase()}/mp4`);
         return source;
       })());
-      try {
-        fetch(`http://localhost:3001/chest-of-notes/mongo/fetch/one/${fileId}`, {
-          method: 'GET',
-        }).then((result) => {
-          console.log(result);
-        });
-      } catch (e) {
-        console.log('Can\'t fetch the data!');
-      }
     }
     this.media.addMediaElementListeners(fileUrl);
     this.media.addPlayerListeners();

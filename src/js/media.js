@@ -124,6 +124,7 @@ export default class Media {
     this.listenerFunctions = null;
     // Remove the media element
     if (this.mediaElement) {
+      URL.revokeObjectURL(this.mediaElement.src);
       this.mediaElement.remove();
       this.mediaElement = null;
       this.time.textContent = '00:00';
