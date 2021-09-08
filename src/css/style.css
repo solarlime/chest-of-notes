@@ -289,15 +289,21 @@ button {
     left: -9999px;
 }
 
-.spoiler {
+.notes-list-item-header-buttons {
+    display: flex;
+    flex-wrap: nowrap;
+    flex-shrink: 0;
+}
+
+.spoiler, .delete-note {
     display: flex;
     align-items: center;
     flex-shrink: 0;
     width: 15px;
-    margin-left: 5px;
+    margin-left: 10px;
 }
 
-.spoiler-svg {
+.spoiler-svg, .delete-note-svg {
     fill: #000000;
     width: 15px;
     height: 15px;

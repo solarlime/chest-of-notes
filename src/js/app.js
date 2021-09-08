@@ -12,11 +12,10 @@ export default class App {
     window.dispatchEvent(new Event('resize'));
 
     try {
-      // const res = await fetch('http://localhost:3001/chest-of-notes/mongo/fetch/all', {
-      //   method: 'GET',
-      // });
-      // const result = await res.json();
-      const result = { status: 'Fetched', data: [] };
+      const res = await fetch('http://localhost:3001/chest-of-notes/mongo/fetch/all', {
+        method: 'GET',
+      });
+      const result = await res.json();
       console.log(result);
       const page = new Page(result.data);
       page.addEventListeners();

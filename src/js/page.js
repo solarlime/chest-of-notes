@@ -22,6 +22,16 @@ export default class Page {
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
+    this.deleteListener = async (dataId) => {
+      const res = await fetch(`http://localhost:3001/chest-of-notes/mongo/delete/${dataId}`);
+      const result = await res.json();
+      console.log(result);
+      if (result.status === 'Deleted') {
+        const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
+        itemToDelete.remove();
+      }
+    };
+
     this.previewListener = (dataType, dataContent, dataId) => {
       const previewWrapper = this.page.querySelector('.preview');
       const preview = new Preview(previewWrapper, dataId, dataType, dataContent);
@@ -39,7 +49,7 @@ export default class Page {
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
-        renderNewNote(this.notesList, note, this.previewListener);
+        renderNewNote(this.notesList, note, this.deleteListener, this.previewListener);
       });
     } else {
       this.emptyList.style.visibility = 'visible';
@@ -85,7 +95,7 @@ export default class Page {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
         // eslint-disable-next-line max-len
-        const { modalAdd, type } = this.modal.openModal(button, contentButtons, this.previewListener);
+        const { modalAdd, type } = this.modal.openModal(button, contentButtons, this.deleteListener, this.previewListener);
         animateModals(modalAdd, this.background, 'open');
         if (type !== 'text') {
           this.modal.addModalButtonListeners();

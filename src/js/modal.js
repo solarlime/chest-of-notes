@@ -32,7 +32,7 @@ export default class Modal {
   /**
    * A function to resolve, what appearance is needed for an adding modal now
    */
-  openModal(button, contentButtons, previewListener) {
+  openModal(button, contentButtons, deleteListener, previewListener) {
     const [audioButton, videoButton, textButton] = contentButtons;
 
     /**
@@ -47,7 +47,7 @@ export default class Modal {
         this.emptyList.style.visibility = '';
         [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       }
-      renderNewNote(this.notesList, data, previewListener);
+      renderNewNote(this.notesList, data, deleteListener, previewListener);
     };
 
     /**
