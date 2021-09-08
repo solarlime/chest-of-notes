@@ -49,15 +49,16 @@ export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea)
     id,
     name: modalFormName.value,
     type,
-    content: URL.createObjectURL(pipeBlob),
   };
 
   const formData = new FormData();
   Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
   if (data.type === 'text') {
     formData.set('content', modalFormTextArea.value);
+    data.content = modalFormTextArea.value;
   } else {
     formData.set('content', pipeBlob);
+    data.content = URL.createObjectURL(pipeBlob);
   }
 
   const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
