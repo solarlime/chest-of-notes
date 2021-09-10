@@ -4,7 +4,8 @@ import Preview from './preview';
 import { animateModals, renderNewNote } from './utils';
 
 export default class Page {
-  constructor(fetchedData) {
+  constructor(serverHost, fetchedData) {
+    this.serverHost = serverHost;
     this.fetchedData = fetchedData;
     this.page = document.body;
     this.add = this.page.querySelector('.add');
@@ -23,7 +24,7 @@ export default class Page {
     this.about = this.page.querySelector('.about');
 
     this.deleteListener = async (dataId) => {
-      const res = await fetch(`http://localhost:3001/chest-of-notes/mongo/delete/${dataId}`);
+      const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
       const result = await res.json();
       console.log(result);
       if (result.status === 'Deleted') {
@@ -34,7 +35,7 @@ export default class Page {
 
     this.previewListener = (dataType, dataContent, dataId) => {
       const previewWrapper = this.page.querySelector('.preview');
-      const preview = new Preview(previewWrapper, dataId, dataType, dataContent);
+      const preview = new Preview(this.serverHost, previewWrapper, dataId, dataType, dataContent);
       animateModals(previewWrapper, this.background, 'open');
 
       const closeListener = (event) => {
@@ -95,7 +96,7 @@ export default class Page {
         event.preventDefault();
         // Resolve a modal view according to a clicked button
         // eslint-disable-next-line max-len
-        const { modalAdd, type } = this.modal.openModal(button, contentButtons, this.deleteListener, this.previewListener);
+        const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
         animateModals(modalAdd, this.background, 'open');
         if (type !== 'text') {
           this.modal.addModalButtonListeners();

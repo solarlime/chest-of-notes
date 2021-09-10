@@ -32,7 +32,7 @@ export default class Modal {
   /**
    * A function to resolve, what appearance is needed for an adding modal now
    */
-  openModal(button, contentButtons, deleteListener, previewListener) {
+  openModal(serverHost, button, contentButtons, deleteListener, previewListener) {
     const [audioButton, videoButton, textButton] = contentButtons;
 
     /**
@@ -41,7 +41,7 @@ export default class Modal {
     this.sendDataWrapper = async (event) => {
       event.preventDefault();
       // eslint-disable-next-line max-len
-      const data = await sendData(this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
+      const data = await sendData(serverHost, this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
       this.modalCloseButton.dispatchEvent(new Event('click'));
       if (!this.emptyList.classList.contains('hidden')) {
         this.emptyList.style.visibility = '';
@@ -98,7 +98,7 @@ export default class Modal {
     const validatorWrapper = () => {
       const string = this.modalFormName.value.trim();
       this.modalSaveButton.disabled = validator.isEmpty(string)
-          || !validator.isLength(string, { min: 1, max: 60 });
+        || !validator.isLength(string, { min: 1, max: 60 });
     };
     this.modalFormName.addEventListener('input', validatorWrapper);
 

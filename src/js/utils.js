@@ -43,7 +43,7 @@ export function animateModals(modal, background, action) {
   }
 }
 
-export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea) {
+export async function sendData(serverHost, modalFormName, type, pipeBlob, modalFormTextArea) {
   const id = uniqid();
   const data = {
     id,
@@ -61,7 +61,7 @@ export async function sendData(modalFormName, type, pipeBlob, modalFormTextArea)
     data.content = URL.createObjectURL(pipeBlob);
   }
 
-  const res = await fetch('http://localhost:3001/chest-of-notes/mongo/update', {
+  const res = await fetch(`${serverHost}/chest-of-notes/mongo/update`, {
     method: 'POST',
     body: formData,
   });

@@ -2,7 +2,7 @@ import Media from './media';
 import { animateModals } from './utils';
 
 export default class Preview {
-  constructor(preview, fileId, fileType, fileUrl) {
+  constructor(serverHost, preview, fileId, fileType, fileUrl) {
     this.fileUrl = fileUrl;
     this.preview = preview;
     this.media = new Media(this.preview, 'preview', fileType);
@@ -15,7 +15,7 @@ export default class Preview {
     } else {
       this.media.mediaElement.prepend((() => {
         const source = document.createElement('source');
-        source.setAttribute('src', `http://localhost:3001/chest-of-notes/mongo/fetch/one/${fileId}`);
+        source.setAttribute('src', `${serverHost}/chest-of-notes/mongo/fetch/one/${fileId}`);
         source.setAttribute('type', `${this.media.mediaElement.tagName.toLowerCase()}/mp4`);
         return source;
       })());

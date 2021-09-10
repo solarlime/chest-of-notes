@@ -11,13 +11,21 @@ export default class App {
     });
     window.dispatchEvent(new Event('resize'));
 
+    let serverHost;
+    const { hostname, protocol } = window.location;
+    if (hostname === 'localhost') {
+      serverHost = `${protocol}//${hostname}:3001`;
+    } else {
+      serverHost = `${protocol}//nginx.solarlime.dev`;
+    }
+
     try {
-      const res = await fetch('http://localhost:3001/chest-of-notes/mongo/fetch/all', {
+      const res = await fetch(`${serverHost}/chest-of-notes/mongo/fetch/all`, {
         method: 'GET',
       });
       const result = await res.json();
       console.log(result);
-      const page = new Page(result.data);
+      const page = new Page(serverHost, result.data);
       page.addEventListeners();
 
       console.log('Initiated!');
