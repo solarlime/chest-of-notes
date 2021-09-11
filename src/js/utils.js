@@ -1,6 +1,11 @@
 /* eslint-disable no-param-reassign */
 import uniqid from 'uniqid';
 
+/**
+ * A function to format raw time to hh-mm-ss
+ * @param rawTime
+ * @returns {string}
+ */
 export function formatTime(rawTime) {
   const time = Math.floor(rawTime);
   const hours = Math.floor(time / 3600);
@@ -9,6 +14,12 @@ export function formatTime(rawTime) {
   return (`${((hours < 10) && (hours > 0)) ? '0' : ''}${(hours > 0) ? `${hours}:` : ''}${(minutes < 10) ? '0' : ''}${minutes}:${(seconds < 10) ? '0' : ''}${seconds}`);
 }
 
+/**
+ * A function to make an animation of appearing and disappearing
+ * @param modal
+ * @param background
+ * @param action
+ */
 export function animateModals(modal, background, action) {
   switch (action) {
     case 'open': {
@@ -43,6 +54,15 @@ export function animateModals(modal, background, action) {
   }
 }
 
+/**
+ * A function, which collects data, puts it to FormData & sends to a server
+ * @param serverHost
+ * @param modalFormName
+ * @param type
+ * @param pipeBlob
+ * @param modalFormTextArea
+ * @returns {Promise<{name, id: *, type}>} - a data object (without a file - for notes with media)
+ */
 export async function sendData(serverHost, modalFormName, type, pipeBlob, modalFormTextArea) {
   const id = uniqid();
   const data = {
@@ -70,6 +90,11 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
   return data;
 }
 
+/**
+ * A function, which initiates media recording
+ * @param media
+ * @returns {Promise<{pipeline: *[], mediaRecorder: MediaRecorder}>}
+ */
 export async function recordSomeMedia(media) {
   const tag = media.tagName.toLowerCase();
   const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
@@ -84,6 +109,14 @@ export async function recordSomeMedia(media) {
   return { mediaRecorder, pipeline };
 }
 
+/**
+ * A function for rendering new notes. Adds listeners for 'Delete' buttons & for preview links
+ * @param notesList
+ * @param data
+ * @param pipeBlob
+ * @param deleteListener
+ * @param previewListener
+ */
 export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener) {
   const isText = (data.type === 'text');
   const hasDescription = !!data.content;
@@ -114,11 +147,13 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
       + '                    </div>\n'
       + `                    <p class="notes-list-item-description${(!hasDescription && isText) ? ' hidden' : ''}">${(isText) ? data.content : 'Click to open the media!'}</p>`;
   notesList.append(notesListItem);
+
   const deleteButton = notesListItem.querySelector('.delete-note');
   const deleteButtonListener = () => {
     deleteListener(data.id);
   };
   deleteButton.addEventListener('click', deleteButtonListener, { once: true });
+
   if (!isText) {
     const mediaContent = notesListItem.querySelector('.notes-list-item-description');
     mediaContent.classList.add('media-content');

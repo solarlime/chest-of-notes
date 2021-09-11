@@ -11,6 +11,7 @@ export default class App {
     });
     window.dispatchEvent(new Event('resize'));
 
+    // It's necessary to recognise if the page is loaded locally or not to choose a server location
     let serverHost;
     const { hostname, protocol } = window.location;
     if (hostname === 'localhost') {
@@ -19,6 +20,7 @@ export default class App {
       serverHost = `${protocol}//nginx.solarlime.dev`;
     }
 
+    // Some notes may have been uploaded yet. Fetch them!
     try {
       const res = await fetch(`${serverHost}/chest-of-notes/mongo/fetch/all`, {
         method: 'GET',

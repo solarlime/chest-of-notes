@@ -23,6 +23,7 @@ export default class Page {
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
+    // Listener functions are initiated in a constructor and are given as callbacks
     this.deleteListener = async (dataId) => {
       const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
       const result = await res.json();
@@ -51,6 +52,7 @@ export default class Page {
       previewWrapper.addEventListener('click', closeListener);
     };
 
+    // At first, fetched notes must be rendered
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {

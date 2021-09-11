@@ -2,6 +2,15 @@ import Media from './media';
 import { animateModals } from './utils';
 
 export default class Preview {
+  /**
+   * Calling a constructor makes a preview modal visible
+   * & creates a new Media to control the audio/video
+   * @param serverHost
+   * @param preview
+   * @param fileId
+   * @param fileType
+   * @param fileBlob
+   */
   constructor(serverHost, preview, fileId, fileType, fileBlob) {
     this.fileBlob = fileBlob;
     this.preview = preview;
@@ -25,6 +34,10 @@ export default class Preview {
     this.media.addPlayerListeners();
   }
 
+  /**
+   * A function for closing a preview modal
+   * @param background
+   */
   closeModal(background) {
     animateModals(this.preview, background, 'close');
     URL.revokeObjectURL(this.fileUrl);
