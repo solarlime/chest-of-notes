@@ -2,16 +2,17 @@ import Media from './media';
 import { animateModals } from './utils';
 
 export default class Preview {
-  constructor(serverHost, preview, fileId, fileType, fileUrl) {
-    this.fileUrl = fileUrl;
+  constructor(serverHost, preview, fileId, fileType, fileBlob) {
+    this.fileBlob = fileBlob;
     this.preview = preview;
     this.media = new Media(this.preview, 'preview', fileType);
     this.media.player.style.order = '1';
     if (this.media.player.classList.contains('hidden')) {
       this.media.player.classList.remove('hidden');
     }
-    if (this.fileUrl !== 'media') {
-      this.media.mediaElement.src = fileUrl;
+    if (this.fileBlob) {
+      this.fileUrl = URL.createObjectURL(this.fileBlob);
+      this.media.mediaElement.src = this.fileUrl;
     } else {
       this.media.mediaElement.prepend((() => {
         const source = document.createElement('source');
@@ -20,12 +21,13 @@ export default class Preview {
         return source;
       })());
     }
-    this.media.addMediaElementListeners(fileUrl);
+    this.media.addMediaElementListeners(this.fileUrl);
     this.media.addPlayerListeners();
   }
 
   closeModal(background) {
     animateModals(this.preview, background, 'close');
+    URL.revokeObjectURL(this.fileUrl);
     if (this.media) this.media.removeMedia();
   }
 }

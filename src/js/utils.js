@@ -84,7 +84,7 @@ export async function recordSomeMedia(media) {
   return { mediaRecorder, pipeline };
 }
 
-export function renderNewNote(notesList, data, deleteListener, previewListener) {
+export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener) {
   const isText = (data.type === 'text') ? data.content : 'media';
   const notesListItem = document.createElement('li');
   notesListItem.classList.add('notes-list-item');
@@ -124,7 +124,7 @@ export function renderNewNote(notesList, data, deleteListener, previewListener) 
     const mediaContent = notesListItem.querySelector('.notes-list-item-description');
     mediaContent.classList.add('media-content');
     const newNoteListener = () => {
-      previewListener(data.type, data.content, data.id);
+      previewListener(data.type, pipeBlob, data.id);
     };
     mediaContent.addEventListener('click', newNoteListener);
   }

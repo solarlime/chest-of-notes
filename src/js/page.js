@@ -50,7 +50,7 @@ export default class Page {
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
-        renderNewNote(this.notesList, note, this.deleteListener, this.previewListener);
+        renderNewNote(this.notesList, note, null, this.deleteListener, this.previewListener);
       });
     } else {
       this.emptyList.style.visibility = 'visible';

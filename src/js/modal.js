@@ -47,7 +47,7 @@ export default class Modal {
         this.emptyList.style.visibility = '';
         [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       }
-      renderNewNote(this.notesList, data, deleteListener, previewListener);
+      renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener);
     };
 
     /**
