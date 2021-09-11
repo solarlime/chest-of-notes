@@ -31,6 +31,10 @@ export default class Page {
         const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
         itemToDelete.remove();
       }
+      if (!this.notesList.children.length) {
+        [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+        this.emptyList.style.visibility = 'visible';
+      }
     };
 
     this.previewListener = (dataType, dataContent, dataId) => {
