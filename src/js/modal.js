@@ -172,44 +172,50 @@ export default class Modal {
     this.mediaRecorderWrapper = async () => {
       if (!navigator.mediaDevices) {
         alert('Your browser can\'t deal with media functions!');
+        this.modalCloseButton.dispatchEvent(new Event('click'));
         return;
       }
       try {
-        const { mediaRecorder, pipeline } = await recordSomeMedia(this.mediaElement);
-        this.mediaRecorder = mediaRecorder;
-        this.modalStartButton.classList.add('hidden');
-        this.modalStopButton.classList.remove('hidden');
+        const recorder = await recordSomeMedia(this.mediaElement);
+        if (!recorder) {
+          this.modalCloseButton.dispatchEvent(new Event('click'));
+        } else {
+          const { mediaRecorder, pipeline } = recorder;
+          this.mediaRecorder = mediaRecorder;
+          this.modalStartButton.classList.add('hidden');
+          this.modalStopButton.classList.remove('hidden');
 
-        // Collect the data into a Blob
-        this.recorder = (event) => {
-          pipeline.push(event.data);
-          if (this.mediaRecorder.state === 'inactive') {
-            if (this.media.mediaElement) {
-              this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
-              this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
-              this.mediaElement.srcObject = null;
-              this.media.addMediaElementListeners(this.mediaElement.src);
-              this.media.addPlayerListeners();
+          // Collect the data into a Blob
+          this.recorder = (event) => {
+            pipeline.push(event.data);
+            if (this.mediaRecorder.state === 'inactive') {
+              if (this.media.mediaElement) {
+                this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
+                this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
+                this.mediaElement.srcObject = null;
+                this.media.addMediaElementListeners(this.mediaElement.src);
+                this.media.addPlayerListeners();
+              }
             }
-          }
-        };
-        this.mediaRecorder.addEventListener('dataavailable', this.recorder);
+          };
+          this.mediaRecorder.addEventListener('dataavailable', this.recorder);
 
-        /**
-         * A wrapper for a 'stop recording' function
-         */
-        this.stopListener = () => {
-          this.mediaRecorder.stop();
-          this.modalStopButton.classList.add('hidden');
-          this.modalSaveButton.classList.remove('hidden');
+          /**
+           * A wrapper for a 'stop recording' function
+           */
+          this.stopListener = () => {
+            this.mediaRecorder.stop();
+            this.modalStopButton.classList.add('hidden');
+            this.modalSaveButton.classList.remove('hidden');
 
-          this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
-          // After saving remove a listener for stopping
-          this.modalStopButton.removeEventListener('click', this.stopListener);
-        };
-        this.modalStopButton.addEventListener('click', this.stopListener);
-        // After stopping remove a listener for recording
-        this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
+            this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
+            // After saving remove a listener for stopping
+            this.modalStopButton.removeEventListener('click', this.stopListener);
+          };
+          this.modalStopButton.addEventListener('click', this.stopListener);
+          // After stopping remove a listener for recording
+          this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
+        }
       } catch (e) {
         console.log(e);
       }

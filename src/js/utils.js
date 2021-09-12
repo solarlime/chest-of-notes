@@ -97,16 +97,21 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
  */
 export async function recordSomeMedia(media) {
   const tag = media.tagName.toLowerCase();
-  const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
-  const mediaRecorder = new MediaRecorder(stream);
-  const pipeline = [];
-  mediaRecorder.start();
-  if (tag === 'video') {
-    media.srcObject = stream;
-    media.muted = true;
-    media.play();
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
+    const mediaRecorder = new MediaRecorder(stream);
+    const pipeline = [];
+    mediaRecorder.start();
+    if (tag === 'video') {
+      media.srcObject = stream;
+      media.muted = true;
+      media.play();
+    }
+    return { mediaRecorder, pipeline };
+  } catch (e) {
+    alert('You didn\'t allow to record media. You can make only text notes!');
+    return null;
   }
-  return { mediaRecorder, pipeline };
 }
 
 /**
