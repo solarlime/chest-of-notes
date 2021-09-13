@@ -1,5 +1,6 @@
 /* eslint-disable no-param-reassign */
 import uniqid from 'uniqid';
+import AudioRecorder from 'audio-recorder-polyfill';
 
 /**
  * A function to format raw time to hh-mm-ss
@@ -99,6 +100,13 @@ export async function recordSomeMedia(media) {
   const tag = media.tagName.toLowerCase();
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
+    if (!window.MediaRecorder) {
+      alert('A polyfill is active. You can record only audio files. If you\'re using Safari on iOS you can enable this functionality in its settings (MediaRecorder). Then reload the page');
+      window.MediaRecorder = AudioRecorder;
+      if (tag === 'video') {
+        return null;
+      }
+    }
     const mediaRecorder = new MediaRecorder(stream);
     const pipeline = [];
     mediaRecorder.start();

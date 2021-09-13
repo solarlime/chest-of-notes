@@ -2101,6 +2101,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"audio-recorder-polyfill@npm:^0.4.1":
+  version: 0.4.1
+  resolution: "audio-recorder-polyfill@npm:0.4.1"
+  checksum: c64befbe7d599ce003a80ec1bf612488581af6f62dd07e5ef4cc8ad40167fd5e568c9fe5fdbf9de6f955cd332cdd5ba2e0bde86de7702ad41a5194b43ca76e4f
+  languageName: node
+  linkType: hard
+
 "babel-loader@npm:^8.2.2":
   version: 8.2.2
   resolution: "babel-loader@npm:8.2.2"
@@ -2495,6 +2502,7 @@ __metadata:
     "@babel/core": ^7.13.16
     "@babel/eslint-parser": ^7.13.14
     "@babel/preset-env": ^7.13.15
+    audio-recorder-polyfill: ^0.4.1
     babel-loader: ^8.2.2
     core-js: ^3.10.2
     css-loader: ^5.2.4
