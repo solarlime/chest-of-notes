@@ -28,8 +28,8 @@ export function animateModals(modal, background, action) {
       if (notNew && modal.classList.contains('modal-add')) {
         background.forEach((item) => item.classList.toggle('blur'));
         background.forEach((item) => item.classList.toggle('remove-blur'));
-        modal.classList.toggle('modal-active');
-        modal.classList.toggle('modal-inactive');
+        modal.classList.add('modal-active');
+        modal.classList.remove('modal-inactive');
       } else {
         if (notNew) {
           background.forEach((item) => item.classList.remove('remove-blur'));
