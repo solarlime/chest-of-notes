@@ -380,7 +380,6 @@ button {
     top: 50%;
     left: 50%;
     min-width: 150px;
-    width: 50%;
     max-width: 300px;
     transform: translate(-50%, calc(-50% + 5vh));
     background: white;
@@ -484,6 +483,10 @@ button {
     font-size: 0.7rem;
 }
 
+.preview-player-controls {
+    margin-right: 20px;
+}
+
 .modal-player-play, .modal-player-pause, .modal-player-back, .modal-player-forward,
 .preview-player-play, .preview-player-pause, .preview-player-back, .preview-player-forward {
     background-color: #2fa693;
@@ -514,6 +517,7 @@ button {
 
 video {
     width: 100%;
+    max-height: 30vh;
     margin-top: 10px;
     box-sizing: border-box;
     border: #2fa693 1px solid;
