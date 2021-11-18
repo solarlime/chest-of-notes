@@ -83,7 +83,7 @@ export default class Media {
    * A function for adding listeners to a media element
    */
   addMediaElementListeners(fileUrl) {
-    const canplay = () => {
+    const loadedmetadata = () => {
       // A bugfix for Chromium: it can't get the duration
       if (this.mediaElement.duration === Infinity) {
         (async () => {
@@ -107,7 +107,7 @@ export default class Media {
       this.pause.classList.add('hidden');
       this.play.classList.remove('hidden');
     };
-    this.mediaElement.addEventListener('canplay', canplay);
+    this.mediaElement.addEventListener('loadedmetadata', loadedmetadata);
     this.mediaElement.addEventListener('timeupdate', timeupdate);
     this.mediaElement.addEventListener('ended', ended);
   }
