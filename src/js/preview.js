@@ -25,7 +25,8 @@ export default class Preview {
     } else {
       this.media.mediaElement.prepend((() => {
         const source = document.createElement('source');
-        source.setAttribute('src', `${serverHost}/chest-of-notes/mongo/fetch/one/${fileId}`);
+        this.fileUrl = `${serverHost}/chest-of-notes/mongo/fetch/one/${fileId}`;
+        source.setAttribute('src', this.fileUrl);
         source.setAttribute('type', `${this.media.mediaElement.tagName.toLowerCase()}/mp4`);
         return source;
       })());

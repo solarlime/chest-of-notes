@@ -522,6 +522,7 @@ video {
     box-sizing: border-box;
     border: #2fa693 1px solid;
     border-radius: 10px;
+    background: black;
 }
 
 .preview-container video {
