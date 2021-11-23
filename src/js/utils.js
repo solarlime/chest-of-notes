@@ -82,13 +82,18 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
     data.content = 'media';
   }
 
-  const res = await fetch(`${serverHost}/chest-of-notes/mongo/update`, {
-    method: 'POST',
-    body: formData,
-  });
-  const result = await res.json();
-  console.log(result);
-  return data;
+  try {
+    const res = await fetch(`${serverHost}/chest-of-notes/mongo/update`, {
+      method: 'POST',
+      body: formData,
+    });
+    const result = await res.json();
+    console.log(result);
+    return data;
+  } catch (e) {
+    console.log(e);
+    return null;
+  }
 }
 
 /**

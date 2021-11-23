@@ -47,7 +47,11 @@ export default class Modal {
         this.emptyList.style.visibility = '';
         [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       }
-      renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener);
+      if (!data) {
+        alert('Your note wasn\'t saved. It seems that your record was too big. Try to make a smaller one!');
+      } else {
+        renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener);
+      }
     };
 
     /**
@@ -184,6 +188,7 @@ export default class Modal {
           this.mediaRecorder = mediaRecorder;
           this.modalStartButton.classList.add('hidden');
           this.modalStopButton.classList.remove('hidden');
+          this.modalFormDescriptionMedia.classList.add('hidden');
 
           // Collect the data into a Blob
           this.recorder = (event) => {
@@ -195,6 +200,12 @@ export default class Modal {
                 this.mediaElement.srcObject = null;
                 this.media.addMediaElementListeners(this.mediaElement.src);
                 this.media.addPlayerListeners();
+                if (this.pipeBlob.size > 50 * 1024 * 1024) {
+                  this.modalFormDescriptionBoth.classList.add('hidden');
+                  alert('Your record is too big, so you can\'t save it. Try to make a smaller one!');
+                } else {
+                  this.modalSaveButton.classList.remove('hidden');
+                }
               }
             }
           };
@@ -206,7 +217,6 @@ export default class Modal {
           this.stopListener = () => {
             this.mediaRecorder.stop();
             this.modalStopButton.classList.add('hidden');
-            this.modalSaveButton.classList.remove('hidden');
 
             this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
             // After saving remove a listener for stopping
