@@ -62,6 +62,38 @@ export default class Page {
       this.emptyList.style.visibility = 'visible';
     }
 
+    // Then, add functionality to spoilers
+    this.page.addEventListener('click', (event) => {
+      if (event.target.classList.contains('checkbox')) {
+        const spoiler = event.target;
+        const description = spoiler.closest('li').querySelector('.notes-list-item-description');
+        if (!event.isTrusted) {
+          spoiler.checked = false;
+        }
+        if (spoiler.checked) {
+          description.style.maxHeight = `${description.scrollHeight}px`;
+          Array.from(this.page.querySelectorAll('.checkbox'))
+            .filter((item) => item.checked && item !== spoiler)
+            .forEach((item) => { item.dispatchEvent(new Event('click', { bubbles: true })); });
+        } else {
+          description.style.maxHeight = '';
+        }
+      }
+    });
+
+    // Expanded notes should adapt if layout changes
+    window.addEventListener('resize', () => {
+      const timeout = setTimeout(() => {
+        Array.from(this.page.querySelectorAll('.checkbox'))
+          .filter((spoiler) => spoiler.checked)
+          .forEach((spoiler) => {
+            const description = spoiler.closest('li').querySelector('.notes-list-item-description');
+            description.style.maxHeight = `${description.scrollHeight}px`;
+          });
+        clearTimeout(timeout);
+      }, 1000);
+    });
+
     this.notes.scrollIntoView();
   }
 
