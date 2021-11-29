@@ -1,7 +1,7 @@
 ![CI](https://github.com/solarlime/chest-of-notes/workflows/CI/badge.svg?branch=master)
 
 # Chest of notes
-A frontend side of a project (backend is [here](https://github.com/solarlime/chest-of-notes)).
+A frontend side of a project (backend is [here](https://github.com/solarlime/chest-of-notes-server)).
 
 ### What's it:
 A web application for dealing with notes. All information is recorded locally & stored in a MongoDB (+ GridFS).
