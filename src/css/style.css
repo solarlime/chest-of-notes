@@ -20,12 +20,15 @@ html {
     font-weight: 300;
 }
 
-body {
+html, body {
     position: relative;
     height: 100vh;
     height: var(--height);
-    background: linear-gradient(to top, #1d755f, #2fa693);
     overflow: hidden;
+}
+
+body {
+    background: linear-gradient(to top, #1d755f, #2fa693);
 }
 
 .blur {
@@ -101,7 +104,6 @@ button {
     display: flex;
     height: calc(var(--height) - 10vh);
     padding-bottom: 10vh;
-    overflow-x: hidden;
     scroll-snap-type: x mandatory;
 }
 
@@ -369,13 +371,17 @@ button {
     animation: disappear 0.5s linear forwards;
 }
 
-.modal-add, .preview {
+.modal-add, .preview, .wait {
     position: fixed;
     visibility: hidden;
     width: 100%;
     height: 100%;
     font-size: 0.6rem;
     z-index: 1;
+}
+
+.wait {
+    background: rgba(255, 255, 255, 0.5);
 }
 
 .modal-add-form, .preview-container {

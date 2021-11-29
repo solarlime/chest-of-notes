@@ -87,6 +87,8 @@ export default class Modal {
         if (this.modalSaveButton.classList.contains('hidden')) {
           this.modalSaveButton.classList.remove('hidden');
         }
+        // Specially for mobiles: sometimes layout goes mad
+        window.dispatchEvent(new Event('resize'));
       }, 500);
       // After closing remove listeners
       this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
