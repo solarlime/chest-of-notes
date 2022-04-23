@@ -51,7 +51,14 @@ export default class Modal {
       if (!data) {
         alert('Your note wasn\'t saved. It seems that your record was too big. Try to make a smaller one!');
       } else {
-        renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener, this.masonry);
+        renderNewNote(
+          this.notesList,
+          data,
+          this.pipeBlob,
+          deleteListener,
+          previewListener,
+          this.masonry,
+        );
       }
     };
 

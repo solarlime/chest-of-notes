@@ -1,8 +1,8 @@
 /* eslint-disable no-param-reassign */
+import Masonry from 'masonry-layout';
 import Modal from './modal';
 import Preview from './preview';
 import { animateModals, renderNewNote } from './utils';
-import Masonry from 'masonry-layout';
 
 export default class Page {
   constructor(serverHost, fetchedData) {
@@ -65,7 +65,14 @@ export default class Page {
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
-        renderNewNote(this.notesList, note, null, this.deleteListener, this.previewListener, masonry);
+        renderNewNote(
+          this.notesList,
+          note,
+          null,
+          this.deleteListener,
+          this.previewListener,
+          masonry,
+        );
       });
       masonry.layout();
     } else {
