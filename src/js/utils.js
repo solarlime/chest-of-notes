@@ -134,8 +134,9 @@ export async function recordSomeMedia(media) {
  * @param pipeBlob
  * @param deleteListener
  * @param previewListener
+ * @param masonry
  */
-export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener) {
+export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
   const isText = (data.type === 'text');
   const hasDescription = !!data.content;
   const notesListItem = document.createElement('li');
@@ -165,6 +166,7 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
       + '                    </div>\n'
       + `                    <p class="notes-list-item-description${(!hasDescription && isText) ? ' hidden' : ''}">${(isText) ? data.content : 'Click to open the media!'}</p>`;
   notesList.append(notesListItem);
+  masonry.appended(notesListItem);
 
   const deleteButton = notesListItem.querySelector('.delete-note');
   const deleteButtonListener = () => {

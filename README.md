@@ -14,9 +14,9 @@ A web application for dealing with notes. All information is recorded locally & 
 - Delete unneeded notes
 
 ### Problems:
-- Graphical issues (especially on mobiles) - *mostly fixed*
-- Instability on mobiles - *seems to be stable now*
-- Inability to play fetched media in a desktop Safari - *fixed*
+- Graphical issues (especially on mobiles) - *fixed*
+- Instability on mobiles - *problems with Safari on iOS*
+- Inability to play fetched media in a desktop Safari (and on iOS too) - *still a problem*
 - ???
 
 Try it on [Vercel](https://chest-of-notes.solarlime.dev)!

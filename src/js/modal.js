@@ -6,7 +6,7 @@ import {
 } from './utils';
 
 export default class Modal {
-  constructor(page) {
+  constructor(page, masonry) {
     this.modalAdd = page.querySelector('.modal-add');
     this.modalAddForm = page.querySelector('.modal-add-form');
     this.modalAddFormHeader = page.querySelector('.modal-add-form-header');
@@ -20,6 +20,7 @@ export default class Modal {
     this.modalStopButton = page.querySelector('button.stop');
     this.modalSaveButton = page.querySelector('button.save');
     this.modalCloseButton = page.querySelector('button.close');
+    this.masonry = masonry;
 
     this.media = null;
     this.pipeBlob = null;
@@ -50,7 +51,7 @@ export default class Modal {
       if (!data) {
         alert('Your note wasn\'t saved. It seems that your record was too big. Try to make a smaller one!');
       } else {
-        renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener);
+        renderNewNote(this.notesList, data, this.pipeBlob, deleteListener, previewListener, this.masonry);
       }
     };
 

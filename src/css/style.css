@@ -86,20 +86,6 @@ button {
     animation: disappear 1s ease-out 1s forwards;
 }
 
-@keyframes disappear {
-    0% {
-        opacity: 1;
-    }
-
-    99% {
-        opacity: 0;
-    }
-    100% {
-        visibility: hidden;
-        opacity: 0;
-    }
-}
-
 .app {
     display: flex;
     height: calc(var(--height) - 10vh);
@@ -319,17 +305,6 @@ button {
 .checkbox:checked ~ .notes-list-item-header-wrapper .spoiler-svg {
     transform: rotate(180deg);
 }
-
-/*.checkbox:not(:checked) ~ .notes-list-item-description {*/
-/*    max-height: 0;*/
-/*    overflow: hidden;*/
-/*    transition: all 0.5s linear 0s;*/
-/*}*/
-
-/*.checkbox:checked ~ .notes-list-item-description {*/
-/*    overflow: hidden;*/
-/*    transition: all 0.5s linear 0s;*/
-/*}*/
 
 @keyframes appear {
     0% {
@@ -689,16 +664,8 @@ a:visited {
 }
 
 @media (min-width: 1000px) {
-    .notes-list {
-        display: flex;
-        flex-wrap: wrap;
-        align-items: flex-start;
-        min-height: 0;
-    }
-
     .notes-list-item {
         width: calc(calc(100% - 10px) / 2);
-        margin-right: 10px;
     }
 
     .notes-list-item:nth-child(2n) {

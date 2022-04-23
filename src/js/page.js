@@ -2,6 +2,7 @@
 import Modal from './modal';
 import Preview from './preview';
 import { animateModals, renderNewNote } from './utils';
+import Masonry from 'masonry-layout';
 
 export default class Page {
   constructor(serverHost, fetchedData) {
@@ -19,7 +20,14 @@ export default class Page {
     this.textButton = this.page.querySelector('button.text-button');
     this.background = this.page.querySelectorAll('section, footer');
 
-    this.modal = new Modal(this.page);
+    const masonry = new Masonry(this.notesList, {
+      gutter: 10,
+      itemSelector: '.notes-list-item',
+      percentPosition: true,
+      columnWidth: '.notes-list-item',
+    });
+
+    this.modal = new Modal(this.page, masonry);
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
@@ -31,6 +39,7 @@ export default class Page {
       if (result.status === 'Deleted') {
         const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
         itemToDelete.remove();
+        masonry.layout();
       }
       if (!this.notesList.children.length) {
         [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
@@ -56,8 +65,9 @@ export default class Page {
     if (this.fetchedData.length) {
       [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
-        renderNewNote(this.notesList, note, null, this.deleteListener, this.previewListener);
+        renderNewNote(this.notesList, note, null, this.deleteListener, this.previewListener, masonry);
       });
+      masonry.layout();
     } else {
       this.emptyList.style.visibility = 'visible';
     }
@@ -78,6 +88,7 @@ export default class Page {
         } else {
           description.style.maxHeight = '';
         }
+        setTimeout(() => masonry.layout(), 600);
       }
     });
 
