@@ -6,7 +6,8 @@
   "scripts": {
     "start": "webpack serve --config webpack.dev.js",
     "build": "webpack --config webpack.prod.js",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "test": "yarn playwright test"
   },
   "repository": {
     "type": "git",
@@ -19,34 +20,39 @@
   },
   "homepage": "https://github.com/solarlime/chest-of-notes#readme",
   "devDependencies": {
-    "@babel/cli": "^7.13.16",
-    "@babel/core": "^7.13.16",
-    "@babel/eslint-parser": "^7.13.14",
-    "@babel/preset-env": "^7.13.15",
-    "babel-loader": "^8.2.2",
-    "core-js": "^3.10.2",
-    "css-loader": "^5.2.4",
-    "css-minimizer-webpack-plugin": "^3.0.0",
-    "eslint": "^7.24.0",
-    "eslint-config-airbnb-base": "^14.2.1",
-    "eslint-import-resolver-node": "^0.3.4",
-    "eslint-plugin-import": "^2.22.1",
-    "file-loader": "^6.2.0",
+    "@babel/cli": "^7.19.3",
+    "@babel/core": "^7.19.6",
+    "@babel/eslint-parser": "^7.19.1",
+    "@babel/preset-env": "^7.19.4",
+    "@playwright/test": "^1.27.1",
+    "babel-loader": "^9.1.0",
+    "clean-webpack-plugin": "^4.0.0",
+    "core-js": "^3.26.0",
+    "css-loader": "^6.7.1",
+    "css-minimizer-webpack-plugin": "^4.2.2",
+    "eslint": "^8.26.0",
+    "eslint-config-airbnb-base": "^15.0.0",
+    "eslint-import-resolver-node": "^0.3.6",
+    "eslint-plugin-import": "^2.26.0",
     "get-blob-duration": "^1.2.0",
-    "html-loader": "^2.1.2",
-    "html-webpack-plugin": "^5.3.1",
+    "html-loader": "^4.2.0",
+    "html-webpack-plugin": "^5.5.0",
     "mini-css-extract-plugin": "^1.5.0",
-    "regenerator-runtime": "^0.13.7",
-    "url-loader": "^4.1.1",
-    "webpack": "^5.34.0",
-    "webpack-cli": "^4.6.0",
-    "webpack-dev-server": "^3.11.2",
-    "webpack-merge": "^5.7.3"
+    "regenerator-runtime": "^0.13.10",
+    "webpack": "^5.74.0",
+    "webpack-cli": "^4.10.0",
+    "webpack-dev-server": "^4.11.1",
+    "webpack-merge": "^5.8.0"
+  },
+  "dependenciesMeta": {
+    "core-js": {
+      "built": false
+    }
   },
   "dependencies": {
     "audio-recorder-polyfill": "^0.4.1",
     "masonry-layout": "^4.2.2",
-    "uniqid": "^5.3.0",
-    "validator": "^13.6.0"
+    "uniqid": "^5.4.0",
+    "validator": "^13.7.0"
   }
 }
