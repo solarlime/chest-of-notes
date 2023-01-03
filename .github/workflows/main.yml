@@ -29,10 +29,10 @@ jobs:
           node-version: 16
 
       - name: Install dependencies
-        run: yarn
+        run: yarn install --immutable
 
       - name: Install Playwright Browsers
-        run: npx playwright install --with-deps
+        run: yarn playwright install --with-deps
 
       - name: Linting
         run: yarn run lint
