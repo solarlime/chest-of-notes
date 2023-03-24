@@ -48,8 +48,8 @@ export default class Modal {
         this.emptyList.style.visibility = '';
         [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       }
-      if (!data) {
-        alert('Your note wasn\'t saved. It seems that your record was too big. Try to make a smaller one!');
+      if (typeof data === 'string') {
+        alert(`Your note wasn't saved. Server response: ${data}`);
       } else {
         renderNewNote(
           this.notesList,
