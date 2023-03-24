@@ -89,10 +89,13 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
     });
     const result = await res.json();
     console.log(result);
+    if (result.status.includes('Error')) {
+      throw Error(result.data);
+    }
     return data;
   } catch (e) {
     console.log(e);
-    return null;
+    return e.message;
   }
 }
 

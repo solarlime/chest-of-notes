@@ -36,6 +36,9 @@ export default class Page {
       const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
       const result = await res.json();
       console.log(result);
+      if (result.status.includes('Error')) {
+        alert(`Cannot delete! Server response: ${result.data}`);
+      }
       if (result.status === 'Deleted') {
         const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
         itemToDelete.remove();

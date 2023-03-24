@@ -27,6 +27,9 @@ export default class App {
       });
       const result = await res.json();
       console.log(result);
+      if (result.status.includes('Error')) {
+        throw Error(result.data);
+      }
       const page = new Page(serverHost, result.data);
       page.addEventListeners();
 
