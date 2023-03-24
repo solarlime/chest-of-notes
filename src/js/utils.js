@@ -83,7 +83,7 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
   }
 
   try {
-    const res = await fetch(`${serverHost}/chest-of-notes/mongo/update`, {
+    const res = await fetch(`${serverHost}/chest-of-notes/mongo/add`, {
       method: 'POST',
       body: formData,
     });
