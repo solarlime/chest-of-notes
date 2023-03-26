@@ -30,7 +30,7 @@ test.describe('E2E', () => {
           }],
         }),
       }));
-      await page.route('http://localhost:3001/chest-of-notes/mongo/update', (route) => route.fulfill({
+      await page.route('http://localhost:3001/chest-of-notes/mongo/add', (route) => route.fulfill({
         status: 200,
         body: JSON.stringify({
           status: 'Added',

@@ -12,13 +12,7 @@ export default class App {
     window.dispatchEvent(new Event('resize'));
 
     // It's necessary to recognise if the page is loaded locally or not to choose a server location
-    let serverHost;
-    const { hostname, protocol } = window.location;
-    if (hostname === 'localhost') {
-      serverHost = `${protocol}//${hostname}:3001`;
-    } else {
-      serverHost = `${protocol}//nginx.solarlime.dev`;
-    }
+    const serverHost = process.env.SERVERHOST ? process.env.SERVERHOST : 'http://localhost:3001';
 
     // Some notes may have been uploaded yet. Fetch them!
     try {
