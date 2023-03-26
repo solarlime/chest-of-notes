@@ -205,6 +205,11 @@ export default class Modal {
             pipeline.push(event.data);
             if (this.mediaRecorder.state === 'inactive') {
               if (this.media.mediaElement) {
+                // At first, we need to turn camera off
+                if (this.mediaElement.srcObject) {
+                  const tracks = this.mediaElement.srcObject.getTracks();
+                  tracks.forEach((track) => track.stop());
+                }
                 this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
                 this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
                 this.mediaElement.srcObject = null;
