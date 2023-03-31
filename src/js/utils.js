@@ -176,8 +176,9 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     + '</svg>\n',
   );
   // Level 4 <div.delete-note>{svg}</div>
-  const deleteNote = document.createElement('div');
+  const deleteNote = document.createElement('button');
   deleteNote.classList.add('delete-note');
+  deleteNote.type = 'button';
   deleteNote.insertAdjacentHTML(
     'beforeend',
     '<svg class="delete-note-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">\n'
@@ -190,7 +191,10 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   + '</svg>\n',
   );
   // Level 2 <p class="notes-list-item-description {condition}">{text}</p>
-  const notesListItemDescription = document.createElement('p');
+  const notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
+  if (notesListItemDescription instanceof HTMLButtonElement) {
+    notesListItemDescription.type = 'button';
+  }
   notesListItemDescription.classList.add('notes-list-item-description');
   if (!hasDescription && isText) {
     notesListItemDescription.classList.add('hidden');
@@ -212,6 +216,18 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     deleteListener(data.id);
   };
   deleteButton.addEventListener('click', deleteButtonListener, { once: true });
+
+  checkbox.addEventListener('focus', () => {
+    spoiler.style.border = '2px solid #888888';
+  });
+
+  checkbox.addEventListener('blur', () => {
+    spoiler.style.border = '';
+  });
+
+  checkbox.addEventListener('click', () => {
+    checkbox.dispatchEvent(new Event('blur'));
+  });
 
   if (!isText) {
     const mediaContent = notesListItem.querySelector('.notes-list-item-description');

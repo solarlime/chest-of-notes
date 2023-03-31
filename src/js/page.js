@@ -62,6 +62,12 @@ export default class Page {
         }
       };
       previewWrapper.addEventListener('click', closeListener);
+      // A way to close without a mouse
+      previewWrapper.addEventListener('keyup', (event) => {
+        if (event.key === 'Escape') {
+          previewWrapper.dispatchEvent(new Event('click'));
+        }
+      }, { once: true });
     };
 
     // At first, fetched notes must be rendered

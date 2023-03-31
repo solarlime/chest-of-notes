@@ -13,6 +13,10 @@ export default class Media {
     this.duration = wrapper.querySelector(`.${type}-player-duration`);
 
     this.mediaElement = this.addMediaElement(type, mediaType);
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      this.play.focus();
+    }, 500);
   }
 
   /**
