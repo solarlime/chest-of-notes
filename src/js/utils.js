@@ -92,6 +92,9 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
     if (result.status.includes('Error')) {
       throw Error(result.data);
     }
+    if (result.uploadComplete !== undefined) {
+      return { ...data, uploadComplete: result.uploadComplete };
+    }
     return data;
   } catch (e) {
     console.log(e);
@@ -150,6 +153,7 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   checkbox.classList.add('checkbox');
   checkbox.id = data.id;
   checkbox.type = 'checkbox';
+  checkbox.tabIndex = -1;
   // Level 2 <div.notes-list-item-header-wrapper></div>
   const notesListItemHeaderWrapper = document.createElement('div');
   notesListItemHeaderWrapper.classList.add('notes-list-item-header-wrapper');
@@ -167,6 +171,7 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     spoiler.classList.add('hidden');
   }
   spoiler.htmlFor = data.id;
+  spoiler.tabIndex = 0;
   spoiler.insertAdjacentHTML(
     'beforeend',
     '<svg class="spoiler-svg" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 490.656 490.656" xml:space="preserve">'
@@ -199,7 +204,10 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   if (!hasDescription && isText) {
     notesListItemDescription.classList.add('hidden');
   }
-  notesListItemDescription.textContent = (isText) ? data.content : 'Click to open the media!';
+
+  if (isText) {
+    notesListItemDescription.textContent = data.content;
+  }
 
   notesListItem.insertAdjacentElement('beforeend', checkbox);
   notesListItemHeaderWrapper.insertAdjacentElement('beforeend', notesListItemHeader);
@@ -211,30 +219,38 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   notesList.append(notesListItem);
   masonry.appended(notesListItem);
 
-  const deleteButton = notesListItem.querySelector('.delete-note');
   const deleteButtonListener = () => {
     deleteListener(data.id);
   };
-  deleteButton.addEventListener('click', deleteButtonListener, { once: true });
+  deleteNote.addEventListener('click', deleteButtonListener, { once: true });
 
-  checkbox.addEventListener('focus', () => {
-    spoiler.style.border = '2px solid #888888';
-  });
+  // New notes shouldn't be available to use before they are ready for it
+  if (data.uploadComplete !== undefined) {
+    if (data.uploadComplete === false) {
+      deleteNote.disabled = true;
+      deleteNote.querySelector('svg').style.fill = '#aaaaaa';
+      notesListItemDescription.textContent = 'Please, wait — your file is uploading...';
+      notesListItemDescription.disabled = true;
+    } else {
+      notesListItemDescription.classList.add('media-content');
+      notesListItemDescription.textContent = 'Click to open the media!';
+    }
+  }
 
-  checkbox.addEventListener('blur', () => {
-    spoiler.style.border = '';
-  });
-
-  checkbox.addEventListener('click', () => {
-    checkbox.dispatchEvent(new Event('blur'));
+  // A listener for spoilers is needed to improve accessibility
+  spoiler.addEventListener('keyup', (event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      checkbox.checked = !checkbox.checked;
+      const evt = new Event('click', { bubbles: true });
+      evt.fromKeyboard = true;
+      checkbox.dispatchEvent(evt);
+    }
   });
 
   if (!isText) {
-    const mediaContent = notesListItem.querySelector('.notes-list-item-description');
-    mediaContent.classList.add('media-content');
     const newNoteListener = () => {
       previewListener(data.type, pipeBlob, data.id);
     };
-    mediaContent.addEventListener('click', newNoteListener);
+    notesListItemDescription.addEventListener('click', newNoteListener);
   }
 }
