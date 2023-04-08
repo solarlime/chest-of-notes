@@ -173,6 +173,10 @@ export default class Modal {
     if (this.modalFormName.value.trim()) {
       this.modalSaveButton.disabled = false;
     }
+    const timeout = setTimeout(() => {
+      clearTimeout(timeout);
+      this.modalFormName.focus();
+    }, 500);
     return { modalAdd: this.modalAdd, type: this.type };
   }
 
@@ -199,12 +203,18 @@ export default class Modal {
           this.modalStartButton.classList.add('hidden');
           this.modalStopButton.classList.remove('hidden');
           this.modalFormDescriptionMedia.classList.add('hidden');
+          this.modalStopButton.focus();
 
           // Collect the data into a Blob
           this.recorder = (event) => {
             pipeline.push(event.data);
             if (this.mediaRecorder.state === 'inactive') {
               if (this.media.mediaElement) {
+                // At first, we need to turn camera off
+                if (this.mediaElement.srcObject) {
+                  const tracks = this.mediaElement.srcObject.getTracks();
+                  tracks.forEach((track) => track.stop());
+                }
                 this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
                 this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
                 this.mediaElement.srcObject = null;
@@ -215,6 +225,7 @@ export default class Modal {
                   alert('Your record is too big, so you can\'t save it. Try to make a smaller one!');
                 } else {
                   this.modalSaveButton.classList.remove('hidden');
+                  this.modalSaveButton.focus();
                 }
               }
             }

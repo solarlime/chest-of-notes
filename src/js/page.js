@@ -31,6 +31,38 @@ export default class Page {
     this.footerLogo = this.page.querySelector('.footer-logo');
     this.about = this.page.querySelector('.about');
 
+    // At first, it is needed to subscribe on server notifications
+    // Without this feature, the app freezes when a big file is sent
+    const eventSource = new EventSource(`${this.serverHost}/chest-of-notes/notifications`, { withCredentials: true });
+
+    eventSource.addEventListener('open', () => { console.log('Subscribing on notifications...'); });
+    eventSource.addEventListener('deny', () => {
+      const message = 'Server denied to subscribe on notifications: somebody has already connected';
+      console.log(message);
+      eventSource.close();
+      [this.textButton, this.audioButton, this.videoButton].forEach((button) => {
+        button.disabled = true;
+        button.parentElement.classList.add('hidden');
+      });
+      setTimeout(() => { alert(message); }, 500);
+    });
+    eventSource.addEventListener('error', () => { console.log('An error occurred with a notifications\' subscription'); });
+    eventSource.addEventListener('uploaderror', (event) => {
+      const message = `An error occurred with a file from the note "${event.data}". Try to record it again`;
+      console.log(message);
+      alert(message);
+    });
+    eventSource.addEventListener('uploadsuccess', (event) => {
+      console.log(`Successfully saved a file from the note "${event.data}"!`);
+      const descriptionToEdit = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-description`);
+      const deleteNote = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-header-wrapper .delete-note`);
+      deleteNote.querySelector('svg').style.fill = '';
+      deleteNote.disabled = false;
+      descriptionToEdit.textContent = 'Click to open the media!';
+      descriptionToEdit.classList.add('media-content');
+      descriptionToEdit.disabled = false;
+    });
+
     // Listener functions are initiated in a constructor and are given as callbacks
     this.deleteListener = async (dataId) => {
       const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
@@ -62,6 +94,12 @@ export default class Page {
         }
       };
       previewWrapper.addEventListener('click', closeListener);
+      // A way to close without a mouse
+      previewWrapper.addEventListener('keyup', (event) => {
+        if (event.key === 'Escape') {
+          previewWrapper.dispatchEvent(new Event('click'));
+        }
+      }, { once: true });
     };
 
     // At first, fetched notes must be rendered
@@ -87,7 +125,7 @@ export default class Page {
       if (event.target.classList.contains('checkbox')) {
         const spoiler = event.target;
         const description = spoiler.closest('li').querySelector('.notes-list-item-description');
-        if (!event.isTrusted) {
+        if (!event.isTrusted && !event.fromKeyboard) {
           spoiler.checked = false;
         }
         if (spoiler.checked) {
