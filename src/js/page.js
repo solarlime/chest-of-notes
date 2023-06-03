@@ -44,6 +44,10 @@ export default class Page {
         button.disabled = true;
         button.parentElement.classList.add('hidden');
       });
+      this.notesList.querySelectorAll('.delete-note').forEach((deleteButton) => {
+        deleteButton.disabled = true;
+        deleteButton.querySelector('svg').style.fill = '#aaaaaa';
+      });
       setTimeout(() => { alert(message); }, 500);
     });
     eventSource.addEventListener('error', () => { console.log('An error occurred with a notifications\' subscription'); });
@@ -136,7 +140,7 @@ export default class Page {
         } else {
           description.style.maxHeight = '';
         }
-        setTimeout(() => masonry.layout(), 600);
+        const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 600);
       }
     });
 
@@ -149,6 +153,7 @@ export default class Page {
             const description = spoiler.closest('li').querySelector('.notes-list-item-description');
             description.style.maxHeight = `${description.scrollHeight}px`;
           });
+        masonry.layout();
         clearTimeout(timeout);
       }, 1000);
     });
