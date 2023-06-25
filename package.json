@@ -20,35 +20,30 @@
   },
   "homepage": "https://github.com/solarlime/chest-of-notes#readme",
   "devDependencies": {
-    "@babel/cli": "^7.21.5",
-    "@babel/core": "^7.22.1",
-    "@babel/eslint-parser": "^7.21.8",
-    "@babel/preset-env": "^7.22.4",
+    "@babel/cli": "^7.22.5",
+    "@babel/core": "^7.22.5",
+    "@babel/eslint-parser": "^7.22.5",
+    "@babel/preset-env": "^7.22.5",
     "@playwright/test": "^1.35.1",
     "babel-loader": "^9.1.2",
     "clean-webpack-plugin": "^4.0.0",
     "core-js": "^3.30.2",
     "css-loader": "^6.8.1",
-    "css-minimizer-webpack-plugin": "^5.0.0",
+    "css-minimizer-webpack-plugin": "^5.0.1",
     "dotenv-webpack": "^8.0.1",
-    "eslint": "^8.42.0",
+    "eslint": "^8.43.0",
     "eslint-config-airbnb-base": "^15.0.0",
     "eslint-import-resolver-node": "^0.3.7",
     "eslint-plugin-import": "^2.27.5",
     "get-blob-duration": "^1.2.0",
     "html-loader": "^4.2.0",
-    "html-webpack-plugin": "^5.5.1",
+    "html-webpack-plugin": "^5.5.3",
     "mini-css-extract-plugin": "^2.7.6",
     "regenerator-runtime": "^0.13.11",
-    "webpack": "^5.86.0",
+    "webpack": "^5.88.0",
     "webpack-cli": "^5.1.4",
-    "webpack-dev-server": "^4.15.0",
+    "webpack-dev-server": "^4.15.1",
     "webpack-merge": "^5.9.0"
-  },
-  "dependenciesMeta": {
-    "core-js": {
-      "built": false
-    }
   },
   "dependencies": {
     "audio-recorder-polyfill": "^0.4.1",
@@ -56,5 +51,6 @@
     "uniqid": "^5.4.0",
     "validator": "^13.9.0"
   },
+  "browserslist": ">0.25%, not dead",
   "packageManager": "yarn@3.4.1"
 }
