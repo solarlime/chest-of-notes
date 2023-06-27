@@ -1,0 +1,136 @@
+@charset "utf-8";
+
+$primary: #2fa693;
+$danger: #9c1428;
+
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~bulma/bulma";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@400&family=Noto+Sans:wght@500&display=swap');
+
+body {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.navbar.spaced, .hero.spaced {
+  padding: 1rem 1.75rem;
+  &.hero {
+    padding: 1rem 1rem 1.75rem 1rem;
+  }
+}
+
+.navbar-menu {
+  align-items: center;
+  padding: 0;
+  border-radius: 4px;
+  @include until(1023px) {
+    margin: 1rem 0;
+  }
+}
+
+.button.add {
+  padding: 0;
+  aspect-ratio: 1;
+}
+
+.logo {
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 5px #fab400);
+  @include from(770px) {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.title.name {
+  margin-bottom: 0;
+  font-family: 'Cormorant SC', serif;
+  font-size: 1.5rem;
+  @include until(400px) {
+    font-size: 1.2rem;
+  }
+  @include from(770px) {
+    font-size: 2rem;
+  }
+  text-transform: uppercase;
+}
+
+.button.navbar-link {
+  border: 0;
+  background-color: #fab400;
+  font-family: 'Noto Sans', sans-serif;
+}
+
+.navbar-dropdown {
+  @include until(1023px) {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  @include until(550px) {
+    display: block;
+  }
+  & .navbar-item {
+    text-align: center;
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+.navbar-burger {
+  &:hover {
+    background-color: unset;
+    & span {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
+  &.is-active {
+    & span {
+      &:nth-child(2) {
+        opacity: unset;
+        transform: rotate(-45deg);
+      }
+      width: 24px;
+      @include from(770px) {
+        width: 32px;
+      }
+    }
+  }
+  & span {
+    left: unset;
+    right: 0;
+    width: 20px;
+    &:nth-child(1) {
+      transform: translateY(5px) rotate(90deg);
+    }
+  }
+}
+
+.hero {
+  min-height: unset;
+  flex-basis: 100vh;
+  overflow: hidden;
+}
+
+.hero-body.columns {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 1;
+  padding: 0;
+  margin: 0;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.card-content {
+  padding: 1rem;
+}
