@@ -9,10 +9,16 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~bulma/bulma";
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@400&family=Noto+Sans:wght@500&display=swap');
 
+html {
+  background-color: $primary;
+}
+
 body {
   display: flex;
   flex-direction: column;
+  max-width: 2000px;
   height: 100dvh;
+  margin: 0 auto;
   font-family: 'Noto Sans', sans-serif;
 }
 
@@ -119,15 +125,29 @@ body {
 }
 
 .hero-body.columns {
-  display: flex;
-  flex-wrap: wrap;
-  flex-shrink: 1;
   padding: 0;
   margin: 0;
   overflow-y: scroll;
   scrollbar-width: none;
   &::-webkit-scrollbar {
     width: 0;
+  }
+}
+
+.column {
+  width: 100%;
+  @include from(600px) {
+    width: 50%;
+  }
+  @include from(900px) {
+    width: 33.33%;
+  }
+  @include from(1200px) {
+    width: 25%;
+  }
+  @include from(1500px) {
+    width: 20%;
+    max-width: 400px;
   }
 }
 
