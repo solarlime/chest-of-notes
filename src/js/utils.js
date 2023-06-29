@@ -145,62 +145,40 @@ export async function recordSomeMedia(media) {
 export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
   const isText = (data.type === 'text');
   const hasDescription = !!data.content;
-  // Level 1 <li.notes-list-item></li>
+  // Level 1 <li.column.notes-list-item></li>
   const notesListItem = document.createElement('li');
-  notesListItem.classList.add('notes-list-item');
-  // Level 2 <input type="checkbox" id="{data.id}" class="checkbox">
-  const checkbox = document.createElement('input');
-  checkbox.classList.add('checkbox');
-  checkbox.id = data.id;
-  checkbox.type = 'checkbox';
-  checkbox.tabIndex = -1;
-  // Level 2 <div.notes-list-item-header-wrapper></div>
-  const notesListItemHeaderWrapper = document.createElement('div');
-  notesListItemHeaderWrapper.classList.add('notes-list-item-header-wrapper');
-  // Level 3 <h3.notes-list-item-header>{data.name}</h3>
-  const notesListItemHeader = document.createElement('h3');
-  notesListItemHeader.classList.add('notes-list-item-header');
-  notesListItemHeader.textContent = data.name;
-  // Level 3 <div.notes-list-item-header-buttons></div>
-  const notesListItemHeaderButtons = document.createElement('div');
-  notesListItemHeaderButtons.classList.add('notes-list-item-header-buttons');
-  // Level 4 <label class="spoiler {condition}" for="{data.id}">{svg}</label>
-  const spoiler = document.createElement('label');
-  spoiler.classList.add('spoiler');
-  if (!hasDescription && isText) {
-    spoiler.classList.add('hidden');
-  }
-  spoiler.htmlFor = data.id;
-  spoiler.tabIndex = 0;
-  spoiler.insertAdjacentHTML(
-    'beforeend',
-    '<svg class="spoiler-svg" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 490.656 490.656" xml:space="preserve">'
-    + '    <g><g>\n'
-    + '        <path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0    c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667    C491.696,131.368,491.696,124.605,487.536,120.445z"/>\n'
-    + '    </g></g>'
-    + '</svg>\n',
-  );
-  // Level 4 <div.delete-note>{svg}</div>
+  notesListItem.classList.add('column', 'notes-list-item');
+  // Level 2 <div className="card">
+  const notesListItemWrapper = document.createElement('div');
+  notesListItemWrapper.classList.add('card', 'notes-list-item-header-wrapper');
+  // Level 3 <header className="card-header">
+  const notesListItemHeader = document.createElement('header');
+  notesListItemHeader.classList.add('card-header', 'notes-list-item-header');
+  // Level 4 <p className="card-header-title">
+  const cardHeaderTitle = document.createElement('p');
+  cardHeaderTitle.classList.add('card-header-title');
+  cardHeaderTitle.textContent = data.name;
+  // Level 4 <button className="card-header-icon delete-note" aria-label="delete">
   const deleteNote = document.createElement('button');
-  deleteNote.classList.add('delete-note');
+  deleteNote.classList.add('card-header-icon', 'delete-note');
+  deleteNote.ariaLabel = 'delete';
   deleteNote.type = 'button';
-  deleteNote.insertAdjacentHTML(
-    'beforeend',
-    '<svg class="delete-note-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">\n'
-  + '    <g>\n'
-  + '        <path d="m424 64h-88v-16c0-26.467-21.533-48-48-48h-64c-26.467 0-48 21.533-48 48v16h-88c-22.056 0-40 17.944-40 40v56c0 8.836 7.164 16 16 16h8.744l13.823 290.283c1.221 25.636 22.281 45.717 47.945 45.717h242.976c25.665 0 46.725-20.081 47.945-45.717l13.823-290.283h8.744c8.836 0 16-7.164 16-16v-56c0-22.056-17.944-40-40-40zm-216-16c0-8.822 7.178-16 16-16h64c8.822 0 16 7.178 16 16v16h-96zm-128 56c0-4.411 3.589-8 8-8h336c4.411 0 8 3.589 8 8v40c-4.931 0-331.567 0-352 0zm313.469 360.761c-.407 8.545-7.427 15.239-15.981 15.239h-242.976c-8.555 0-15.575-6.694-15.981-15.239l-13.751-288.761h302.44z"/>\n'
-  + '        <path d="m256 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '        <path d="m336 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '        <path d="m176 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '    </g>\n'
-  + '</svg>\n',
-  );
-  // Level 2 <p class="notes-list-item-description {condition}">{text}</p>
+  // Level 5 <span className="icon">
+  const iconContainer = document.createElement('span');
+  iconContainer.classList.add('icon');
+  // Level 6 <i className="fa-solid fa-trash"></i>
+  const icon = document.createElement('i');
+  icon.classList.add('fa-solid', 'fa-trash');
+  // Level 3 <div className="card-content">
+  const cardContent = document.createElement('div');
+  cardContent.classList.add('card-content');
+  // Level 4 <div className="content">
   const notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
+  notesListItemDescription.classList.add('content', 'notes-list-item-description');
   if (notesListItemDescription instanceof HTMLButtonElement) {
     notesListItemDescription.type = 'button';
+    notesListItemDescription.classList.add('button');
   }
-  notesListItemDescription.classList.add('notes-list-item-description');
   if (!hasDescription && isText) {
     notesListItemDescription.classList.add('hidden');
   }
@@ -209,13 +187,15 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     notesListItemDescription.textContent = data.content;
   }
 
-  notesListItem.insertAdjacentElement('beforeend', checkbox);
-  notesListItemHeaderWrapper.insertAdjacentElement('beforeend', notesListItemHeader);
-  notesListItemHeaderButtons.insertAdjacentElement('beforeend', spoiler);
-  notesListItemHeaderWrapper.insertAdjacentElement('beforeend', notesListItemHeaderButtons)
-    .insertAdjacentElement('beforeend', deleteNote);
-  notesListItem.insertAdjacentElement('beforeend', notesListItemHeaderWrapper)
-    .insertAdjacentElement('afterend', notesListItemDescription);
+  notesListItemWrapper.insertAdjacentElement('beforeend', cardContent)
+    .insertAdjacentElement('beforeend', notesListItemDescription);
+  notesListItem.insertAdjacentElement('beforeend', notesListItemWrapper)
+    .insertAdjacentElement('afterbegin', notesListItemHeader)
+    .insertAdjacentElement('beforeend', cardHeaderTitle)
+    .insertAdjacentElement('afterend', deleteNote)
+    .insertAdjacentElement('beforeend', iconContainer)
+    .insertAdjacentElement('beforeend', icon);
+
   notesList.append(notesListItem);
   masonry.appended(notesListItem);
 
@@ -237,20 +217,33 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     }
   }
 
-  // A listener for spoilers is needed to improve accessibility
-  spoiler.addEventListener('keyup', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      checkbox.checked = !checkbox.checked;
-      const evt = new Event('click', { bubbles: true });
-      evt.fromKeyboard = true;
-      checkbox.dispatchEvent(evt);
-    }
-  });
+  // // A listener for spoilers is needed to improve accessibility
+  // spoiler.addEventListener('keyup', (event) => {
+  //   if (event.key === 'Enter' || event.key === ' ') {
+  //     checkbox.checked = !checkbox.checked;
+  //     const evt = new Event('click', { bubbles: true });
+  //     evt.fromKeyboard = true;
+  //     checkbox.dispatchEvent(evt);
+  //   }
+  // });
 
-  if (!isText) {
-    const newNoteListener = () => {
-      previewListener(data.type, pipeBlob, data.id);
-    };
-    notesListItemDescription.addEventListener('click', newNoteListener);
-  }
+  // // TODO: resizeObserver -> masonry.layout on big text;
+  // if (!isText) {
+  //   const newNoteListener = () => {
+  //     // TODO: zustand
+  //     // previewListener(data.type, pipeBlob, data.id);
+  //     notesListItemDescription.textContent = 'Click to close the media!';
+  //     const media = document.createElement(data.type);
+  //     media.src = `http://localhost:3001/chest-of-notes/mongo/fetch/${data.id}`;
+  //     // media.src = `${serverHost}/chest-of-notes/mongo/fetch/${data.id}`;
+  //     // media.src = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
+  //     media.controls = true;
+  //     media.style.width = '100%';
+  //     media.style.borderRadius = '4px';
+  //     notesListItemDescription.insertAdjacentElement('afterend', media);
+  //     masonry.layout();
+  //     const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
+  //   };
+  //   notesListItemDescription.addEventListener('click', newNoteListener);
+  // }
 }

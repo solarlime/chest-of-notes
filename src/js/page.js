@@ -21,15 +21,13 @@ export default class Page {
     this.background = this.page.querySelectorAll('section, footer');
 
     const masonry = new Masonry(this.notesList, {
-      gutter: 10,
       itemSelector: '.notes-list-item',
-      percentPosition: true,
       columnWidth: '.notes-list-item',
     });
 
     this.modal = new Modal(this.page, masonry);
-    this.footerLogo = this.page.querySelector('.footer-logo');
-    this.about = this.page.querySelector('.about');
+    // this.footerLogo = this.page.querySelector('.footer-logo');
+    // this.about = this.page.querySelector('.about');
 
     // At first, it is needed to subscribe on server notifications
     // Without this feature, the app freezes when a big file is sent
@@ -108,7 +106,7 @@ export default class Page {
 
     // At first, fetched notes must be rendered
     if (this.fetchedData.length) {
-      [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+      // [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
       this.fetchedData.forEach((note) => {
         renderNewNote(
           this.notesList,
@@ -120,91 +118,92 @@ export default class Page {
         );
       });
       masonry.layout();
+      const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
       this.emptyList.style.visibility = 'visible';
     }
 
-    // Then, add functionality to spoilers
-    this.page.addEventListener('click', (event) => {
-      if (event.target.classList.contains('checkbox')) {
-        const spoiler = event.target;
-        const description = spoiler.closest('li').querySelector('.notes-list-item-description');
-        if (!event.isTrusted && !event.fromKeyboard) {
-          spoiler.checked = false;
-        }
-        if (spoiler.checked) {
-          description.style.maxHeight = `${description.scrollHeight}px`;
-          Array.from(this.page.querySelectorAll('.checkbox'))
-            .filter((item) => item.checked && item !== spoiler)
-            .forEach((item) => { item.dispatchEvent(new Event('click', { bubbles: true })); });
-        } else {
-          description.style.maxHeight = '';
-        }
-        const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 600);
-      }
-    });
+    // // Then, add functionality to spoilers
+    // this.page.addEventListener('click', (event) => {
+    //   if (event.target.classList.contains('checkbox')) {
+    //     const spoiler = event.target;
+    //     const description = spoiler.closest('li').querySelector('.notes-list-item-description');
+    //     if (!event.isTrusted && !event.fromKeyboard) {
+    //       spoiler.checked = false;
+    //     }
+    //     if (spoiler.checked) {
+    //       description.style.maxHeight = `${description.scrollHeight}px`;
+    //       Array.from(this.page.querySelectorAll('.checkbox'))
+    //         .filter((item) => item.checked && item !== spoiler)
+    //         .forEach((item) => { item.dispatchEvent(new Event('click', { bubbles: true })); });
+    //     } else {
+    //       description.style.maxHeight = '';
+    //     }
+    //     const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 600);
+    //   }
+    // });
 
-    // Expanded notes should adapt if layout changes
-    window.addEventListener('resize', () => {
-      const timeout = setTimeout(() => {
-        Array.from(this.page.querySelectorAll('.checkbox'))
-          .filter((spoiler) => spoiler.checked)
-          .forEach((spoiler) => {
-            const description = spoiler.closest('li').querySelector('.notes-list-item-description');
-            description.style.maxHeight = `${description.scrollHeight}px`;
-          });
-        masonry.layout();
-        clearTimeout(timeout);
-      }, 1000);
-    });
+    // // Expanded notes should adapt if layout changes
+    // window.addEventListener('resize', () => {
+    //   const timeout = setTimeout(() => {
+    //     Array.from(this.page.querySelectorAll('.checkbox'))
+    //       .filter((spoiler) => spoiler.checked)
+    //       .forEach((spoiler) => {
+    //         const description = spoiler.closest('li').querySelector('.notes-list-item-description');
+    //         description.style.maxHeight = `${description.scrollHeight}px`;
+    //       });
+    //     masonry.layout();
+    //     clearTimeout(timeout);
+    //   }, 1000);
+    // });
 
-    this.notes.scrollIntoView();
+    // this.notes.scrollIntoView();
   }
 
-  addEventListeners() {
-    /**
-     * A listener for showing an 'about' modal
-     */
-    this.footerLogo.addEventListener('click', () => this.about.classList.add('active'));
-
-    /**
-     * A listener for hiding an 'about' modal after the animation end
-     */
-    this.about.addEventListener('animationend', () => this.about.classList.remove('active'));
-
-    /**
-     * A listener for an 'add' button
-     */
-    this.addButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      this.add.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    /**
-     * A listener for a 'back' button
-     */
-    this.backButton.addEventListener('click', (event) => {
-      event.preventDefault();
-      this.notes.scrollIntoView({ behavior: 'smooth' });
-    });
-
-    /**
-     * A listener to open the content modal
-     */
-    const contentButtons = [this.audioButton, this.videoButton, this.textButton];
-    contentButtons.forEach((button) => {
-      // Make a listener for each button
-      const listener = (event) => {
-        event.preventDefault();
-        // Resolve a modal view according to a clicked button
-        // eslint-disable-next-line max-len
-        const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
-        animateModals(modalAdd, this.background, 'open');
-        if (type !== 'text') {
-          this.modal.addModalButtonListeners();
-        }
-      };
-      button.addEventListener('click', listener);
-    });
-  }
+  // addEventListeners() {
+  //   /**
+  //    * A listener for showing an 'about' modal
+  //    */
+  //   this.footerLogo.addEventListener('click', () => this.about.classList.add('active'));
+  //
+  //   /**
+  //    * A listener for hiding an 'about' modal after the animation end
+  //    */
+  //   this.about.addEventListener('animationend', () => this.about.classList.remove('active'));
+  //
+  //   /**
+  //    * A listener for an 'add' button
+  //    */
+  //   this.addButton.addEventListener('click', (event) => {
+  //     event.preventDefault();
+  //     this.add.scrollIntoView({ behavior: 'smooth' });
+  //   });
+  //
+  //   /**
+  //    * A listener for a 'back' button
+  //    */
+  //   this.backButton.addEventListener('click', (event) => {
+  //     event.preventDefault();
+  //     this.notes.scrollIntoView({ behavior: 'smooth' });
+  //   });
+  //
+  //   /**
+  //    * A listener to open the content modal
+  //    */
+  //   const contentButtons = [this.audioButton, this.videoButton, this.textButton];
+  //   contentButtons.forEach((button) => {
+  //     // Make a listener for each button
+  //     const listener = (event) => {
+  //       event.preventDefault();
+  //       // Resolve a modal view according to a clicked button
+  //       // eslint-disable-next-line max-len
+  //       const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
+  //       animateModals(modalAdd, this.background, 'open');
+  //       if (type !== 'text') {
+  //         this.modal.addModalButtonListeners();
+  //       }
+  //     };
+  //     button.addEventListener('click', listener);
+  //   });
+  // }
 }

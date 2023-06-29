@@ -55,6 +55,8 @@
     "uniqid": "^5.4.0",
     "validator": "^13.9.0"
   },
-  "browserslist": [ "defaults" ],
+  "browserslist": [
+    "defaults"
+  ],
   "packageManager": "yarn@3.4.1"
 }
