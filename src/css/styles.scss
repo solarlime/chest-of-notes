@@ -112,6 +112,9 @@ body {
     left: unset;
     right: 0;
     width: 20px;
+    @include from(770px) {
+      width: 28px;
+    }
     &:nth-child(1) {
       transform: translateY(5px) rotate(90deg);
     }

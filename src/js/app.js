@@ -31,7 +31,7 @@ export default class App {
       }
       store.setState((previous) => ({ ...previous, items: result.data }));
       const page = new Page(serverHost, store);
-      // page.addEventListeners();
+      page.addEventListeners();
 
       console.log('Initiated!');
     } catch (e) {

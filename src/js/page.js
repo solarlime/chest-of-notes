@@ -9,6 +9,9 @@ export default class Page {
     this.serverHost = serverHost;
     this.store = store;
     this.page = document.body;
+    this.burger = this.page.querySelector('.navbar-burger');
+    this.burgerMenu = this.page.querySelector('.navbar-menu');
+    this.menuButton = this.page.querySelector('.menu-button');
     this.add = this.page.querySelector('.add');
     this.notes = this.page.querySelector('.notes');
     this.emptyList = this.page.querySelector('.notes-empty-list');
@@ -195,7 +198,24 @@ export default class Page {
     // this.notes.scrollIntoView();
   }
 
-  // addEventListeners() {
+  addEventListeners() {
+    /**
+     * A listener for showing adding options (desktop)
+     */
+    this.menuButton.addEventListener('click', (event) => {
+      event.preventDefault();
+      event.target.parentElement.classList.toggle('is-active');
+    });
+
+    /**
+     * A listener for showing adding options (mobile)
+     */
+    this.burger.addEventListener('click', (event) => {
+      event.preventDefault();
+      this.burger.classList.toggle('is-active');
+      this.burgerMenu.classList.toggle('is-active');
+    });
+
   //   /**
   //    * A listener for showing an 'about' modal
   //    */
@@ -240,5 +260,5 @@ export default class Page {
   //     };
   //     button.addEventListener('click', listener);
   //   });
-  // }
+  }
 }
