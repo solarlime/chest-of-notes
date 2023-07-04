@@ -53,7 +53,8 @@
     "audio-recorder-polyfill": "^0.4.1",
     "masonry-layout": "^4.2.2",
     "uniqid": "^5.4.0",
-    "validator": "^13.9.0"
+    "validator": "^13.9.0",
+    "zustand": "^4.3.8"
   },
   "browserslist": [
     "defaults"

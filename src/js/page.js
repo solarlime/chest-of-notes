@@ -5,9 +5,9 @@ import Preview from './preview';
 import { animateModals, renderNewNote } from './utils';
 
 export default class Page {
-  constructor(serverHost, fetchedData) {
+  constructor(serverHost, store) {
     this.serverHost = serverHost;
-    this.fetchedData = fetchedData;
+    this.store = store;
     this.page = document.body;
     this.add = this.page.querySelector('.add');
     this.notes = this.page.querySelector('.notes');
@@ -84,30 +84,65 @@ export default class Page {
       }
     };
 
-    this.previewListener = (dataType, dataContent, dataId) => {
-      const previewWrapper = this.page.querySelector('.preview');
-      const preview = new Preview(this.serverHost, previewWrapper, dataId, dataType, dataContent);
-      animateModals(previewWrapper, this.background, 'open');
+    // this.previewListener = (dataType, dataContent, dataId) => {
+    //   const previewWrapper = this.page.querySelector('.preview');
+    //   const preview = new Preview(this.serverHost, previewWrapper, dataId, dataType, dataContent);
+    //   animateModals(previewWrapper, this.background, 'open');
+    //
+    //   const closeListener = (event) => {
+    //     if (event.target.classList.contains('preview')) {
+    //       preview.closeModal(this.background);
+    //       previewWrapper.removeEventListener('click', closeListener);
+    //     }
+    //   };
+    //   previewWrapper.addEventListener('click', closeListener);
+    //   // A way to close without a mouse
+    //   previewWrapper.addEventListener('keyup', (event) => {
+    //     if (event.key === 'Escape') {
+    //       previewWrapper.dispatchEvent(new Event('click'));
+    //     }
+    //   }, { once: true });
+    // };
+    const unsubscribe = store.subscribe(() => {
+      console.log('store:', store.getState());
+      masonry.layout();
+      const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
+    });
 
-      const closeListener = (event) => {
-        if (event.target.classList.contains('preview')) {
-          preview.closeModal(this.background);
-          previewWrapper.removeEventListener('click', closeListener);
-        }
+    this.previewListener = (id, description, type) => {
+      const { opened } = store.getState();
+      const close = (idToClose) => {
+        const previousMediaContainer = this.notesList.querySelector(`[data-id="${idToClose}"]`);
+        const previousDescription = previousMediaContainer.querySelector('.notes-list-item-description');
+        const previousMedia = previousMediaContainer.querySelector('.media');
+        previousMedia.remove();
+        previousDescription.textContent = 'Click to open the media!';
       };
-      previewWrapper.addEventListener('click', closeListener);
-      // A way to close without a mouse
-      previewWrapper.addEventListener('keyup', (event) => {
-        if (event.key === 'Escape') {
-          previewWrapper.dispatchEvent(new Event('click'));
+
+      if (opened !== id) {
+        if (opened !== null) {
+          close(opened);
         }
-      }, { once: true });
+        description.textContent = 'Click to close the media!';
+        const media = document.createElement(type);
+        media.src = `http://localhost:3001/chest-of-notes/mongo/fetch/${id}`;
+        media.className = 'media';
+        media.controls = true;
+        media.style.width = '100%';
+        media.style.borderRadius = '4px';
+        description.insertAdjacentElement('afterend', media);
+        store.setState((previous) => ({ ...previous, opened: id }));
+      } else {
+        close(opened);
+        store.setState((previous) => ({ ...previous, opened: null }));
+      }
     };
 
     // At first, fetched notes must be rendered
-    if (this.fetchedData.length) {
-      // [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
-      this.fetchedData.forEach((note) => {
+    const fetchedData = this.store.getState().items;
+    if (fetchedData.length) {
+      this.notesList.hidden = false;
+      fetchedData.forEach((note) => {
         renderNewNote(
           this.notesList,
           note,
@@ -120,7 +155,7 @@ export default class Page {
       masonry.layout();
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
-      this.emptyList.style.visibility = 'visible';
+      this.emptyList.hidden = false;
     }
 
     // // Then, add functionality to spoilers

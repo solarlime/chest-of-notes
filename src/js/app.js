@@ -1,3 +1,4 @@
+import { createStore } from 'zustand/vanilla';
 import Page from './page';
 
 export default class App {
@@ -14,6 +15,10 @@ export default class App {
     // It's necessary to recognise if the page is loaded locally or not to choose a server location
     const serverHost = process.env.SERVERHOST ? process.env.SERVERHOST : 'http://localhost:3001';
 
+    const store = createStore(() => ({
+      opened: null,
+    }));
+
     // Some notes may have been uploaded yet. Fetch them!
     try {
       const res = await fetch(`${serverHost}/chest-of-notes/mongo/fetch/all`, {
@@ -24,7 +29,8 @@ export default class App {
       if (result.status.includes('Error')) {
         throw Error(result.data);
       }
-      const page = new Page(serverHost, result.data);
+      store.setState((previous) => ({ ...previous, items: result.data }));
+      const page = new Page(serverHost, store);
       // page.addEventListeners();
 
       console.log('Initiated!');

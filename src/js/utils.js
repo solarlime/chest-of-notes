@@ -213,6 +213,7 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
       notesListItemDescription.disabled = true;
     } else {
       notesListItemDescription.classList.add('media-content');
+      cardContent.setAttribute('data-id', data.id);
       notesListItemDescription.textContent = 'Click to open the media!';
     }
   }
@@ -227,23 +228,12 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   //   }
   // });
 
-  // // TODO: resizeObserver -> masonry.layout on big text;
-  // if (!isText) {
-  //   const newNoteListener = () => {
-  //     // TODO: zustand
-  //     // previewListener(data.type, pipeBlob, data.id);
-  //     notesListItemDescription.textContent = 'Click to close the media!';
-  //     const media = document.createElement(data.type);
-  //     media.src = `http://localhost:3001/chest-of-notes/mongo/fetch/${data.id}`;
-  //     // media.src = `${serverHost}/chest-of-notes/mongo/fetch/${data.id}`;
-  //     // media.src = 'http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/TearsOfSteel.mp4';
-  //     media.controls = true;
-  //     media.style.width = '100%';
-  //     media.style.borderRadius = '4px';
-  //     notesListItemDescription.insertAdjacentElement('afterend', media);
-  //     masonry.layout();
-  //     const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
-  //   };
-  //   notesListItemDescription.addEventListener('click', newNoteListener);
-  // }
+  // TODO: resizeObserver -> masonry.layout on big text;
+  if (!isText) {
+    const newNoteListener = () => {
+      previewListener(data.id, notesListItemDescription, data.type);
+      // previewListener(data.type, pipeBlob, data.id);
+    };
+    notesListItemDescription.addEventListener('click', newNoteListener);
+  }
 }

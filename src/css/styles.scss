@@ -121,17 +121,16 @@ body {
 .hero {
   min-height: unset;
   flex-basis: 100vh;
-  overflow: hidden;
-}
-
-.hero-body.columns {
-  padding: 0;
-  margin: 0;
   overflow-y: scroll;
   scrollbar-width: none;
   &::-webkit-scrollbar {
     width: 0;
   }
+}
+
+.hero-body.columns {
+  padding: 0;
+  margin: 0;
 }
 
 .column {
