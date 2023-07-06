@@ -6,20 +6,21 @@ import {
 } from './utils';
 
 export default class Modal {
-  constructor(page, masonry) {
-    this.modalAdd = page.querySelector('.modal-add');
-    this.modalAddForm = page.querySelector('.modal-add-form');
-    this.modalAddFormHeader = page.querySelector('.modal-add-form-header');
-    this.modalFormName = page.querySelector('#modal-add-form-input');
-    this.modalFormTextArea = page.querySelector('#modal-add-form-text-area');
-    this.modalFormText = page.querySelector('.modal-add-form-text');
-    this.modalFormDescriptionBoth = page.querySelector('.modal-add-form-description-both');
-    this.modalFormDescriptionMedia = page.querySelector('.modal-add-form-description-media');
-    this.modalFormMedia = page.querySelector('.modal-add-form-media');
-    this.modalStartButton = page.querySelector('button.start');
-    this.modalStopButton = page.querySelector('button.stop');
-    this.modalSaveButton = page.querySelector('button.save');
-    this.modalCloseButton = page.querySelector('button.close');
+  constructor(serverHost, page, masonry) {
+    this.page = page;
+    this.serverHost = serverHost;
+    this.modalAdd = this.page.querySelector('.modal-add');
+    this.modalAddForm = this.page.querySelector('.modal-add-form');
+    this.modalAddFormHeader = this.page.querySelector('.modal-add-form-header');
+    this.modalFormName = this.page.querySelector('#modal-add-form-input');
+    this.modalFormTextArea = this.page.querySelector('#modal-add-form-text-area');
+    this.modalFormText = this.page.querySelector('.modal-add-form-text');
+    this.modalFormDescriptionBoth = this.page.querySelector('.modal-add-form-description-both');
+    this.modalFormDescriptionMedia = this.page.querySelector('.modal-add-form-description-media');
+    this.modalFormMedia = this.page.querySelector('.modal-add-form-media');
+    this.modalStartButton = this.page.querySelector('button.start');
+    this.modalStopButton = this.page.querySelector('button.stop');
+    this.modalSaveButton = this.page.querySelector('button.save');
     this.masonry = masonry;
 
     this.media = null;
@@ -34,13 +35,42 @@ export default class Modal {
    * A function to resolve, what appearance is needed for an adding modal now
    */
   openModal(serverHost, button, contentButtons, deleteListener, previewListener) {
+    const cancelListener = (event) => {
+      const form = event.target.closest('.form');
+      this.masonry.remove(form);
+      // If event.isTrusted === true => form is replacing with a note => is no need to trigger masonry
+      if (event.isTrusted) this.masonry.layout();
+    };
+
+    const saveListener = async (formName, type) => {
+      const { name, content } = document.forms[formName];
+      const data = await sendData(serverHost, name.value, type, this.pipeBlob, content.value);
+      const closeButton = this.page.querySelector('button.cancel');
+      closeButton.dispatchEvent(new Event('click'));
+      if (typeof data === 'string') {
+        alert(`Your note wasn't saved. Server response: ${data}`);
+      } else {
+        render(
+          type,
+          this.notesList,
+          data,
+          this.pipeBlob,
+          deleteListener,
+          previewListener,
+          null,
+          this.masonry,
+        );
+      }
+    };
+
     render(
       'text',
       this.notesList,
       null,
       null,
+      cancelListener,
       null,
-      null,
+      saveListener,
       this.masonry,
     );
 

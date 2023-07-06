@@ -28,7 +28,7 @@ export default class Page {
       columnWidth: '.notes-list-item',
     });
 
-    this.modal = new Modal(this.page, masonry);
+    this.modal = new Modal(this.serverHost, this.page, masonry);
     // this.footerLogo = this.page.querySelector('.footer-logo');
     // this.about = this.page.querySelector('.about');
 
@@ -159,6 +159,7 @@ export default class Page {
           null,
           this.deleteListener,
           this.previewListener,
+          null,
           masonry,
         );
       });

@@ -64,19 +64,19 @@ export function animateModals(modal, background, action) {
  * @param modalFormTextArea
  * @returns {Promise<{name, id: *, type}>} - a data object (without a file - for notes with media)
  */
-export async function sendData(serverHost, modalFormName, type, pipeBlob, modalFormTextArea) {
+export async function sendData(serverHost, name, type, pipeBlob, text) {
   const id = uniqid();
   const data = {
     id,
-    name: modalFormName.value,
+    name,
     type,
   };
 
   const formData = new FormData();
   Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
   if (data.type === 'text') {
-    formData.set('content', modalFormTextArea.value);
-    data.content = modalFormTextArea.value;
+    formData.set('content', text);
+    data.content = text;
   } else {
     formData.set('content', pipeBlob);
     data.content = 'media';
@@ -142,7 +142,7 @@ export async function recordSomeMedia(media) {
  * @param previewListener
  * @param masonry
  */
-export function render(type, notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
+export function render(type, notesList, data, pipeBlob, deleteListener, previewListener, saveListener, masonry) {
   // Level 1 <li.column.notes-list-item></li>
   const notesListItem = document.createElement('li');
   notesListItem.classList.add('column', 'notes-list-item');
@@ -171,16 +171,25 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
 
   switch (type) {
     case 'text': {
+      const formName = 'addForm';
+
+      notesListItem.classList.add('form');
+
       // Level 2 <form className="card">
       notesListItemWrapper = document.createElement('form');
       notesListItemWrapper.classList.add('card');
+      notesListItemWrapper.name = formName;
 
       // Level 5 <input class="input" type="text" placeholder="Type the note's name">
       const input = document.createElement('input');
       input.classList.add('input');
       input.type = 'text';
+      input.name = 'name';
+      input.required = true;
       input.placeholder = 'Type the note\'s name';
       cardHeaderTitle.append(input);
+
+      notesListItem.addEventListener('submit', (event) => event.preventDefault());
 
       deleteNote.classList.add('cancel');
       deleteNote.ariaLabel = 'cancel';
@@ -193,6 +202,7 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
       // Level 5 <textarea class="textarea" placeholder="Type the note's content"></textarea>
       const textarea = document.createElement('textarea');
       textarea.classList.add('textarea');
+      textarea.name = 'content';
       textarea.placeholder = 'Type the note\'s content';
       notesListItemDescription.append(textarea);
 
@@ -203,10 +213,14 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
       // Level 5 <button class="button save" type="button">Save</button>
       const saveButton = document.createElement('button');
       saveButton.classList.add('button', 'save');
-      saveButton.type = 'button';
+      saveButton.type = 'submit';
       saveButton.textContent = 'Save';
 
+      saveButton.addEventListener('click', () => saveListener(formName, type));
+
       cardContent.insertAdjacentElement('beforeend', control).append(saveButton);
+      deleteNote.addEventListener('click', deleteListener, { once: true });
+
       break;
     }
     case 'audio': {
