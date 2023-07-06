@@ -6,8 +6,9 @@ import {
 } from './utils';
 
 export default class Modal {
-  constructor(serverHost, page, masonry) {
+  constructor(serverHost, page, store, masonry) {
     this.page = page;
+    this.store = store;
     this.serverHost = serverHost;
     this.modalAdd = this.page.querySelector('.modal-add');
     this.modalAddForm = this.page.querySelector('.modal-add-form');
@@ -60,6 +61,7 @@ export default class Modal {
           null,
           this.masonry,
         );
+        this.store.setState((previous) => ({ ...previous, items: [...previous.items, data] }));
       }
     };
 

@@ -28,7 +28,7 @@ export default class Page {
       columnWidth: '.notes-list-item',
     });
 
-    this.modal = new Modal(this.serverHost, this.page, masonry);
+    this.modal = new Modal(this.serverHost, this.page, this.store, masonry);
     // this.footerLogo = this.page.querySelector('.footer-logo');
     // this.about = this.page.querySelector('.about');
 
@@ -79,12 +79,12 @@ export default class Page {
       if (result.status === 'Deleted') {
         const itemToDelete = event.target.closest('.notes-list-item');
         masonry.remove(itemToDelete);
-        masonry.layout();
+        this.store.setState((previous) => ({ ...previous, items: previous.items.filter((item) => item.id !== dataId) }));
       }
-      if (!this.notesList.children.length) {
-        [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
-        this.emptyList.style.visibility = 'visible';
-      }
+      // if (!this.notesList.children.length) {
+      //   [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+      //   this.emptyList.style.visibility = 'visible';
+      // }
     };
 
     // this.previewListener = (dataType, dataContent, dataId) => {
