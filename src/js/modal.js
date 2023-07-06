@@ -51,7 +51,7 @@ export default class Modal {
         alert(`Your note wasn't saved. Server response: ${data}`);
       } else {
         render(
-          type,
+          'note',
           this.notesList,
           data,
           this.pipeBlob,

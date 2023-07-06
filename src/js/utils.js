@@ -256,8 +256,8 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
         notesListItemDescription.textContent = data.content;
       }
 
-      const deleteButtonListener = () => {
-        deleteListener(data.id);
+      const deleteButtonListener = (event) => {
+        deleteListener(event, data.id);
       };
       deleteNote.addEventListener('click', deleteButtonListener, { once: true });
 

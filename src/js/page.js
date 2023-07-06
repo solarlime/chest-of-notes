@@ -69,7 +69,7 @@ export default class Page {
     });
 
     // Listener functions are initiated in a constructor and are given as callbacks
-    this.deleteListener = async (dataId) => {
+    this.deleteListener = async (event, dataId) => {
       const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
       const result = await res.json();
       console.log(result);
@@ -77,8 +77,8 @@ export default class Page {
         alert(`Cannot delete! Server response: ${result.data}`);
       }
       if (result.status === 'Deleted') {
-        const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
-        itemToDelete.remove();
+        const itemToDelete = event.target.closest('.notes-list-item');
+        masonry.remove(itemToDelete);
         masonry.layout();
       }
       if (!this.notesList.children.length) {
