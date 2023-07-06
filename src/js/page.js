@@ -259,6 +259,11 @@ export default class Page {
       // Make a listener for each button
       const listener = (event) => {
         event.preventDefault();
+        [this.burger, this.menuButton].forEach((btn) => {
+          if (btn.classList.contains('is-active') || (btn.parentElement.classList.contains('is-active'))) {
+            btn.dispatchEvent(new Event('click'));
+          }
+        });
         this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
 
         // // Resolve a modal view according to a clicked button

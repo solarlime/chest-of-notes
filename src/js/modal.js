@@ -65,7 +65,7 @@ export default class Modal {
       }
     };
 
-    render(
+    const newItem = render(
       'text',
       this.notesList,
       null,
@@ -75,6 +75,7 @@ export default class Modal {
       saveListener,
       this.masonry,
     );
+    newItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     // const [audioButton, videoButton, textButton] = contentButtons;
     //

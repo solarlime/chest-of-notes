@@ -298,6 +298,8 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
   notesList.append(notesListItem);
   masonry.prepended(notesListItem);
 
+  return notesListItem;
+
   // // A listener for spoilers is needed to improve accessibility
   // spoiler.addEventListener('keyup', (event) => {
   //   if (event.key === 'Enter' || event.key === ' ') {
