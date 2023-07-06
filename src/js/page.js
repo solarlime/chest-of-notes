@@ -2,7 +2,7 @@
 import Masonry from 'masonry-layout';
 import Modal from './modal';
 import Preview from './preview';
-import { animateModals, renderNewNote } from './utils';
+import { animateModals, render } from './utils';
 
 export default class Page {
   constructor(serverHost, store) {
@@ -112,7 +112,7 @@ export default class Page {
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     });
 
-    this.previewListener = (id, description, type) => {
+    this.previewListener = (id, description, type, pipeBlob) => {
       const { opened } = store.getState();
       const close = (idToClose) => {
         const previousMediaContainer = this.notesList.querySelector(`[data-id="${idToClose}"]`);
@@ -128,7 +128,12 @@ export default class Page {
         }
         description.textContent = 'Click to close the media!';
         const media = document.createElement(type);
-        media.src = `http://localhost:3001/chest-of-notes/mongo/fetch/${id}`;
+        if (pipeBlob) {
+          media.src = URL.createObjectURL(pipeBlob);
+        } else {
+          media.src = `${this.serverHost}/chest-of-notes/mongo/fetch/${id}`;
+        }
+
         media.className = 'media';
         media.controls = true;
         media.style.width = '100%';
@@ -143,10 +148,12 @@ export default class Page {
 
     // At first, fetched notes must be rendered
     const fetchedData = this.store.getState().items;
+    // const fetchedData = [];
     if (fetchedData.length) {
       this.notesList.hidden = false;
       fetchedData.forEach((note) => {
-        renderNewNote(
+        render(
+          'note',
           this.notesList,
           note,
           null,
@@ -159,6 +166,7 @@ export default class Page {
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
       this.emptyList.hidden = false;
+      // this.notesList.hidden = false;
     }
 
     // // Then, add functionality to spoilers
@@ -216,49 +224,51 @@ export default class Page {
       this.burgerMenu.classList.toggle('is-active');
     });
 
-  //   /**
-  //    * A listener for showing an 'about' modal
-  //    */
-  //   this.footerLogo.addEventListener('click', () => this.about.classList.add('active'));
-  //
-  //   /**
-  //    * A listener for hiding an 'about' modal after the animation end
-  //    */
-  //   this.about.addEventListener('animationend', () => this.about.classList.remove('active'));
-  //
-  //   /**
-  //    * A listener for an 'add' button
-  //    */
-  //   this.addButton.addEventListener('click', (event) => {
-  //     event.preventDefault();
-  //     this.add.scrollIntoView({ behavior: 'smooth' });
-  //   });
-  //
-  //   /**
-  //    * A listener for a 'back' button
-  //    */
-  //   this.backButton.addEventListener('click', (event) => {
-  //     event.preventDefault();
-  //     this.notes.scrollIntoView({ behavior: 'smooth' });
-  //   });
-  //
-  //   /**
-  //    * A listener to open the content modal
-  //    */
-  //   const contentButtons = [this.audioButton, this.videoButton, this.textButton];
-  //   contentButtons.forEach((button) => {
-  //     // Make a listener for each button
-  //     const listener = (event) => {
-  //       event.preventDefault();
-  //       // Resolve a modal view according to a clicked button
-  //       // eslint-disable-next-line max-len
-  //       const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
-  //       animateModals(modalAdd, this.background, 'open');
-  //       if (type !== 'text') {
-  //         this.modal.addModalButtonListeners();
-  //       }
-  //     };
-  //     button.addEventListener('click', listener);
-  //   });
+    //   /**
+    //    * A listener for showing an 'about' modal
+    //    */
+    //   this.footerLogo.addEventListener('click', () => this.about.classList.add('active'));
+    //
+    //   /**
+    //    * A listener for hiding an 'about' modal after the animation end
+    //    */
+    //   this.about.addEventListener('animationend', () => this.about.classList.remove('active'));
+    //
+    //   /**
+    //    * A listener for an 'add' button
+    //    */
+    //   this.addButton.addEventListener('click', (event) => {
+    //     event.preventDefault();
+    //     this.add.scrollIntoView({ behavior: 'smooth' });
+    //   });
+    //
+    //   /**
+    //    * A listener for a 'back' button
+    //    */
+    //   this.backButton.addEventListener('click', (event) => {
+    //     event.preventDefault();
+    //     this.notes.scrollIntoView({ behavior: 'smooth' });
+    //   });
+    //
+    /**
+     * A listener to open the content modal
+     */
+    const contentButtons = [this.audioButton, this.videoButton, this.textButton];
+    contentButtons.forEach((button) => {
+      // Make a listener for each button
+      const listener = (event) => {
+        event.preventDefault();
+        this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
+
+        // // Resolve a modal view according to a clicked button
+        // // eslint-disable-next-line max-len
+        // const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
+        // animateModals(modalAdd, this.background, 'open');
+        // if (type !== 'text') {
+        //   this.modal.addModalButtonListeners();
+        // }
+      };
+      button.addEventListener('click', listener);
+    });
   }
 }

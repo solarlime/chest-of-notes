@@ -142,53 +142,138 @@ export async function recordSomeMedia(media) {
  * @param previewListener
  * @param masonry
  */
-export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
-  const isText = (data.type === 'text');
-  const hasDescription = !!data.content;
+export function render(type, notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
   // Level 1 <li.column.notes-list-item></li>
   const notesListItem = document.createElement('li');
   notesListItem.classList.add('column', 'notes-list-item');
-  // Level 2 <div className="card">
-  const notesListItemWrapper = document.createElement('div');
-  notesListItemWrapper.classList.add('card', 'notes-list-item-header-wrapper');
+  // Level 2
+  let notesListItemWrapper;
   // Level 3 <header className="card-header">
   const notesListItemHeader = document.createElement('header');
-  notesListItemHeader.classList.add('card-header', 'notes-list-item-header');
+  notesListItemHeader.classList.add('card-header');
   // Level 4 <p className="card-header-title">
   const cardHeaderTitle = document.createElement('p');
   cardHeaderTitle.classList.add('card-header-title');
-  cardHeaderTitle.textContent = data.name;
-  // Level 4 <button className="card-header-icon delete-note" aria-label="delete">
+  // Level 4 <button className="card-header-icon delete-note" aria-label="delete" type="button">
   const deleteNote = document.createElement('button');
-  deleteNote.classList.add('card-header-icon', 'delete-note');
-  deleteNote.ariaLabel = 'delete';
+  deleteNote.classList.add('card-header-icon');
   deleteNote.type = 'button';
   // Level 5 <span className="icon">
   const iconContainer = document.createElement('span');
   iconContainer.classList.add('icon');
   // Level 6 <i className="fa-solid fa-trash"></i>
   const icon = document.createElement('i');
-  icon.classList.add('fa-solid', 'fa-trash');
   // Level 3 <div className="card-content">
   const cardContent = document.createElement('div');
   cardContent.classList.add('card-content');
-  // Level 4 <div className="content">
-  const notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
-  notesListItemDescription.classList.add('content', 'notes-list-item-description');
-  if (notesListItemDescription instanceof HTMLButtonElement) {
-    notesListItemDescription.type = 'button';
-    notesListItemDescription.classList.add('button');
-  }
-  if (!hasDescription && isText) {
-    notesListItemDescription.classList.add('hidden');
-  }
+  // Level 4
+  let notesListItemDescription;
 
-  if (isText) {
-    notesListItemDescription.textContent = data.content;
+  switch (type) {
+    case 'text': {
+      // Level 2 <form className="card">
+      notesListItemWrapper = document.createElement('form');
+      notesListItemWrapper.classList.add('card');
+
+      // Level 5 <input class="input" type="text" placeholder="Type the note's name">
+      const input = document.createElement('input');
+      input.classList.add('input');
+      input.type = 'text';
+      input.placeholder = 'Type the note\'s name';
+      cardHeaderTitle.append(input);
+
+      deleteNote.classList.add('cancel');
+      deleteNote.ariaLabel = 'cancel';
+
+      icon.classList.add('fa-solid', 'fa-circle-xmark');
+      // Level 4 <div className="content">
+      notesListItemDescription = document.createElement('div');
+      notesListItemDescription.classList.add('content');
+
+      // Level 5 <textarea class="textarea" placeholder="Type the note's content"></textarea>
+      const textarea = document.createElement('textarea');
+      textarea.classList.add('textarea');
+      textarea.placeholder = 'Type the note\'s content';
+      notesListItemDescription.append(textarea);
+
+      // Level 4 <div class="control">
+      const control = document.createElement('div');
+      control.classList.add('control');
+
+      // Level 5 <button class="button save" type="button">Save</button>
+      const saveButton = document.createElement('button');
+      saveButton.classList.add('button', 'save');
+      saveButton.type = 'button';
+      saveButton.textContent = 'Save';
+
+      cardContent.insertAdjacentElement('beforeend', control).append(saveButton);
+      break;
+    }
+    case 'audio': {
+      break;
+    }
+    case 'video': {
+      break;
+    }
+    default: {
+      const isText = (data.type === 'text');
+      const hasDescription = !!data.content;
+      // Level 2 <div className="card notes-list-item-header-wrapper">
+      notesListItemWrapper = document.createElement('div');
+      notesListItemWrapper.classList.add('card', 'notes-list-item-header-wrapper');
+      notesListItemHeader.classList.add('notes-list-item-header');
+      cardHeaderTitle.textContent = data.name;
+      deleteNote.classList.add('delete-note');
+      deleteNote.ariaLabel = 'delete';
+      icon.classList.add('fa-solid', 'fa-trash');
+      // Level 4 <p/button className="content notes-list-item-description">
+      notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
+      notesListItemDescription.classList.add('content', 'notes-list-item-description');
+
+      if (notesListItemDescription instanceof HTMLButtonElement) {
+        notesListItemDescription.type = 'button';
+        notesListItemDescription.classList.add('button');
+      }
+      if (!hasDescription && isText) {
+        notesListItemDescription.classList.add('hidden');
+      }
+
+      if (isText) {
+        notesListItemDescription.textContent = data.content;
+      }
+
+      const deleteButtonListener = () => {
+        deleteListener(data.id);
+      };
+      deleteNote.addEventListener('click', deleteButtonListener, { once: true });
+
+      // New notes shouldn't be available to use before they are ready for it
+      if (data.uploadComplete !== undefined) {
+        if (data.uploadComplete === false) {
+          deleteNote.disabled = true;
+          deleteNote.querySelector('svg').style.fill = '#aaaaaa';
+          notesListItemDescription.textContent = 'Please, wait — your file is uploading...';
+          notesListItemDescription.disabled = true;
+        } else {
+          notesListItemDescription.classList.add('media-content');
+          cardContent.setAttribute('data-id', data.id);
+          notesListItemDescription.textContent = 'Click to open the media!';
+        }
+      }
+
+      if (!isText) {
+        const newNoteListener = () => {
+          previewListener(data.id, notesListItemDescription, data.type, pipeBlob);
+          // previewListener(data.type, pipeBlob, data.id);
+        };
+        notesListItemDescription.addEventListener('click', newNoteListener);
+      }
+      break;
+    }
   }
 
   notesListItemWrapper.insertAdjacentElement('beforeend', cardContent)
-    .insertAdjacentElement('beforeend', notesListItemDescription);
+    .insertAdjacentElement('afterbegin', notesListItemDescription);
   notesListItem.insertAdjacentElement('beforeend', notesListItemWrapper)
     .insertAdjacentElement('afterbegin', notesListItemHeader)
     .insertAdjacentElement('beforeend', cardHeaderTitle)
@@ -197,26 +282,7 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
     .insertAdjacentElement('beforeend', icon);
 
   notesList.append(notesListItem);
-  masonry.appended(notesListItem);
-
-  const deleteButtonListener = () => {
-    deleteListener(data.id);
-  };
-  deleteNote.addEventListener('click', deleteButtonListener, { once: true });
-
-  // New notes shouldn't be available to use before they are ready for it
-  if (data.uploadComplete !== undefined) {
-    if (data.uploadComplete === false) {
-      deleteNote.disabled = true;
-      deleteNote.querySelector('svg').style.fill = '#aaaaaa';
-      notesListItemDescription.textContent = 'Please, wait — your file is uploading...';
-      notesListItemDescription.disabled = true;
-    } else {
-      notesListItemDescription.classList.add('media-content');
-      cardContent.setAttribute('data-id', data.id);
-      notesListItemDescription.textContent = 'Click to open the media!';
-    }
-  }
+  masonry.prepended(notesListItem);
 
   // // A listener for spoilers is needed to improve accessibility
   // spoiler.addEventListener('keyup', (event) => {
@@ -229,11 +295,4 @@ export function renderNewNote(notesList, data, pipeBlob, deleteListener, preview
   // });
 
   // TODO: resizeObserver -> masonry.layout on big text;
-  if (!isText) {
-    const newNoteListener = () => {
-      previewListener(data.id, notesListItemDescription, data.type);
-      // previewListener(data.type, pipeBlob, data.id);
-    };
-    notesListItemDescription.addEventListener('click', newNoteListener);
-  }
 }

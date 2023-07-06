@@ -2,7 +2,7 @@
 import validator from 'validator';
 import Media from './media';
 import {
-  animateModals, recordSomeMedia, renderNewNote, sendData,
+  animateModals, recordSomeMedia, render, sendData,
 } from './utils';
 
 export default class Modal {
@@ -34,150 +34,162 @@ export default class Modal {
    * A function to resolve, what appearance is needed for an adding modal now
    */
   openModal(serverHost, button, contentButtons, deleteListener, previewListener) {
-    const [audioButton, videoButton, textButton] = contentButtons;
+    render(
+      'text',
+      this.notesList,
+      null,
+      null,
+      null,
+      null,
+      this.masonry,
+    );
 
-    /**
-     * A wrapper for a data sending function. Also calls rendering a new note
-     */
-    this.sendDataWrapper = async (event) => {
-      event.preventDefault();
-      // eslint-disable-next-line max-len
-      const data = await sendData(serverHost, this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
-      this.modalCloseButton.dispatchEvent(new Event('click'));
-      if (!this.emptyList.classList.contains('hidden')) {
-        this.emptyList.style.visibility = '';
-        [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
-      }
-      if (typeof data === 'string') {
-        alert(`Your note wasn't saved. Server response: ${data}`);
-      } else {
-        renderNewNote(
-          this.notesList,
-          data,
-          this.pipeBlob,
-          deleteListener,
-          previewListener,
-          this.masonry,
-        );
-      }
-    };
-
-    /**
-     * A function to close the content modal
-     */
-    this.closeModal = (event) => {
-      event.preventDefault();
-      animateModals(this.modalAdd, this.background, 'close');
-
-      if (this.media) this.media.removeMedia();
-      // Stop media recording if it's not stopped (early closing)
-      if (this.mediaRecorder) {
-        if (this.mediaRecorder.state !== 'inactive') this.mediaRecorder.stop();
-        this.mediaRecorder.removeEventListener('dataavailable', this.recorder);
-      }
-      // Clean the fields after saving
-      if (!event.isTrusted) {
-        [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
-      }
-      // Give some time for an animation to end
-      setTimeout(() => {
-        // eslint-disable-next-line max-len
-        [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
-          .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
-        if (!this.modalStopButton.classList.contains('hidden')) {
-          this.modalStopButton.classList.add('hidden');
-        }
-        for (const item of this.modalAddForm.children) {
-          item.classList.add('hidden');
-        }
-        // Disable the save button by default
-        this.modalSaveButton.disabled = true;
-        if (this.modalSaveButton.classList.contains('hidden')) {
-          this.modalSaveButton.classList.remove('hidden');
-        }
-        // Specially for mobiles: sometimes layout goes mad
-        window.dispatchEvent(new Event('resize'));
-      }, 500);
-      // After closing remove listeners
-      this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
-      this.modalStopButton.removeEventListener('click', this.stopListener);
-      this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
-      this.modalCloseButton.removeEventListener('click', this.closeModal);
-      this.modalAddForm.removeEventListener('submit', this.preventSubmit);
-    };
-
-    /**
-     * A wrapper for validating the note's header strings
-     */
-    const validatorWrapper = () => {
-      const string = this.modalFormName.value.trim();
-      this.modalSaveButton.disabled = validator.isEmpty(string)
-        || !validator.isLength(string, { min: 1, max: 60 });
-    };
-    this.modalFormName.addEventListener('input', validatorWrapper);
-
-    /**
-     * A wrapper to prevent submitting
-     */
-    this.preventSubmit = (event) => {
-      event.preventDefault();
-    };
-    this.modalAddForm.addEventListener('submit', this.preventSubmit);
-
-    switch (button) {
-      case audioButton: {
-        [this.modalAddFormHeader,
-          this.modalFormName,
-          this.modalFormMedia,
-          this.modalFormDescriptionMedia,
-          this.modalFormDescriptionBoth,
-        ].forEach((item) => item.classList.remove('hidden'));
-        this.type = 'audio';
-        this.media = new Media(this.modalAdd, 'modal', this.type);
-        this.mediaElement = this.media.mediaElement;
-        this.modalSaveButton.classList.add('hidden');
-        break;
-      }
-      case videoButton: {
-        [
-          this.modalAddFormHeader,
-          this.modalFormName,
-          this.modalFormMedia,
-          this.modalFormDescriptionMedia,
-          this.modalFormDescriptionBoth,
-        ].forEach((item) => item.classList.remove('hidden'));
-        this.type = 'video';
-        this.media = new Media(this.modalAdd, 'modal', this.type);
-        this.mediaElement = this.media.mediaElement;
-        this.modalSaveButton.classList.add('hidden');
-        break;
-      }
-      case textButton: {
-        [
-          this.modalAddFormHeader,
-          this.modalFormName,
-          this.modalFormText,
-          this.modalFormMedia,
-          this.modalFormDescriptionBoth,
-        ].forEach((item) => item.classList.remove('hidden'));
-        [this.modalStartButton, this.modalStopButton].forEach((item) => item.classList.add('hidden'));
-        this.type = 'text';
-        this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
-        this.modalCloseButton.addEventListener('click', this.closeModal);
-        break;
-      }
-      default: {
-        console.log('Hmm, something else happened!');
-      }
-    }
-    if (this.modalFormName.value.trim()) {
-      this.modalSaveButton.disabled = false;
-    }
-    const timeout = setTimeout(() => {
-      clearTimeout(timeout);
-      this.modalFormName.focus();
-    }, 500);
-    return { modalAdd: this.modalAdd, type: this.type };
+    // const [audioButton, videoButton, textButton] = contentButtons;
+    //
+    // /**
+    //  * A wrapper for a data sending function. Also calls rendering a new note
+    //  */
+    // this.sendDataWrapper = async (event) => {
+    //   event.preventDefault();
+    //   // eslint-disable-next-line max-len
+    //   const data = await sendData(serverHost, this.modalFormName, this.type, this.pipeBlob, this.modalFormTextArea);
+    //   this.modalCloseButton.dispatchEvent(new Event('click'));
+    //   if (!this.emptyList.classList.contains('hidden')) {
+    //     this.emptyList.style.visibility = '';
+    //     [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
+    //   }
+    //   if (typeof data === 'string') {
+    //     alert(`Your note wasn't saved. Server response: ${data}`);
+    //   } else {
+    //     render(
+    //       // TODO: replace 'type'
+    //       'type',
+    //       this.notesList,
+    //       data,
+    //       this.pipeBlob,
+    //       deleteListener,
+    //       previewListener,
+    //       this.masonry,
+    //     );
+    //   }
+    // };
+    //
+    // /**
+    //  * A function to close the content modal
+    //  */
+    // this.closeModal = (event) => {
+    //   event.preventDefault();
+    //   animateModals(this.modalAdd, this.background, 'close');
+    //
+    //   if (this.media) this.media.removeMedia();
+    //   // Stop media recording if it's not stopped (early closing)
+    //   if (this.mediaRecorder) {
+    //     if (this.mediaRecorder.state !== 'inactive') this.mediaRecorder.stop();
+    //     this.mediaRecorder.removeEventListener('dataavailable', this.recorder);
+    //   }
+    //   // Clean the fields after saving
+    //   if (!event.isTrusted) {
+    //     [this.modalFormName, this.modalFormTextArea].forEach((item) => { item.value = ''; });
+    //   }
+    //   // Give some time for an animation to end
+    //   setTimeout(() => {
+    //     // eslint-disable-next-line max-len
+    //     [this.modalFormText, this.modalStartButton, this.modalFormDescriptionMedia]
+    //       .forEach((item) => (item.classList.contains('hidden') ? item.classList.remove('hidden') : null));
+    //     if (!this.modalStopButton.classList.contains('hidden')) {
+    //       this.modalStopButton.classList.add('hidden');
+    //     }
+    //     for (const item of this.modalAddForm.children) {
+    //       item.classList.add('hidden');
+    //     }
+    //     // Disable the save button by default
+    //     this.modalSaveButton.disabled = true;
+    //     if (this.modalSaveButton.classList.contains('hidden')) {
+    //       this.modalSaveButton.classList.remove('hidden');
+    //     }
+    //     // Specially for mobiles: sometimes layout goes mad
+    //     window.dispatchEvent(new Event('resize'));
+    //   }, 500);
+    //   // After closing remove listeners
+    //   this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
+    //   this.modalStopButton.removeEventListener('click', this.stopListener);
+    //   this.modalSaveButton.removeEventListener('click', this.sendDataWrapper);
+    //   this.modalCloseButton.removeEventListener('click', this.closeModal);
+    //   this.modalAddForm.removeEventListener('submit', this.preventSubmit);
+    // };
+    //
+    // /**
+    //  * A wrapper for validating the note's header strings
+    //  */
+    // const validatorWrapper = () => {
+    //   const string = this.modalFormName.value.trim();
+    //   this.modalSaveButton.disabled = validator.isEmpty(string)
+    //     || !validator.isLength(string, { min: 1, max: 60 });
+    // };
+    // this.modalFormName.addEventListener('input', validatorWrapper);
+    //
+    // /**
+    //  * A wrapper to prevent submitting
+    //  */
+    // this.preventSubmit = (event) => {
+    //   event.preventDefault();
+    // };
+    // this.modalAddForm.addEventListener('submit', this.preventSubmit);
+    //
+    // switch (button) {
+    //   case audioButton: {
+    //     [this.modalAddFormHeader,
+    //       this.modalFormName,
+    //       this.modalFormMedia,
+    //       this.modalFormDescriptionMedia,
+    //       this.modalFormDescriptionBoth,
+    //     ].forEach((item) => item.classList.remove('hidden'));
+    //     this.type = 'audio';
+    //     this.media = new Media(this.modalAdd, 'modal', this.type);
+    //     this.mediaElement = this.media.mediaElement;
+    //     this.modalSaveButton.classList.add('hidden');
+    //     break;
+    //   }
+    //   case videoButton: {
+    //     [
+    //       this.modalAddFormHeader,
+    //       this.modalFormName,
+    //       this.modalFormMedia,
+    //       this.modalFormDescriptionMedia,
+    //       this.modalFormDescriptionBoth,
+    //     ].forEach((item) => item.classList.remove('hidden'));
+    //     this.type = 'video';
+    //     this.media = new Media(this.modalAdd, 'modal', this.type);
+    //     this.mediaElement = this.media.mediaElement;
+    //     this.modalSaveButton.classList.add('hidden');
+    //     break;
+    //   }
+    //   case textButton: {
+    //     [
+    //       this.modalAddFormHeader,
+    //       this.modalFormName,
+    //       this.modalFormText,
+    //       this.modalFormMedia,
+    //       this.modalFormDescriptionBoth,
+    //     ].forEach((item) => item.classList.remove('hidden'));
+    //     [this.modalStartButton, this.modalStopButton].forEach((item) => item.classList.add('hidden'));
+    //     this.type = 'text';
+    //     this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
+    //     this.modalCloseButton.addEventListener('click', this.closeModal);
+    //     break;
+    //   }
+    //   default: {
+    //     console.log('Hmm, something else happened!');
+    //   }
+    // }
+    // if (this.modalFormName.value.trim()) {
+    //   this.modalSaveButton.disabled = false;
+    // }
+    // const timeout = setTimeout(() => {
+    //   clearTimeout(timeout);
+    //   this.modalFormName.focus();
+    // }, 500);
+    // return { modalAdd: this.modalAdd, type: this.type };
   }
 
   /**

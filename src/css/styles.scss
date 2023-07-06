@@ -7,10 +7,15 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~bulma/bulma";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@400&family=Noto+Sans:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@400&family=Noto+Sans:wght@400&display=swap');
 
 html {
   background-color: $primary;
+}
+
+button {
+  font-family: 'Noto Sans', sans-serif;
+  font-weight: 400;
 }
 
 body {
@@ -20,6 +25,7 @@ body {
   height: 100dvh;
   margin: 0 auto;
   font-family: 'Noto Sans', sans-serif;
+  font-weight: 400;
 }
 
 .navbar.spaced, .hero.spaced {
@@ -57,6 +63,7 @@ body {
 .title.name {
   margin-bottom: 0;
   font-family: 'Cormorant SC', serif;
+  font-weight: 400;
   font-size: 1.5rem;
   @include until(400px) {
     font-size: 1.2rem;
@@ -70,7 +77,6 @@ body {
 .button.navbar-link {
   border: 0;
   background-color: #fab400;
-  font-family: 'Noto Sans', sans-serif;
 }
 
 .navbar-dropdown {
@@ -86,6 +92,14 @@ body {
     &:hover {
       color: $primary;
     }
+  }
+}
+
+.media-button {
+  border: 0;
+  background-color: unset;
+  &:hover {
+    background-color: hsl(0, 0%, 98%);
   }
 }
 
@@ -153,6 +167,15 @@ body {
   }
 }
 
+form .card-content div.content {
+  margin-bottom: 0.5rem;
+}
+
 .card-content {
   padding: 1rem;
+}
+
+.media {
+  background: #000000;
+  border-radius: 4px;
 }
