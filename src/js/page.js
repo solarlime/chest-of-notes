@@ -264,7 +264,7 @@ export default class Page {
             btn.dispatchEvent(new Event('click'));
           }
         });
-        this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
+        this.modal.openForm(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
 
         // // Resolve a modal view according to a clicked button
         // // eslint-disable-next-line max-len

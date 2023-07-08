@@ -35,7 +35,7 @@ export default class Modal {
   /**
    * A function to resolve, what appearance is needed for an adding modal now
    */
-  openModal(serverHost, button, contentButtons, deleteListener, previewListener) {
+  openForm(serverHost, button, contentButtons, deleteListener, previewListener) {
     const cancelListener = (event) => {
       const form = event.target.closest('.form');
       this.masonry.remove(form);
@@ -66,7 +66,7 @@ export default class Modal {
     };
 
     const newItem = render(
-      'text',
+      button.name,
       this.notesList,
       null,
       null,
