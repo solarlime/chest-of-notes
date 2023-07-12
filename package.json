@@ -21,7 +21,7 @@
   "homepage": "https://github.com/solarlime/chest-of-notes#readme",
   "devDependencies": {
     "@babel/cli": "^7.21.5",
-    "@babel/core": "^7.22.1",
+    "@babel/core": "^7.22.9",
     "@babel/eslint-parser": "^7.21.8",
     "@babel/preset-env": "^7.22.4",
     "@playwright/test": "^1.35.1",
