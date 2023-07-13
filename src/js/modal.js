@@ -44,38 +44,44 @@ export default class Modal {
     };
 
     const saveListener = async (formName, type) => {
-      const { name, content } = document.forms[formName];
-      const data = await sendData(serverHost, name.value, type, this.pipeBlob, content.value);
+      const { nameField, content } = document.forms[formName];
+      const data = await sendData(serverHost, nameField.value, type, this.pipeBlob, content.value);
       const closeButton = this.page.querySelector('button.cancel');
       closeButton.dispatchEvent(new Event('click'));
       if (typeof data === 'string') {
         alert(`Your note wasn't saved. Server response: ${data}`);
       } else {
-        render(
+        const { deleteNote: deleteButton, notesListItemDescription: previewButton } = render(
           'note',
           this.notesList,
           data,
           this.pipeBlob,
-          deleteListener,
-          previewListener,
-          null,
           this.masonry,
         );
+        deleteButton.addEventListener('click', (event) => deleteListener(event, data.id), { once: true });
+        if (previewButton instanceof HTMLButtonElement) {
+          previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, null));
+        }
         this.store.setState((previous) => ({ ...previous, items: [...previous.items, data] }));
       }
     };
 
-    const newItem = render(
+    const {
+      notesListItemWrapper: form, deleteNote: cancelButton, startButton, saveButton,
+    } = render(
       button.name,
       this.notesList,
       null,
       null,
-      cancelListener,
-      null,
-      saveListener,
       this.masonry,
     );
-    newItem.scrollIntoView({ behavior: 'smooth', block: 'end' });
+    form.addEventListener('submit', (event) => { event.preventDefault(); });
+    cancelButton.addEventListener('click', cancelListener, { once: true });
+    if (startButton) {
+      startButton.addEventListener('click', () => console.log('Recording!'), { once: true });
+    }
+    saveButton.addEventListener('click', () => saveListener(form.name, button.name));
+    form.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     // const [audioButton, videoButton, textButton] = contentButtons;
     //

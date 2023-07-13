@@ -135,14 +135,13 @@ export async function recordSomeMedia(media) {
 
 /**
  * A function for rendering new notes. Adds listeners for 'Delete' buttons & for preview links
+ * @param type
  * @param notesList
  * @param data
  * @param pipeBlob
- * @param deleteListener
- * @param previewListener
  * @param masonry
  */
-export function render(type, notesList, data, pipeBlob, deleteListener, previewListener, saveListener, masonry) {
+export function render(type, notesList, data, pipeBlob, masonry) {
   // Level 1 <li className="column notes-list-item">
   const notesListItem = document.createElement('li');
   notesListItem.classList.add('column', 'notes-list-item');
@@ -168,27 +167,27 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
   cardContent.classList.add('card-content');
   // Level 4
   let notesListItemDescription;
-  console.log(type);
+  // Level 5
+  let saveButton;
+  // Level 5
+  let startButton;
 
   if (['text', 'audio', 'video'].includes(type)) {
-    const formName = 'addForm';
     notesListItem.classList.add('form');
 
     // Level 2 <form className="card">
     notesListItemWrapper = document.createElement('form');
     notesListItemWrapper.classList.add('card');
-    notesListItemWrapper.name = formName;
+    notesListItemWrapper.name = 'addForm';
 
     // Level 5 <input class="input" type="text" placeholder="Type the note's name">
     const input = document.createElement('input');
     input.classList.add('input');
     input.type = type;
-    input.name = 'name';
+    input.name = 'nameField';
     input.required = true;
     input.placeholder = 'Type the note\'s name';
     cardHeaderTitle.append(input);
-
-    notesListItem.addEventListener('submit', (event) => event.preventDefault());
 
     deleteNote.classList.add('cancel');
     deleteNote.ariaLabel = 'cancel';
@@ -202,6 +201,12 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
     const control = document.createElement('div');
     control.classList.add('control');
 
+    // Level 5 <button class="button save" type="submit">Save</button>
+    saveButton = document.createElement('button');
+    saveButton.classList.add('button', 'save');
+    saveButton.type = 'button';
+    saveButton.textContent = 'Save';
+
     switch (type) {
       case 'text': {
         // Level 5 <textarea class="textarea" placeholder="Type the note's content">
@@ -213,25 +218,25 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
         break;
       }
       default: {
-        // Level 5 <video class="media">Your browser does not support the &lt;code&gt;video&lt;/code&gt; element.</video>
+        // Level 5 <video class="media">Your browser...</video>
         const media = document.createElement(`${type}`);
         media.classList.add('media');
         media.textContent = `Your browser does not support the &lt;code&gt;${type}&lt;/code&gt; element.`;
         notesListItemDescription.append(media);
+
+        // Level 5 <button class="button start" type="button">Start</button>
+        startButton = document.createElement('button');
+        startButton.classList.add('button', 'start');
+        startButton.type = 'button';
+        startButton.textContent = 'Start';
+        control.append(startButton);
+
+        saveButton.classList.add('is-hidden');
         break;
       }
     }
 
-    // Level 5 <button class="button save" type="button">Save</button>
-    const saveButton = document.createElement('button');
-    saveButton.classList.add('button', 'save');
-    saveButton.type = 'submit';
-    saveButton.textContent = 'Save';
-
-    saveButton.addEventListener('click', () => saveListener(formName, type));
-
     cardContent.insertAdjacentElement('beforeend', control).append(saveButton);
-    deleteNote.addEventListener('click', deleteListener, { once: true });
   } else {
     const isText = (data.type === 'text');
     const hasDescription = !!data.content;
@@ -259,11 +264,6 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
       notesListItemDescription.textContent = data.content;
     }
 
-    const deleteButtonListener = (event) => {
-      deleteListener(event, data.id);
-    };
-    deleteNote.addEventListener('click', deleteButtonListener, { once: true });
-
     // New notes shouldn't be available to use before they are ready for it
     if (data.uploadComplete !== undefined) {
       if (data.uploadComplete === false) {
@@ -276,14 +276,6 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
         cardContent.setAttribute('data-id', data.id);
         notesListItemDescription.textContent = 'Click to open the media!';
       }
-    }
-
-    if (!isText) {
-      const newNoteListener = () => {
-        previewListener(data.id, notesListItemDescription, data.type, pipeBlob);
-        // previewListener(data.type, pipeBlob, data.id);
-      };
-      notesListItemDescription.addEventListener('click', newNoteListener);
     }
   }
 
@@ -299,7 +291,13 @@ export function render(type, notesList, data, pipeBlob, deleteListener, previewL
   notesList.append(notesListItem);
   masonry.prepended(notesListItem);
 
-  return notesListItem;
+  return {
+    notesListItemWrapper,
+    deleteNote,
+    notesListItemDescription,
+    saveButton,
+    startButton,
+  };
 
   // // A listener for spoilers is needed to improve accessibility
   // spoiler.addEventListener('keyup', (event) => {

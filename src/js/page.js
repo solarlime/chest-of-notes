@@ -112,7 +112,7 @@ export default class Page {
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     });
 
-    this.previewListener = (id, description, type, pipeBlob) => {
+    this.previewListener = (id, button, type, pipeBlob) => {
       const { opened } = store.getState();
       const close = (idToClose) => {
         const previousMediaContainer = this.notesList.querySelector(`[data-id="${idToClose}"]`);
@@ -126,7 +126,7 @@ export default class Page {
         if (opened !== null) {
           close(opened);
         }
-        description.textContent = 'Click to close the media!';
+        button.textContent = 'Click to close the media!';
         const media = document.createElement(type);
         if (pipeBlob) {
           media.src = URL.createObjectURL(pipeBlob);
@@ -138,7 +138,7 @@ export default class Page {
         media.controls = true;
         media.style.width = '100%';
         media.style.borderRadius = '4px';
-        description.insertAdjacentElement('afterend', media);
+        button.insertAdjacentElement('afterend', media);
         store.setState((previous) => ({ ...previous, opened: id }));
       } else {
         close(opened);
@@ -150,23 +150,24 @@ export default class Page {
     const fetchedData = this.store.getState().items;
     // const fetchedData = [];
     if (fetchedData.length) {
-      this.notesList.hidden = false;
+      this.notesList.classList.remove('is-hidden');
       fetchedData.forEach((note) => {
-        render(
+        const { deleteNote: deleteButton, notesListItemDescription: previewButton } = render(
           'note',
           this.notesList,
           note,
           null,
-          this.deleteListener,
-          this.previewListener,
-          null,
           masonry,
         );
+        deleteButton.addEventListener('click', (event) => this.deleteListener(event, note.id), { once: true });
+        if (previewButton instanceof HTMLButtonElement) {
+          previewButton.addEventListener('click', () => this.previewListener(note.id, previewButton, note.type, null));
+        }
       });
       masonry.layout();
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
-      this.emptyList.hidden = false;
+      this.emptyList.classList.remove('is-hidden');
       // this.notesList.hidden = false;
     }
 
