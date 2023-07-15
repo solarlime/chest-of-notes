@@ -1,58 +1,50 @@
 /* eslint-disable no-param-reassign */
+/* eslint-disable prefer-promise-reject-errors */
 import uniqid from 'uniqid';
 import AudioRecorder from 'audio-recorder-polyfill';
 
-/**
- * A function to format raw time to hh-mm-ss
- * @param rawTime
- * @returns {string}
- */
-export function formatTime(rawTime) {
-  const time = Math.floor(rawTime);
-  const hours = Math.floor(time / 3600);
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  return (`${((hours < 10) && (hours > 0)) ? '0' : ''}${(hours > 0) ? `${hours}:` : ''}${(minutes < 10) ? '0' : ''}${minutes}:${(seconds < 10) ? '0' : ''}${seconds}`);
-}
+// At first, it is needed to subscribe on server notifications
+// Without this feature, the app freezes when a big file is sent
+export async function subscribeOnNotifications(serverHost, notesList) {
+  return new Promise((resolve) => {
+    const eventSource = new EventSource(`${serverHost}/chest-of-notes/notifications`, { withCredentials: true });
 
-/**
- * A function to make an animation of appearing and disappearing
- * @param modal
- * @param background
- * @param action
- */
-export function animateModals(modal, background, action) {
-  switch (action) {
-    case 'open': {
-      const notNew = Array.from(background).find((item) => item.classList.contains('remove-blur'));
-      if (notNew && modal.classList.contains('modal-add')) {
-        background.forEach((item) => item.classList.toggle('blur'));
-        background.forEach((item) => item.classList.toggle('remove-blur'));
-        modal.classList.add('modal-active');
-        modal.classList.remove('modal-inactive');
-      } else {
-        if (notNew) {
-          background.forEach((item) => item.classList.remove('remove-blur'));
-        }
-        background.forEach((item) => item.classList.add('blur'));
-        if (modal.classList.contains('modal-inactive')) {
-          modal.classList.remove('modal-inactive');
-        }
-        modal.classList.add('modal-active');
-      }
-      break;
-    }
-    case 'close': {
-      background.forEach((item) => item.classList.toggle('blur'));
-      background.forEach((item) => item.classList.toggle('remove-blur'));
-      modal.classList.toggle('modal-active');
-      modal.classList.toggle('modal-inactive');
-      break;
-    }
-    default: {
-      console.log('Hmm, something else happened with your animation!');
-    }
-  }
+    eventSource.addEventListener('open', () => {
+      console.log('Subscribing on notifications...');
+      setTimeout(() => resolve('allow'), 500);
+    });
+
+    eventSource.addEventListener('deny', () => {
+      const message = 'Server denied to subscribe on notifications: somebody has already connected';
+      console.log(message);
+      eventSource.close();
+      resolve('deny');
+      setTimeout(() => { alert(message); }, 500);
+    });
+
+    eventSource.addEventListener('error', () => {
+      console.log('An error occurred with a notifications\' subscription');
+      resolve('deny');
+    });
+
+    eventSource.addEventListener('uploaderror', (event) => {
+      const message = `An error occurred with a file from the note "${event.data}". Try to record it again`;
+      console.log(message);
+      alert(message);
+    });
+
+    eventSource.addEventListener('uploadsuccess', (event) => {
+      console.log(`Successfully saved a file from the note "${event.data}"!`);
+      const descriptionToEdit = notesList.querySelector(`[data-id="${event.lastEventId}"] .notes-list-item-description`);
+      console.log(descriptionToEdit);
+      const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
+      deleteNote.querySelector('i').style.color = '';
+      deleteNote.disabled = false;
+      descriptionToEdit.textContent = 'Click to open the media!';
+      descriptionToEdit.classList.add('media-content');
+      descriptionToEdit.disabled = false;
+    });
+  });
 }
 
 /**
@@ -66,11 +58,7 @@ export function animateModals(modal, background, action) {
  */
 export async function sendData(serverHost, name, type, pipeBlob, textArea) {
   const id = uniqid();
-  const data = {
-    id,
-    name,
-    type,
-  };
+  const data = { id, name, type };
 
   const formData = new FormData();
   Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
@@ -173,6 +161,8 @@ export function render(type, notesList, data, pipeBlob, masonry) {
   let saveButton;
   // Level 5
   let startButton;
+  // Level 5
+  let input;
 
   if (['text', 'audio', 'video'].includes(type)) {
     notesListItem.classList.add('form');
@@ -183,7 +173,7 @@ export function render(type, notesList, data, pipeBlob, masonry) {
     notesListItemWrapper.name = 'addForm';
 
     // Level 5 <input class="input" type="text" placeholder="Type the note's name">
-    const input = document.createElement('input');
+    input = document.createElement('input');
     input.classList.add('input');
     input.type = type;
     input.name = 'nameField';
@@ -207,13 +197,14 @@ export function render(type, notesList, data, pipeBlob, masonry) {
     saveButton = document.createElement('button');
     saveButton.classList.add('button', 'save');
     saveButton.type = 'button';
+    saveButton.disabled = true;
     saveButton.textContent = 'Save';
 
     switch (type) {
       case 'text': {
         // Level 5 <textarea class="textarea" placeholder="Type the note's content">
         const textarea = document.createElement('textarea');
-        textarea.classList.add('textarea');
+        textarea.classList.add('textarea', 'has-fixed-size');
         textarea.name = 'content';
         textarea.placeholder = 'Type the note\'s content';
         notesListItemDescription.append(textarea);
@@ -295,22 +286,12 @@ export function render(type, notesList, data, pipeBlob, masonry) {
 
   return {
     notesListItemWrapper,
+    input,
     deleteNote,
+    icon,
     notesListItemDescription,
     media,
     saveButton,
     startButton,
   };
-
-  // // A listener for spoilers is needed to improve accessibility
-  // spoiler.addEventListener('keyup', (event) => {
-  //   if (event.key === 'Enter' || event.key === ' ') {
-  //     checkbox.checked = !checkbox.checked;
-  //     const evt = new Event('click', { bubbles: true });
-  //     evt.fromKeyboard = true;
-  //     checkbox.dispatchEvent(evt);
-  //   }
-  // });
-
-  // TODO: resizeObserver -> masonry.layout on big text;
 }

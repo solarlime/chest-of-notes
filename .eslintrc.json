@@ -20,6 +20,7 @@
       "error",
       "LabeledStatement",
       "WithStatement"
-    ]
+    ],
+    "no-underscore-dangle": "warn"
   }
 }
