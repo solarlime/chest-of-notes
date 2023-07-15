@@ -7,42 +7,47 @@ import AudioRecorder from 'audio-recorder-polyfill';
 // Without this feature, the app freezes when a big file is sent
 export async function subscribeOnNotifications(serverHost, notesList) {
   return new Promise((resolve) => {
-    const eventSource = new EventSource(`${serverHost}/chest-of-notes/notifications`, { withCredentials: true });
+    const client = new WebSocket(`${serverHost.replace('http', 'ws')}/chest-of-notes/`);
 
-    eventSource.addEventListener('open', () => {
-      console.log('Subscribing on notifications...');
-      setTimeout(() => resolve('allow'), 500);
-    });
-
-    eventSource.addEventListener('deny', () => {
-      const message = 'Server denied to subscribe on notifications: somebody has already connected';
-      console.log(message);
-      eventSource.close();
-      resolve('deny');
-      setTimeout(() => { alert(message); }, 500);
-    });
-
-    eventSource.addEventListener('error', () => {
-      console.log('An error occurred with a notifications\' subscription');
-      resolve('deny');
-    });
-
-    eventSource.addEventListener('uploaderror', (event) => {
-      const message = `An error occurred with a file from the note "${event.data}". Try to record it again`;
-      console.log(message);
-      alert(message);
-    });
-
-    eventSource.addEventListener('uploadsuccess', (event) => {
-      console.log(`Successfully saved a file from the note "${event.data}"!`);
-      const descriptionToEdit = notesList.querySelector(`[data-id="${event.lastEventId}"] .notes-list-item-description`);
-      console.log(descriptionToEdit);
-      const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
-      deleteNote.querySelector('i').style.color = '';
-      deleteNote.disabled = false;
-      descriptionToEdit.textContent = 'Click to open the media!';
-      descriptionToEdit.classList.add('media-content');
-      descriptionToEdit.disabled = false;
+    client.addEventListener('open', () => {
+      client.addEventListener('message', (message) => {
+        const data = JSON.parse(message.data);
+        if (data.users) {
+          if (data.users > 1) {
+            const text = 'Server denied to subscribe on notifications: somebody has already connected';
+            console.log(text);
+            client.close(1000, 'Somebody has already connected');
+            resolve('deny');
+            const timeout = setTimeout(() => { clearTimeout(timeout); alert(text); }, 500);
+          } else {
+            console.log('Subscribed on notifications!');
+            const timeout = setTimeout(() => { clearTimeout(timeout); resolve('allow'); }, 500);
+          }
+        }
+        if (data.event) {
+          if (data.event.name === 'uploaderror') {
+            const text = `An error occurred with a file from the note "${data.event.note}". Try to record it again`;
+            console.log(text);
+            alert(text);
+          }
+          if (data.event.name === 'uploadsuccess') {
+            console.log(`Successfully saved a file from the note "${data.event.note}"!`);
+            const descriptionToEdit = notesList.querySelector(`[data-id="${data.event.id}"] .notes-list-item-description`);
+            const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
+            deleteNote.querySelector('i').style.color = '';
+            deleteNote.disabled = false;
+            descriptionToEdit.textContent = 'Click to open the media!';
+            descriptionToEdit.classList.add('media-content');
+            descriptionToEdit.disabled = false;
+          }
+        }
+      });
+      client.addEventListener('error', () => {
+        const text = 'An error occurred with a notifications\' subscription';
+        console.log(text);
+        alert(text);
+        resolve('deny');
+      });
     });
   });
 }
