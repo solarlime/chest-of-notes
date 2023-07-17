@@ -33,38 +33,52 @@ export default class Page {
 
     // At first, it is needed to subscribe on server notifications
     // Without this feature, the app freezes when a big file is sent
-    const eventSource = new EventSource(`${this.serverHost}/chest-of-notes/notifications`, { withCredentials: true });
+    const client = new WebSocket(`${serverHost.replace('http', 'ws')}/chest-of-notes/`);
 
-    eventSource.addEventListener('open', () => { console.log('Subscribing on notifications...'); });
-    eventSource.addEventListener('deny', () => {
-      const message = 'Server denied to subscribe on notifications: somebody has already connected';
-      console.log(message);
-      eventSource.close();
-      [this.textButton, this.audioButton, this.videoButton].forEach((button) => {
-        button.disabled = true;
-        button.parentElement.classList.add('hidden');
+    client.addEventListener('open', () => {
+      client.addEventListener('message', (message) => {
+        const data = JSON.parse(message.data);
+        if (data.users) {
+          if (data.users > 1) {
+            const text = 'Server denied to subscribe on notifications: somebody has already connected';
+            console.log(text);
+            client.close(1000, 'Somebody has already connected');
+            [this.textButton, this.audioButton, this.videoButton].forEach((button) => {
+              button.disabled = true;
+              button.parentElement.classList.add('hidden');
+            });
+            this.notesList.querySelectorAll('.delete-note').forEach((deleteButton) => {
+              deleteButton.disabled = true;
+              deleteButton.querySelector('svg').style.fill = '#aaaaaa';
+            });
+            const timeout = setTimeout(() => { clearTimeout(timeout); alert(text); }, 500);
+          } else {
+            console.log('Subscribed on notifications!');
+          }
+        }
+        if (data.event) {
+          if (data.event.name === 'uploaderror') {
+            const text = `An error occurred with a file from the note "${data.event.note}". Try to record it again`;
+            console.log(text);
+            alert(text);
+          }
+          if (data.event.name === 'uploadsuccess') {
+            console.log(`Successfully saved a file from the note "${data.event.note}"!`);
+            const descriptionToEdit = this.notes.querySelector(`#${data.event.id} ~ .notes-list-item-description`);
+            const deleteNote = this.notes.querySelector(`#${data.event.id} ~ .notes-list-item-header-wrapper .delete-note`);
+            deleteNote.querySelector('svg').style.fill = '';
+            deleteNote.disabled = false;
+            descriptionToEdit.textContent = 'Click to open the media!';
+            descriptionToEdit.classList.add('media-content');
+            descriptionToEdit.disabled = false;
+          }
+        }
       });
-      this.notesList.querySelectorAll('.delete-note').forEach((deleteButton) => {
-        deleteButton.disabled = true;
-        deleteButton.querySelector('svg').style.fill = '#aaaaaa';
+      client.addEventListener('error', () => {
+        const text = 'An error occurred with a notifications\' subscription';
+        console.log(text);
+        alert(text);
       });
-      setTimeout(() => { alert(message); }, 500);
-    });
-    eventSource.addEventListener('error', () => { console.log('An error occurred with a notifications\' subscription'); });
-    eventSource.addEventListener('uploaderror', (event) => {
-      const message = `An error occurred with a file from the note "${event.data}". Try to record it again`;
-      console.log(message);
-      alert(message);
-    });
-    eventSource.addEventListener('uploadsuccess', (event) => {
-      console.log(`Successfully saved a file from the note "${event.data}"!`);
-      const descriptionToEdit = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-description`);
-      const deleteNote = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-header-wrapper .delete-note`);
-      deleteNote.querySelector('svg').style.fill = '';
-      deleteNote.disabled = false;
-      descriptionToEdit.textContent = 'Click to open the media!';
-      descriptionToEdit.classList.add('media-content');
-      descriptionToEdit.disabled = false;
     });
 
     // Listener functions are initiated in a constructor and are given as callbacks
