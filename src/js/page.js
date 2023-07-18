@@ -54,6 +54,11 @@ export default class Page {
             const timeout = setTimeout(() => { clearTimeout(timeout); alert(text); }, 500);
           } else {
             console.log('Subscribed on notifications!');
+            client.addEventListener('close', () => {
+              console.log('Connection was closed!');
+              const confirmation = window.confirm('A server connection was lost. Do you want reload the page and try to connect again?');
+              if (confirmation) window.location.reload();
+            });
           }
         }
         if (data.event) {
