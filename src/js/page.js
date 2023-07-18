@@ -32,16 +32,22 @@ export default class Page {
 
     // Listener functions are initiated in a constructor and are given as callbacks
     this.deleteListener = async (event, dataId) => {
-      const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
-      const result = await res.json();
-      console.log(result);
-      if (result.status.includes('Error')) {
-        alert(`Cannot delete! Server response: ${result.data}`);
-      }
-      if (result.status === 'Deleted') {
-        const itemToDelete = event.target.closest('.notes-list-item');
-        masonry.remove(itemToDelete);
-        this.store.setState((previous) => ({ ...previous, items: previous.items.filter((item) => item.id !== dataId) }));
+      const confirmation = window.confirm('Are you sure?');
+      if (confirmation) {
+        const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
+        const result = await res.json();
+        console.log(result);
+        if (result.status.includes('Error')) {
+          alert(`Cannot delete! Server response: ${result.data}`);
+        }
+        if (result.status === 'Deleted') {
+          const itemToDelete = event.target.closest('.notes-list-item');
+          masonry.remove(itemToDelete);
+          this.store.setState((previous) => ({
+            ...previous,
+            items: previous.items.filter((item) => item.id !== dataId),
+          }));
+        }
       }
     };
 
@@ -97,7 +103,7 @@ export default class Page {
           masonry,
         );
         if (isSubscribed === 'allow') {
-          deleteButton.addEventListener('click', (event) => this.deleteListener(event, note.id), { once: true });
+          deleteButton.addEventListener('click', (event) => this.deleteListener(event, note.id));
         }
         if (previewButton instanceof HTMLButtonElement) {
           previewButton.addEventListener('click', () => this.previewListener(note.id, previewButton, note.type, null));
