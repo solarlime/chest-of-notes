@@ -2487,13 +2487,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"audio-recorder-polyfill@npm:^0.4.1":
-  version: 0.4.1
-  resolution: "audio-recorder-polyfill@npm:0.4.1"
-  checksum: 51272dc944c67cf9f282da0453e51bfe4b33a23d799a568ec457c76d54c4b6bc8f60ed4b540d85ac0ef7d739c9e638d6dac031c338739740b31e2e03d0422d0d
-  languageName: node
-  linkType: hard
-
 "babel-loader@npm:^9.1.2":
   version: 9.1.2
   resolution: "babel-loader@npm:9.1.2"
@@ -2776,7 +2769,6 @@ __metadata:
     "@babel/preset-env": ^7.22.5
     "@fortawesome/fontawesome-free": ^6.4.0
     "@playwright/test": ^1.35.1
-    audio-recorder-polyfill: ^0.4.1
     babel-loader: ^9.1.2
     bulma: ^0.9.4
     clean-webpack-plugin: ^4.0.0

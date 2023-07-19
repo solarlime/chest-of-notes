@@ -1,7 +1,6 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable prefer-promise-reject-errors */
 import uniqid from 'uniqid';
-import AudioRecorder from 'audio-recorder-polyfill';
 
 // At first, it is needed to subscribe on server notifications
 // Without this feature, the app freezes when a big file is sent
@@ -110,11 +109,8 @@ export async function recordSomeMedia(media) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
     if (!window.MediaRecorder) {
-      alert('A polyfill is active. You can record only audio files. If you\'re using Safari on iOS you can enable this functionality in its settings (MediaRecorder). Then reload the page');
-      window.MediaRecorder = AudioRecorder;
-      if (tag === 'video') {
-        return null;
-      }
+      alert('MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page');
+      return null;
     }
     const mediaRecorder = new MediaRecorder(stream);
     const pipeline = [];
