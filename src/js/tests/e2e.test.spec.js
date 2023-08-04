@@ -1,17 +1,25 @@
 // @ts-check
-const { test, expect } = require('@playwright/test');
+import { WebSocketServer } from 'ws';
+import { test, expect } from '@playwright/test';
 
 test.describe('E2E', () => {
   let page = null;
+  let socketServer = null;
 
   test.describe.configure({ mode: 'serial' });
 
   test.beforeAll(async ({ browser }) => {
     page = await browser.newPage();
+    // Define mocking WebSocket server
+    socketServer = new WebSocketServer({ port: 3001 });
+    socketServer.on('connection', (ws) => {
+      ws.send(JSON.stringify({ users: socketServer.clients.size }));
+    });
   });
 
   test.afterAll(async () => {
     await page.close();
+    socketServer.close();
   });
 
   test.describe('A set of tests', () => {
@@ -40,23 +48,51 @@ test.describe('E2E', () => {
 
       await page.goto('/', { waitUntil: 'networkidle' });
 
-      const notesList = await page.locator('.notes-list');
-      const textButton = await page.locator('.text-button');
-      const nameInput = await page.locator('#modal-add-form-input');
-      const descriptionInput = await page.locator('#modal-add-form-text-area');
-      const saveButton = await page.locator('.save');
+      const wsLogic = async (ws) => {
+        console.log('WebSocket initiated');
+        ws.on('framereceived', async (event) => {
+          const payload = JSON.parse(event.payload.toString());
+          console.log(`${page} got from a server:`, payload);
+        });
+        ws.on('close', () => console.log('WebSocket closed'));
+      };
 
-      await textButton.click();
+      page.on('websocket', wsLogic);
 
-      await nameInput.fill(textNoteName);
-      await descriptionInput.fill(textNoteDescription);
-      await saveButton.click();
+      const buttonResolver = async (selector) => {
+        const element = await page.locator(selector);
+        const isVisible = await element.isVisible();
+        if (isVisible) {
+          return element;
+        }
+        throw Error('Not visible!');
+      };
 
-      const item = await notesList.locator('.notes-list-item', { hasText: textNoteName });
-      await item.locator('.spoiler').click();
-      const description = await item.locator('.notes-list-item-description');
+      const buttonPromiseArray = await Promise.allSettled([buttonResolver('button.menu-button'), buttonResolver('button.navbar-burger')]);
+      const menuButton = buttonPromiseArray.find((promise) => promise.status === 'fulfilled').value;
+      menuButton.click();
 
-      await expect(description).toHaveText(textNoteDescription);
+      const textButton = await page.locator('button.text-button');
+      textButton.click();
+
+      const cancelButton = await page.locator('button.cancel');
+      await expect(cancelButton).toBeEnabled();
+
+      const saveButton = await page.locator('button.save');
+      await expect(saveButton).toBeDisabled();
+
+      const textarea = await page.locator('textarea.textarea');
+      await textarea.type(textNoteDescription);
+      await expect(saveButton).toBeDisabled();
+
+      const input = await page.locator('input.input');
+      await input.type(textNoteName);
+      await expect(saveButton).toBeEnabled();
+
+      saveButton.click();
+
+      const item = await page.locator('.notes-list-item', { hasText: textNoteName });
+      await expect(item).toContainText(textNoteDescription);
     });
 
     test('Delete a text note', async () => {
@@ -68,9 +104,9 @@ test.describe('E2E', () => {
         }),
       }));
 
-      const notesList = await page.locator('.notes-list');
+      page.on('dialog', (prompt) => prompt.accept());
 
-      const item = await notesList.locator('.notes-list-item', { hasText: initNoteName });
+      const item = await page.locator('.notes-list-item', { hasText: initNoteName });
       const deleteButton = await item.locator('.delete-note');
       await deleteButton.click();
       await expect(item).toHaveCount(0);
