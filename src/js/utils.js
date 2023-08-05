@@ -176,7 +176,7 @@ export function render(type, notesList, data, pipeBlob, masonry) {
     // Level 2 <form className="card">
     notesListItemWrapper = document.createElement('form');
     notesListItemWrapper.classList.add('card');
-    notesListItemWrapper.name = 'addForm';
+    notesListItemWrapper.name = uniqid();
 
     // Level 5 <input class="input" type="text" placeholder="Type the note's name">
     input = document.createElement('input');
