@@ -11,6 +11,7 @@ export default class Page {
     this.burger = this.page.querySelector('.navbar-burger');
     this.burgerMenu = this.page.querySelector('.navbar-menu');
     this.menuButton = this.page.querySelector('.menu-button');
+    this.notesLoading = this.page.querySelector('.notes-loading');
     this.emptyList = this.page.querySelector('.notes-empty-list');
     this.notesList = this.page.querySelector('.notes-list');
     this.audioButton = this.page.querySelector('button.audio-button');
@@ -92,6 +93,7 @@ export default class Page {
     const fetchedData = this.store.getState().items;
     // const fetchedData = [];
     let deleteButtonsAndIcons;
+    this.notesLoading.classList.add('is-hidden');
     if (fetchedData.length) {
       this.notesList.classList.remove('is-hidden');
       deleteButtonsAndIcons = fetchedData.map((note) => {
