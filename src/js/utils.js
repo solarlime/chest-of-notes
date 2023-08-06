@@ -64,7 +64,7 @@ export function animateModals(modal, background, action) {
  * @param modalFormTextArea
  * @returns {Promise<{name, id: *, type}>} - a data object (without a file - for notes with media)
  */
-export async function sendData(serverHost, name, type, pipeBlob, text) {
+export async function sendData(serverHost, name, type, pipeBlob, textArea) {
   const id = uniqid();
   const data = {
     id,
@@ -75,8 +75,8 @@ export async function sendData(serverHost, name, type, pipeBlob, text) {
   const formData = new FormData();
   Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
   if (data.type === 'text') {
-    formData.set('content', text);
-    data.content = text;
+    formData.set('content', textArea.value);
+    data.content = textArea.value;
   } else {
     formData.set('content', pipeBlob);
     data.content = 'media';
@@ -168,6 +168,8 @@ export function render(type, notesList, data, pipeBlob, masonry) {
   // Level 4
   let notesListItemDescription;
   // Level 5
+  let media;
+  // Level 5
   let saveButton;
   // Level 5
   let startButton;
@@ -218,8 +220,8 @@ export function render(type, notesList, data, pipeBlob, masonry) {
         break;
       }
       default: {
-        // Level 5 <video class="media">Your browser...</video>
-        const media = document.createElement(`${type}`);
+        // Level 5 <video/audio class="media">Your browser...</video/audio>
+        media = document.createElement(`${type}`);
         media.classList.add('media');
         media.textContent = `Your browser does not support the &lt;code&gt;${type}&lt;/code&gt; element.`;
         notesListItemDescription.append(media);
@@ -266,14 +268,14 @@ export function render(type, notesList, data, pipeBlob, masonry) {
 
     // New notes shouldn't be available to use before they are ready for it
     if (data.uploadComplete !== undefined) {
+      cardContent.setAttribute('data-id', data.id);
       if (data.uploadComplete === false) {
         deleteNote.disabled = true;
-        deleteNote.querySelector('svg').style.fill = '#aaaaaa';
-        notesListItemDescription.textContent = 'Please, wait — your file is uploading...';
+        icon.style.color = '#aaaaaa';
+        notesListItemDescription.textContent = 'File is uploading...';
         notesListItemDescription.disabled = true;
       } else {
         notesListItemDescription.classList.add('media-content');
-        cardContent.setAttribute('data-id', data.id);
         notesListItemDescription.textContent = 'Click to open the media!';
       }
     }
@@ -295,6 +297,7 @@ export function render(type, notesList, data, pipeBlob, masonry) {
     notesListItemWrapper,
     deleteNote,
     notesListItemDescription,
+    media,
     saveButton,
     startButton,
   };

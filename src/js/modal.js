@@ -36,6 +36,83 @@ export default class Modal {
    * A function to resolve, what appearance is needed for an adding modal now
    */
   openForm(serverHost, button, contentButtons, deleteListener, previewListener) {
+    /**
+     * A wrapper for a media recording function
+     */
+    const mediaRecorderWrapper = async (mediaElement, cancelButton, startStopButton, saveButton) => {
+      console.log('Recording!');
+      if (!navigator.mediaDevices) {
+        alert('Your browser can\'t deal with media functions!');
+        cancelButton.dispatchEvent(new Event('click'));
+        return;
+      }
+      try {
+        const recorder = await recordSomeMedia(mediaElement);
+        if (!recorder) {
+          cancelButton.dispatchEvent(new Event('click'));
+        } else {
+          const { mediaRecorder, pipeline } = recorder;
+
+          // this.modalStartButton.classList.add('hidden');
+          // this.modalStopButton.classList.remove('hidden');
+          // this.modalFormDescriptionMedia.classList.add('hidden');
+          // this.modalStopButton.focus();
+
+          // Collect the data into a Blob
+          const recorderListener = (event) => {
+            pipeline.push(event.data);
+            if (mediaRecorder.state === 'inactive') {
+              if (mediaElement) {
+                // At first, we need to turn camera off
+                if (mediaElement.srcObject) {
+                  const tracks = mediaElement.srcObject.getTracks();
+                  tracks.forEach((track) => track.stop());
+                }
+                this.pipeBlob = new Blob(pipeline, { type: `${mediaElement.tagName.toLowerCase()}/mp4` });
+                mediaElement.src = URL.createObjectURL(this.pipeBlob);
+                mediaElement.srcObject = null;
+                // this.media.addMediaElementListeners(mediaElement.src);
+                // this.media.addPlayerListeners();
+                if (this.pipeBlob.size > 50 * 1024 * 1024) {
+                  // this.modalFormDescriptionBoth.classList.add('hidden');
+                  alert('Your record is too big, so you can\'t save it. Try to make a smaller one!');
+                } else {
+                  // this.modalSaveButton.classList.remove('hidden');
+                  // this.modalSaveButton.focus();
+                }
+              }
+            }
+          };
+          mediaRecorder.addEventListener('dataavailable', recorderListener);
+
+          /**
+           * A wrapper for a 'stop recording' function
+           */
+          const stopListener = () => {
+            mediaRecorder.stop();
+            mediaElement.muted = false;
+            mediaElement.controls = true;
+            saveButton.classList.remove('is-hidden');
+            startStopButton.classList.add('is-hidden');
+            // this.modalStopButton.classList.add('hidden');
+
+            // this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
+            // // After saving remove a listener for stopping
+            // this.modalStopButton.removeEventListener('click', this.stopListener);
+          };
+          startStopButton.textContent = 'Stop';
+          startStopButton.addEventListener('click', stopListener, { once: true });
+          // this.modalStopButton.addEventListener('click', this.stopListener);
+          // // After stopping remove a listener for recording
+          // this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
+        }
+      } catch (e) {
+        console.log(e);
+      }
+    };
+    // this.modalStartButton.addEventListener('click', this.mediaRecorderWrapper);
+    // this.modalCloseButton.addEventListener('click', this.closeModal);
+
     const cancelListener = (event) => {
       const form = event.target.closest('.form');
       this.masonry.remove(form);
@@ -43,11 +120,10 @@ export default class Modal {
       if (event.isTrusted) this.masonry.layout();
     };
 
-    const saveListener = async (formName, type) => {
+    const saveListener = async (formName, type, cancelButton) => {
       const { nameField, content } = document.forms[formName];
-      const data = await sendData(serverHost, nameField.value, type, this.pipeBlob, content.value);
-      const closeButton = this.page.querySelector('button.cancel');
-      closeButton.dispatchEvent(new Event('click'));
+      const data = await sendData(serverHost, nameField.value, type, this.pipeBlob, content);
+      cancelButton.dispatchEvent(new Event('click'));
       if (typeof data === 'string') {
         alert(`Your note wasn't saved. Server response: ${data}`);
       } else {
@@ -60,14 +136,14 @@ export default class Modal {
         );
         deleteButton.addEventListener('click', (event) => deleteListener(event, data.id), { once: true });
         if (previewButton instanceof HTMLButtonElement) {
-          previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, null));
+          previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, this.pipeBlob));
         }
         this.store.setState((previous) => ({ ...previous, items: [...previous.items, data] }));
       }
     };
 
     const {
-      notesListItemWrapper: form, deleteNote: cancelButton, startButton, saveButton,
+      notesListItemWrapper: form, deleteNote: cancelButton, media: mediaElement, startButton, saveButton,
     } = render(
       button.name,
       this.notesList,
@@ -78,9 +154,9 @@ export default class Modal {
     form.addEventListener('submit', (event) => { event.preventDefault(); });
     cancelButton.addEventListener('click', cancelListener, { once: true });
     if (startButton) {
-      startButton.addEventListener('click', () => console.log('Recording!'), { once: true });
+      startButton.addEventListener('click', () => mediaRecorderWrapper(mediaElement, cancelButton, startButton, saveButton), { once: true });
     }
-    saveButton.addEventListener('click', () => saveListener(form.name, button.name));
+    saveButton.addEventListener('click', () => saveListener(form.name, button.name, cancelButton));
     form.scrollIntoView({ behavior: 'smooth', block: 'end' });
 
     // const [audioButton, videoButton, textButton] = contentButtons;
@@ -229,80 +305,5 @@ export default class Modal {
     //   this.modalFormName.focus();
     // }, 500);
     // return { modalAdd: this.modalAdd, type: this.type };
-  }
-
-  /**
-   * A function to add listeners for modal buttons
-   */
-  addModalButtonListeners() {
-    /**
-     * A wrapper for a media recording function
-     */
-    this.mediaRecorderWrapper = async () => {
-      if (!navigator.mediaDevices) {
-        alert('Your browser can\'t deal with media functions!');
-        this.modalCloseButton.dispatchEvent(new Event('click'));
-        return;
-      }
-      try {
-        const recorder = await recordSomeMedia(this.mediaElement);
-        if (!recorder) {
-          this.modalCloseButton.dispatchEvent(new Event('click'));
-        } else {
-          const { mediaRecorder, pipeline } = recorder;
-          this.mediaRecorder = mediaRecorder;
-          this.modalStartButton.classList.add('hidden');
-          this.modalStopButton.classList.remove('hidden');
-          this.modalFormDescriptionMedia.classList.add('hidden');
-          this.modalStopButton.focus();
-
-          // Collect the data into a Blob
-          this.recorder = (event) => {
-            pipeline.push(event.data);
-            if (this.mediaRecorder.state === 'inactive') {
-              if (this.media.mediaElement) {
-                // At first, we need to turn camera off
-                if (this.mediaElement.srcObject) {
-                  const tracks = this.mediaElement.srcObject.getTracks();
-                  tracks.forEach((track) => track.stop());
-                }
-                this.pipeBlob = new Blob(pipeline, { type: `${this.media.mediaElement.tagName.toLowerCase()}/mp4` });
-                this.mediaElement.src = URL.createObjectURL(this.pipeBlob);
-                this.mediaElement.srcObject = null;
-                this.media.addMediaElementListeners(this.mediaElement.src);
-                this.media.addPlayerListeners();
-                if (this.pipeBlob.size > 50 * 1024 * 1024) {
-                  this.modalFormDescriptionBoth.classList.add('hidden');
-                  alert('Your record is too big, so you can\'t save it. Try to make a smaller one!');
-                } else {
-                  this.modalSaveButton.classList.remove('hidden');
-                  this.modalSaveButton.focus();
-                }
-              }
-            }
-          };
-          this.mediaRecorder.addEventListener('dataavailable', this.recorder);
-
-          /**
-           * A wrapper for a 'stop recording' function
-           */
-          this.stopListener = () => {
-            this.mediaRecorder.stop();
-            this.modalStopButton.classList.add('hidden');
-
-            this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
-            // After saving remove a listener for stopping
-            this.modalStopButton.removeEventListener('click', this.stopListener);
-          };
-          this.modalStopButton.addEventListener('click', this.stopListener);
-          // After stopping remove a listener for recording
-          this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
-        }
-      } catch (e) {
-        console.log(e);
-      }
-    };
-    this.modalStartButton.addEventListener('click', this.mediaRecorderWrapper);
-    this.modalCloseButton.addEventListener('click', this.closeModal);
   }
 }

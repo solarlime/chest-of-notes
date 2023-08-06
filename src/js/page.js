@@ -59,9 +59,10 @@ export default class Page {
     });
     eventSource.addEventListener('uploadsuccess', (event) => {
       console.log(`Successfully saved a file from the note "${event.data}"!`);
-      const descriptionToEdit = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-description`);
-      const deleteNote = this.notes.querySelector(`#${event.lastEventId} ~ .notes-list-item-header-wrapper .delete-note`);
-      deleteNote.querySelector('svg').style.fill = '';
+      const descriptionToEdit = this.notesList.querySelector(`[data-id="${event.lastEventId}"] .notes-list-item-description`);
+      console.log(descriptionToEdit);
+      const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
+      deleteNote.querySelector('i').style.color = '';
       deleteNote.disabled = false;
       descriptionToEdit.textContent = 'Click to open the media!';
       descriptionToEdit.classList.add('media-content');
