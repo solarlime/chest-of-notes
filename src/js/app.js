@@ -7,6 +7,7 @@ export default class App {
     const serverHost = process.env.SERVERHOST ? process.env.SERVERHOST : 'http://localhost:3001';
 
     const store = createStore(() => ({
+      form: 0,
       opened: null,
     }));
 

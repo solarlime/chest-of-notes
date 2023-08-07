@@ -26,9 +26,16 @@ export default class Page {
     });
 
     const unsubscribe = this.store.subscribe(() => {
-      console.log('store:', this.store.getState());
+      const storeData = this.store.getState();
+      console.log('store:', storeData);
+      if (storeData.form > 0 || storeData.items.length > 0) {
+        this.notesList.classList.remove('is-hidden');
+        this.emptyList.classList.add('is-hidden');
+      } else {
+        this.notesList.classList.add('is-hidden');
+        this.emptyList.classList.remove('is-hidden');
+      }
       masonry.layout();
-      const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     });
 
     // Listener functions are initiated in a constructor and are given as callbacks
@@ -80,6 +87,7 @@ export default class Page {
         media.style.borderRadius = '4px';
         button.insertAdjacentElement('afterend', media);
         this.store.setState((previous) => ({ ...previous, opened: id }));
+        const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
       } else {
         close(opened);
         this.store.setState((previous) => ({ ...previous, opened: null }));
@@ -91,7 +99,6 @@ export default class Page {
 
     // At first, fetched notes must be rendered
     const fetchedData = this.store.getState().items;
-    // const fetchedData = [];
     let deleteButtonsAndIcons;
     this.notesLoading.classList.add('is-hidden');
     if (fetchedData.length) {
@@ -116,7 +123,6 @@ export default class Page {
       const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
       this.emptyList.classList.remove('is-hidden');
-      // this.notesList.hidden = false;
     }
 
     if (isSubscribed !== 'allow') {
@@ -165,6 +171,7 @@ export default class Page {
           }
         });
 
+        this.store.setState((previous) => ({ ...previous, form: previous.form + 1 }));
         this.form = new Form(this.serverHost, this.notesList, this.store, masonry, button.name, this.deleteListener, this.previewListener);
       };
       button.addEventListener('click', listener);

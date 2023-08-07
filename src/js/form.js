@@ -96,8 +96,8 @@ export default class Form {
     const cancelListener = (event) => {
       const form = event.target.closest('.form');
       this.masonry.remove(form);
-      // If event.isTrusted === true => form is replacing with a note => is no need to trigger masonry
-      if (event.isTrusted) this.masonry.layout();
+      // If event.isTrusted === true => form is not replaced with a note => need to update store
+      if (event.isTrusted) this.store.setState((previous) => ({ ...previous, form: previous.form - 1 }));
     };
 
     const saveListener = async (formName, type, cancelButton) => {
@@ -118,7 +118,7 @@ export default class Form {
         if (previewButton instanceof HTMLButtonElement) {
           previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, this.pipeBlob));
         }
-        this.store.setState((previous) => ({ ...previous, items: [...previous.items, data] }));
+        this.store.setState((previous) => ({ ...previous, form: previous.form - 1, items: [...previous.items, data] }));
       }
     };
 
