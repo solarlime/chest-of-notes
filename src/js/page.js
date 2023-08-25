@@ -40,7 +40,7 @@ export default class Page {
         const data = JSON.parse(message.data);
         if (data.users) {
           if (data.users > 1) {
-            const text = 'Server denied to subscribe on notifications: somebody has already connected';
+            const text = 'Server denied to subscribe on notifications: somebody has already connected.';
             console.log(text);
             client.close(1000, 'Somebody has already connected');
             [this.textButton, this.audioButton, this.videoButton].forEach((button) => {
@@ -63,7 +63,7 @@ export default class Page {
         }
         if (data.event) {
           if (data.event.name === 'uploaderror') {
-            const text = `An error occurred with a file from the note "${data.event.note}". Try to record it again`;
+            const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
             console.log(text);
             alert(text);
           }
@@ -80,7 +80,7 @@ export default class Page {
         }
       });
       client.addEventListener('error', () => {
-        const text = 'An error occurred with a notifications\' subscription';
+        const text = 'An error occurred with a notifications\' subscription.';
         console.log(text);
         alert(text);
       });

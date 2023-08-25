@@ -112,7 +112,7 @@ export async function recordSomeMedia(media) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
     if (!window.MediaRecorder) {
-      alert('A polyfill is active. You can record only audio files. If you\'re using Safari on iOS you can enable this functionality in its settings (MediaRecorder). Then reload the page');
+      alert('A polyfill is active. You can record only audio files. If you\'re using Safari on iOS you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
       window.MediaRecorder = AudioRecorder;
       if (tag === 'video') {
         return null;
