@@ -13,7 +13,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
         const data = JSON.parse(message.data);
         if (data.users) {
           if (data.users > 1) {
-            const text = 'Server denied to subscribe on notifications: somebody has already connected';
+            const text = 'Server denied to subscribe on notifications: somebody has already connected.';
             console.log(text);
             client.close(1000, 'Somebody has already connected');
             resolve('deny');
@@ -30,7 +30,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
         }
         if (data.event) {
           if (data.event.name === 'uploaderror') {
-            const text = `An error occurred with a file from the note "${data.event.note}". Try to record it again`;
+            const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
             console.log(text);
             alert(text);
           }
@@ -47,7 +47,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
         }
       });
       client.addEventListener('error', () => {
-        const text = 'An error occurred with a notifications\' subscription';
+        const text = 'An error occurred with a notifications\' subscription.';
         console.log(text);
         alert(text);
         resolve('deny');
@@ -109,7 +109,7 @@ export async function recordSomeMedia(media) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
     if (!window.MediaRecorder) {
-      alert('MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page');
+      alert('MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
       return null;
     }
     const mediaRecorder = new MediaRecorder(stream);
