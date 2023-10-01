@@ -106,6 +106,7 @@ export default class Form {
       cancelButton.dispatchEvent(new Event('click'));
       if (typeof data === 'string') {
         alert(`Your note wasn't saved. Server response: ${data}`);
+        this.masonry.layout();
       } else {
         const { deleteNote: deleteButton, notesListItemDescription: previewButton } = render(
           'note',
