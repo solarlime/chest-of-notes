@@ -38,6 +38,15 @@ export default class Page {
       masonry.layout();
     });
 
+    // Some logic to clear layout from notes
+    const deleteFromInterface = (itemToDelete, dataId) => {
+      masonry.remove(itemToDelete);
+      this.store.setState((previous) => ({
+        ...previous,
+        items: previous.items.filter((item) => item.id !== dataId),
+      }));
+    };
+
     // Listener functions are initiated in a constructor and are given as callbacks
     this.deleteListener = async (event, dataId) => {
       const confirmation = window.confirm('Are you sure?');
@@ -50,11 +59,7 @@ export default class Page {
         }
         if (result.status === 'Deleted') {
           const itemToDelete = event.target.closest('.notes-list-item');
-          masonry.remove(itemToDelete);
-          this.store.setState((previous) => ({
-            ...previous,
-            items: previous.items.filter((item) => item.id !== dataId),
-          }));
+          deleteFromInterface(itemToDelete, dataId);
         }
       }
     };
@@ -138,6 +143,12 @@ export default class Page {
       this.addEventListeners(masonry, contentButtons);
     }
     deleteButtonsAndIcons = null;
+
+    // A listener for deleting incomplete notes (see 'uploaderror' in utils.js)
+    this.notesList.addEventListener('clearIncomplete', (event) => {
+      const itemToDelete = this.notesList.querySelector(`[data-id="${event.detail.id}"]`).closest('li');
+      deleteFromInterface(itemToDelete, event.detail.id);
+    });
   }
 
   addEventListeners(masonry, contentButtons) {

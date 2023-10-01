@@ -33,6 +33,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
             const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
             console.log(text);
             alert(text);
+            notesList.dispatchEvent(new CustomEvent('clearIncomplete', { detail: { id: data.event.id } }));
           }
           if (data.event.name === 'uploadsuccess') {
             console.log(`Successfully saved a file from the note "${data.event.note}"!`);
