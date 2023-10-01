@@ -115,7 +115,7 @@ export default class Form {
           this.pipeBlob,
           this.masonry,
         );
-        deleteButton.addEventListener('click', (event) => deleteListener(event, data.id), { once: true });
+        deleteButton.addEventListener('click', (event) => deleteListener(event, data.id));
         if (previewButton instanceof HTMLButtonElement) {
           previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, this.pipeBlob));
         }
