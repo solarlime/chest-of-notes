@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import Masonry from 'masonry-layout';
 import Form from './form';
-import { render, subscribeOnNotifications } from './utils';
+import { render, showMessage, subscribeOnNotifications } from './utils';
 
 export default class Page {
   constructor(serverHost, store) {
@@ -49,19 +49,23 @@ export default class Page {
 
     // Listener functions are initiated in a constructor and are given as callbacks
     this.deleteListener = async (event, dataId) => {
-      const confirmation = window.confirm('Are you sure?');
-      if (confirmation) {
-        const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
-        const result = await res.json();
-        console.log(result);
-        if (result.status.includes('Error')) {
-          alert(`Cannot delete! Server response: ${result.data}`);
+      try {
+        await showMessage('delete', 'Are you sure?');
+        try {
+          const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
+          const result = await res.json();
+          console.log(result);
+          if (result.status.includes('Error')) {
+            await showMessage('error', `Cannot delete! Server response: ${result.data}`);
+          }
+          if (result.status === 'Deleted') {
+            const itemToDelete = event.target.closest('.notes-list-item');
+            deleteFromInterface(itemToDelete, dataId);
+          }
+        } catch (e) {
+          console.error(e);
         }
-        if (result.status === 'Deleted') {
-          const itemToDelete = event.target.closest('.notes-list-item');
-          deleteFromInterface(itemToDelete, dataId);
-        }
-      }
+      } catch (e) { /* do nothing */ }
     };
 
     this.previewListener = (id, button, type, pipeBlob) => {

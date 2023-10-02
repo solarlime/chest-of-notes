@@ -2,6 +2,82 @@
 /* eslint-disable prefer-promise-reject-errors */
 import uniqid from 'uniqid';
 
+// confirmation:
+// - server connection lost: yes, sure (primary); not now (without)
+// - deleting: yes, sure (danger, outline); no, leave it (primary)
+// error:
+// - error: ok (primary)
+export function showMessage(type, message) {
+  const modal = document.createElement('div');
+  modal.classList.add('modal', 'is-active');
+
+  const modalBackground = document.createElement('div');
+  modalBackground.classList.add('modal-background');
+
+  const modalCard = document.createElement('div');
+  modalCard.classList.add('modal-card');
+
+  const modalCardHead = document.createElement('header');
+  modalCardHead.classList.add('modal-card-head');
+
+  const modalCardTitle = document.createElement('p');
+  modalCardTitle.classList.add('modal-card-title', 'is-size-5-mobile');
+
+  const modalCardBody = document.createElement('section');
+  modalCardBody.classList.add('modal-card-body');
+
+  const modalCardBodyContent = document.createElement('p');
+  modalCardBodyContent.classList.add('modal-card-body-content');
+  modalCardBodyContent.textContent = message;
+
+  const modalCardFoot = document.createElement('footer');
+  modalCardFoot.classList.add('modal-card-foot');
+
+  const buttons = { confirm: document.createElement('button') };
+  buttons.confirm.classList.add('button', 'confirm', 'is-size-7-mobile');
+
+  if (type === 'error') {
+    modalCardTitle.textContent = 'Error';
+    buttons.confirm.classList.add('is-primary');
+    buttons.confirm.textContent = 'OK';
+  } else {
+    modalCardTitle.textContent = 'Confirmation';
+    buttons.confirm.textContent = 'Yes, sure';
+    buttons.decline = document.createElement('button');
+    buttons.decline.classList.add('button', 'decline', 'is-size-7-mobile');
+    if (type === 'delete') {
+      buttons.confirm.classList.add('is-danger', 'is-outlined');
+      buttons.decline.classList.add('is-primary');
+      buttons.decline.textContent = 'No, leave it';
+    } else if (type === 'reconnect') {
+      buttons.confirm.classList.add('is-primary');
+      buttons.decline.textContent = 'Not now';
+    }
+    modalCardFoot.append(buttons.decline);
+  }
+
+  const action = new Promise((resolve, reject) => {
+    buttons.confirm.addEventListener('click', () => {
+      modal.remove();
+      resolve();
+    }, { once: true });
+    if (buttons.decline) {
+      buttons.decline.addEventListener('click', () => {
+        modal.remove();
+        reject();
+      }, { once: true });
+    }
+  });
+
+  modalCardFoot.prepend(buttons.confirm);
+  modalCardBody.append(modalCardBodyContent);
+  modalCardHead.append(modalCardTitle);
+  modalCard.append(modalCardHead, modalCardBody, modalCardFoot);
+  modal.append(modalBackground, modalCard);
+  document.body.append(modal);
+  return action;
+}
+
 // At first, it is needed to subscribe on server notifications
 // Without this feature, the app freezes when a big file is sent
 export async function subscribeOnNotifications(serverHost, notesList) {
@@ -9,7 +85,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
     const client = new WebSocket(`${serverHost.replace('http', 'ws')}/chest-of-notes/`);
 
     client.addEventListener('open', () => {
-      client.addEventListener('message', (message) => {
+      client.addEventListener('message', async (message) => {
         const data = JSON.parse(message.data);
         if (data.users) {
           if (data.users > 1) {
@@ -17,13 +93,23 @@ export async function subscribeOnNotifications(serverHost, notesList) {
             console.log(text);
             client.close(1000, 'Somebody has already connected');
             resolve('deny');
-            const timeout = setTimeout(() => { clearTimeout(timeout); alert(text); }, 500);
+            await new Promise((resolveIt) => {
+              const timeout = setTimeout(() => {
+                clearTimeout(timeout);
+                resolveIt();
+              }, 500);
+            });
+            await showMessage('error', text);
           } else {
             console.log('Subscribed on notifications!');
-            client.addEventListener('close', () => {
+            client.addEventListener('close', async () => {
               console.log('Connection was closed!');
-              const confirmation = window.confirm('A server connection was lost. Do you want reload the page and try to connect again?');
-              if (confirmation) window.location.reload();
+              try {
+                await showMessage('reconnect', 'A server connection was lost. Do you want reload the page and try to connect again?');
+                window.location.reload();
+              } catch (e) {
+                // do nothing
+              }
             });
             const timeout = setTimeout(() => { clearTimeout(timeout); resolve('allow'); }, 500);
           }
@@ -32,7 +118,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
           if (data.event.name === 'uploaderror') {
             const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
             console.log(text);
-            alert(text);
+            await showMessage('error', text);
             notesList.dispatchEvent(new CustomEvent('clearIncomplete', { detail: { id: data.event.id } }));
           }
           if (data.event.name === 'uploadsuccess') {
@@ -47,10 +133,10 @@ export async function subscribeOnNotifications(serverHost, notesList) {
           }
         }
       });
-      client.addEventListener('error', () => {
+      client.addEventListener('error', async () => {
         const text = 'An error occurred with a notifications\' subscription.';
         console.log(text);
-        alert(text);
+        await showMessage('error', text);
         resolve('deny');
       });
     });
@@ -110,7 +196,7 @@ export async function recordSomeMedia(media) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
     if (!window.MediaRecorder) {
-      alert('MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
+      await showMessage('error', 'MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
       return null;
     }
     const mediaRecorder = new MediaRecorder(stream);
@@ -123,7 +209,7 @@ export async function recordSomeMedia(media) {
     }
     return { mediaRecorder, pipeline };
   } catch (e) {
-    alert('You didn\'t allow to record media. You can make only text notes!');
+    await showMessage('error', 'You didn\'t allow to record media. You can make only text notes!');
     return null;
   }
 }

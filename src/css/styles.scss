@@ -183,3 +183,22 @@ form .card-content div.content {
   border-radius: 4px;
   background: #000000;
 }
+
+.modal-background {
+  background-color: rgba(10, 10, 10, 0.6);
+}
+
+.modal-card {
+  $padding: 1.75rem;
+  max-width: 540px;
+  margin: 0 auto;
+  @include until(769px) {
+    width: calc(100% - 2 * $padding);
+    max-width: 540px;
+    margin: 0 auto;
+
+    .modal-card-head, .modal-card-body, .modal-card-foot {
+      padding: 1rem;
+    }
+  }
+}

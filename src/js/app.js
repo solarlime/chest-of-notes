@@ -1,5 +1,6 @@
 import { createStore } from 'zustand/vanilla';
 import Page from './page';
+import { showMessage } from './utils';
 
 export default class App {
   static async init() {
@@ -27,8 +28,8 @@ export default class App {
 
       console.log('Initiated!');
     } catch (e) {
-      alert(`An error occurred: ${e.message} The page will be reloaded.`);
-      window.location.reload();
+      showMessage('error', `An error occurred: ${e.message} The page will be reloaded.`)
+        .then(() => { window.location.reload(); });
     }
   }
 }

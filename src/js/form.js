@@ -1,7 +1,7 @@
 /* eslint-disable no-param-reassign */
 import validator from 'validator';
 import {
-  recordSomeMedia, render, sendData,
+  recordSomeMedia, render, sendData, showMessage,
 } from './utils';
 
 export default class Form {
@@ -26,7 +26,7 @@ export default class Form {
      */
     const mediaRecorderWrapper = async (mediaElement, cancelButton, startStopButton, saveButton) => {
       if (!navigator.mediaDevices) {
-        alert('Your browser can\'t deal with media functions!');
+        await showMessage('error', 'Your browser can\'t deal with media functions!');
         cancelButton.dispatchEvent(new Event('click'));
         return;
       }
@@ -40,7 +40,7 @@ export default class Form {
           const timeoutOnStart = setTimeout(() => { this.masonry.layout(); clearTimeout(timeoutOnStart); }, 500);
 
           // Collect the data into a Blob
-          const recorderListener = (event) => {
+          const recorderListener = async (event) => {
             const timeoutOnEnd = setTimeout(() => { this.masonry.layout(); clearTimeout(timeoutOnEnd); }, 500);
             pipeline.push(event.data);
             if (mediaRecorder.state === 'inactive') {
@@ -55,7 +55,7 @@ export default class Form {
                 mediaElement.srcObject = null;
                 if (this.pipeBlob.size > 50 * 1024 * 1024) {
                   // this.modalFormDescriptionBoth.classList.add('hidden');
-                  alert('Your record is too big, so you can\'t save it. Try to make a smaller one!');
+                  await showMessage('error', 'Your record is too big, so you can\'t save it. Try to make a smaller one!');
                   cancelButton.dispatchEvent(new Event('click'));
                   this.masonry.layout();
                 } else {
@@ -105,7 +105,7 @@ export default class Form {
       const data = await sendData(this.serverHost, nameField.value, type, this.pipeBlob, content);
       cancelButton.dispatchEvent(new Event('click'));
       if (typeof data === 'string') {
-        alert(`Your note wasn't saved. Server response: ${data}`);
+        await showMessage('error', `Your note wasn't saved. Server response: ${data}`);
         this.masonry.layout();
       } else {
         const { deleteNote: deleteButton, notesListItemDescription: previewButton } = render(
