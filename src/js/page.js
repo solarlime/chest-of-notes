@@ -134,7 +134,7 @@ export default class Page {
       this.emptyList.classList.remove('is-hidden');
     }
 
-    if (isSubscribed !== 'allow') {
+    const disableAll = () => {
       contentButtons.forEach((button) => {
         button.disabled = true;
         button.parentElement.classList.add('hidden');
@@ -143,10 +143,17 @@ export default class Page {
         buttonAndIcon.button.disabled = true;
         buttonAndIcon.icon.style.color = '#aaaaaa';
       });
+      this.burger.disabled = true;
+      this.menuButton.disabled = true;
+    };
+
+    if (isSubscribed !== 'allow') {
+      disableAll();
     } else {
       this.addEventListeners(masonry, contentButtons);
     }
-    deleteButtonsAndIcons = null;
+
+    document.body.addEventListener('disable', disableAll);
 
     // A listener for deleting incomplete notes (see 'uploaderror' in utils.js)
     this.notesList.addEventListener('clearIncomplete', (event) => {

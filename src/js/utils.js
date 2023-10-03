@@ -108,7 +108,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
                 await showMessage('reconnect', 'A server connection was lost. Do you want reload the page and try to connect again?');
                 window.location.reload();
               } catch (e) {
-                // do nothing
+                document.body.dispatchEvent(new CustomEvent('disable'));
               }
             });
             const timeout = setTimeout(() => { clearTimeout(timeout); resolve('allow'); }, 500);

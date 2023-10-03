@@ -74,12 +74,20 @@ body {
   text-transform: uppercase;
 }
 
-.button.navbar-link {
+.navbar.is-danger .navbar-item.has-dropdown .button.navbar-link {
   border: 0;
   background-color: #fab400;
+  &:focus-visible {
+    outline-color: hsl(0, 0%, 98%);;
+    outline-width: 2px;
+    outline-style: solid;
+  }
 }
 
 .navbar-dropdown {
+  top: 110%;
+  border-top: 0;
+  border-radius: 4px;
   @include until(1023px) {
     display: flex;
     justify-content: space-evenly;
@@ -107,7 +115,11 @@ body {
 }
 
 .navbar-burger {
-  &:hover {
+  &:hover:disabled {
+    background-color: unset;
+    cursor: not-allowed;
+  }
+  &:hover:not(:disabled) {
     background-color: unset;
     & span {
       background-color: rgba(0, 0, 0, 0.5);
@@ -172,6 +184,14 @@ body {
 
 form .card-content div.content {
   margin-bottom: 0.5rem;
+}
+
+.card-header-icon:hover {
+  opacity: 0.7;
+  &:disabled {
+    opacity: 1;
+    cursor: not-allowed;
+  }
 }
 
 .card-content {
