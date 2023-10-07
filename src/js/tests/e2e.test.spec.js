@@ -104,11 +104,15 @@ test.describe('E2E', () => {
         }),
       }));
 
-      page.on('dialog', (prompt) => prompt.accept());
-
       const item = await page.locator('.notes-list-item', { hasText: initNoteName });
       const deleteButton = await item.locator('.delete-note');
+      const modal = await page.locator('.modal-card');
+
       await deleteButton.click();
+      await expect(modal).toBeVisible();
+
+      const confirm = await page.locator('button.confirm');
+      await confirm.click();
       await expect(item).toHaveCount(0);
     });
   });
