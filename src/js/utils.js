@@ -343,7 +343,7 @@ export function render(type, notesList, data, pipeBlob, masonry) {
       notesListItemDescription.classList.add('button');
     }
     if (!hasDescription && isText) {
-      notesListItemDescription.classList.add('hidden');
+      cardContent.hidden = true;
     }
 
     if (isText) {
