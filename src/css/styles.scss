@@ -7,14 +7,14 @@ $fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
 @import "~@fortawesome/fontawesome-free/scss/fontawesome";
 @import "~@fortawesome/fontawesome-free/scss/solid";
 @import "~bulma/bulma";
-@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC:wght@400&family=Noto+Sans:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC&family=IBM+Plex+Sans:wght@400;500&display=swap');
 
 html {
   background-color: $primary;
 }
 
 button {
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 400;
 }
 
@@ -24,7 +24,7 @@ body {
   max-width: 2000px;
   height: 100dvh;
   margin: 0 auto;
-  font-family: 'Noto Sans', sans-serif;
+  font-family: 'IBM Plex Sans', sans-serif;
   font-weight: 400;
 }
 
@@ -184,6 +184,10 @@ body {
 
 form .card-content div.content {
   margin-bottom: 0.5rem;
+}
+
+.card-header-title {
+  font-weight: 500;
 }
 
 .card-header-icon:hover {
