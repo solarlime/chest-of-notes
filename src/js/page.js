@@ -8,6 +8,7 @@ export default class Page {
     this.serverHost = serverHost;
     this.store = store;
     this.page = document.body;
+    this.logo = this.page.querySelector('.logo');
     this.burger = this.page.querySelector('.navbar-burger');
     this.burgerMenu = this.page.querySelector('.navbar-menu');
     this.menuButton = this.page.querySelector('.menu-button');
@@ -24,6 +25,31 @@ export default class Page {
       itemSelector: '.notes-list-item',
       columnWidth: '.notes-list-item',
     });
+
+    // Easter egg logic
+    const animateIt = () => {
+      console.log('wow');
+      const easterEgg = this.page.querySelector('.name-easter-egg');
+      easterEgg.classList.add('animate-it');
+      const animationTimeout = setTimeout(() => {
+        easterEgg.classList.remove('animate-it');
+        clearTimeout(animationTimeout);
+      }, 2000);
+    };
+    let firstTouch;
+
+    ['mousedown', 'touchstart'].forEach((eventType) => {
+      this.logo.addEventListener(eventType, (event) => {
+        event.preventDefault();
+        if (!firstTouch || (Date.now() - firstTouch >= 1000)) {
+          firstTouch = Date.now();
+        } else {
+          animateIt();
+          firstTouch = undefined;
+        }
+      });
+    });
+
 
     const unsubscribe = this.store.subscribe(() => {
       const storeData = this.store.getState();
