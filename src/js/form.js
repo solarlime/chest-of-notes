@@ -24,7 +24,12 @@ export default class Form {
     /**
      * A wrapper for a media recording function
      */
-    const mediaRecorderWrapper = async (mediaElement, cancelButton, startStopButton, saveButton) => {
+    const mediaRecorderWrapper = async (
+      mediaElement,
+      cancelButton,
+      startStopButton,
+      saveButton,
+    ) => {
       if (!navigator.mediaDevices) {
         await showMessage('error', 'Your browser can\'t deal with media functions!');
         cancelButton.dispatchEvent(new Event('click'));
@@ -37,11 +42,17 @@ export default class Form {
           this.masonry.layout();
         } else {
           const { mediaRecorder, pipeline } = recorder;
-          const timeoutOnStart = setTimeout(() => { this.masonry.layout(); clearTimeout(timeoutOnStart); }, 500);
+          const timeoutOnStart = setTimeout(() => {
+            this.masonry.layout();
+            clearTimeout(timeoutOnStart);
+          }, 500);
 
           // Collect the data into a Blob
           const recorderListener = async (event) => {
-            const timeoutOnEnd = setTimeout(() => { this.masonry.layout(); clearTimeout(timeoutOnEnd); }, 500);
+            const timeoutOnEnd = setTimeout(() => {
+              this.masonry.layout();
+              clearTimeout(timeoutOnEnd);
+            }, 500);
             pipeline.push(event.data);
             if (mediaRecorder.state === 'inactive') {
               if (mediaElement) {
@@ -54,13 +65,9 @@ export default class Form {
                 mediaElement.src = URL.createObjectURL(this.pipeBlob);
                 mediaElement.srcObject = null;
                 if (this.pipeBlob.size > 50 * 1024 * 1024) {
-                  // this.modalFormDescriptionBoth.classList.add('hidden');
                   await showMessage('error', 'Your record is too big, so you can\'t save it. Try to make a smaller one!');
                   cancelButton.dispatchEvent(new Event('click'));
                   this.masonry.layout();
-                } else {
-                  // this.modalSaveButton.classList.remove('hidden');
-                  // this.modalSaveButton.focus();
                 }
               }
             }
@@ -76,28 +83,23 @@ export default class Form {
             mediaElement.controls = true;
             saveButton.classList.remove('is-hidden');
             startStopButton.classList.add('is-hidden');
-            // this.modalStopButton.classList.add('hidden');
-
-            // this.modalSaveButton.addEventListener('click', this.sendDataWrapper);
-            // // After saving remove a listener for stopping
-            // this.modalStopButton.removeEventListener('click', this.stopListener);
           };
           startStopButton.textContent = 'Stop';
           startStopButton.addEventListener('click', stopListener, { once: true });
-          // this.modalStopButton.addEventListener('click', this.stopListener);
-          // // After stopping remove a listener for recording
-          // this.modalStartButton.removeEventListener('click', this.mediaRecorderWrapper);
         }
       } catch (e) {
-        console.log(e);
+        console.error(e);
       }
     };
 
+    // Listeners for form buttons
     const cancelListener = (event) => {
       const form = event.target.closest('.form');
       this.masonry.remove(form);
       // If event.isTrusted === true => form is not replaced with a note => need to update store
-      if (event.isTrusted) this.store.setState((previous) => ({ ...previous, form: previous.form - 1 }));
+      if (event.isTrusted) {
+        this.store.setState((previous) => ({ ...previous, form: previous.form - 1 }));
+      }
     };
 
     const saveListener = async (formName, type, cancelButton) => {
@@ -119,12 +121,21 @@ export default class Form {
         if (previewButton instanceof HTMLButtonElement) {
           previewButton.addEventListener('click', () => previewListener(data.id, previewButton, data.type, this.pipeBlob));
         }
-        this.store.setState((previous) => ({ ...previous, form: previous.form - 1, items: [...previous.items, data] }));
+        this.store.setState((previous) => ({
+          ...previous,
+          form: previous.form - 1,
+          items: [...previous.items, data],
+        }));
       }
     };
 
     const {
-      notesListItemWrapper: form, input, deleteNote: cancelButton, media: mediaElement, startButton, saveButton,
+      notesListItemWrapper: form,
+      input,
+      deleteNote: cancelButton,
+      media: mediaElement,
+      startButton,
+      saveButton,
     } = render(
       formType,
       this.notesList,

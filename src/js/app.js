@@ -18,7 +18,6 @@ export default class App {
         method: 'GET',
       });
       const result = await res.json();
-      console.log(result);
       if (result.status.includes('Error')) {
         throw Error(result.data);
       }

@@ -2,11 +2,12 @@
 /* eslint-disable prefer-promise-reject-errors */
 import uniqid from 'uniqid';
 
-// confirmation:
-// - server connection lost: yes, sure (primary); not now (without)
-// - deleting: yes, sure (danger, outline); no, leave it (primary)
-// error:
-// - error: ok (primary)
+/**
+ * Custom modal window
+ * Buttons: - Server connection lost: yes, sure (primary); not now (without)
+ *          - Deleting: yes, sure (danger, outline); no, leave it (primary)
+ *          - Error: ok (primary)
+ */
 export function showMessage(type, message) {
   const modal = document.createElement('div');
   modal.classList.add('modal', 'is-active');
@@ -90,7 +91,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
         if (data.users) {
           if (data.users > 1) {
             const text = 'Server denied to subscribe on notifications: somebody has already connected.';
-            console.log(text);
+            console.error(text);
             client.close(1000, 'Somebody has already connected');
             resolve('deny');
             await new Promise((resolveIt) => {
@@ -101,9 +102,9 @@ export async function subscribeOnNotifications(serverHost, notesList) {
             });
             await showMessage('error', text);
           } else {
-            console.log('Subscribed on notifications!');
+            console.info('Subscribed on notifications!');
             client.addEventListener('close', async () => {
-              console.log('Connection was closed!');
+              console.info('Connection was closed!');
               try {
                 await showMessage('reconnect', 'A server connection was lost. Do you want reload the page and try to connect again?');
                 window.location.reload();
@@ -117,12 +118,12 @@ export async function subscribeOnNotifications(serverHost, notesList) {
         if (data.event) {
           if (data.event.name === 'uploaderror') {
             const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
-            console.log(text);
+            console.error(text);
             await showMessage('error', text);
             notesList.dispatchEvent(new CustomEvent('clearIncomplete', { detail: { id: data.event.id } }));
           }
           if (data.event.name === 'uploadsuccess') {
-            console.log(`Successfully saved a file from the note "${data.event.note}"!`);
+            console.info(`Successfully saved a file from the note "${data.event.note}"!`);
             const descriptionToEdit = notesList.querySelector(`[data-id="${data.event.id}"] .notes-list-item-description`);
             const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
             deleteNote.querySelector('i').style.color = '';
@@ -135,7 +136,7 @@ export async function subscribeOnNotifications(serverHost, notesList) {
       });
       client.addEventListener('error', async () => {
         const text = 'An error occurred with a notifications\' subscription.';
-        console.log(text);
+        console.error(text);
         await showMessage('error', text);
         resolve('deny');
       });
@@ -145,11 +146,11 @@ export async function subscribeOnNotifications(serverHost, notesList) {
 
 /**
  * A function, which collects data, puts it to FormData & sends to a server
- * @param serverHost
- * @param modalFormName
- * @param type
- * @param pipeBlob
- * @param modalFormTextArea
+ * @param serverHost - needed to resolve url correctly
+ * @param name - a header string
+ * @param type - 'text', 'audio', 'video'
+ * @param pipeBlob - media file if an audio/video note is provided
+ * @param textArea - if a text note is provided
  * @returns {Promise<{name, id: *, type}>} - a data object (without a file - for notes with media)
  */
 export async function sendData(serverHost, name, type, pipeBlob, textArea) {
@@ -172,7 +173,6 @@ export async function sendData(serverHost, name, type, pipeBlob, textArea) {
       body: formData,
     });
     const result = await res.json();
-    console.log(result);
     if (result.status.includes('Error')) {
       throw Error(result.data);
     }
@@ -181,14 +181,14 @@ export async function sendData(serverHost, name, type, pipeBlob, textArea) {
     }
     return data;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e.message;
   }
 }
 
 /**
  * A function, which initiates media recording
- * @param media
+ * @param media an <audio> / <video> element
  * @returns {Promise<{pipeline: *[], mediaRecorder: MediaRecorder}>}
  */
 export async function recordSomeMedia(media) {
@@ -215,7 +215,7 @@ export async function recordSomeMedia(media) {
 }
 
 /**
- * A function for rendering new notes. Adds listeners for 'Delete' buttons & for preview links
+ * A function for rendering new notes
  * @param type
  * @param notesList
  * @param data

@@ -28,7 +28,6 @@ export default class Page {
 
     // Easter egg logic
     const animateIt = () => {
-      console.log('wow');
       const easterEgg = this.page.querySelector('.name-easter-egg');
       easterEgg.classList.add('animate-it');
       const animationTimeout = setTimeout(() => {
@@ -50,10 +49,11 @@ export default class Page {
       });
     });
 
-
+    // This will run each time store changes
+    // eslint-disable-next-line no-unused-vars
     const unsubscribe = this.store.subscribe(() => {
       const storeData = this.store.getState();
-      console.log('store:', storeData);
+      console.info('store:', storeData);
       if (storeData.form > 0 || storeData.items.length > 0) {
         this.notesList.classList.remove('is-hidden');
         this.emptyList.classList.add('is-hidden');
@@ -80,7 +80,6 @@ export default class Page {
         try {
           const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
           const result = await res.json();
-          console.log(result);
           if (result.status.includes('Error')) {
             await showMessage('error', `Cannot delete! Server response: ${result.data}`);
           }
@@ -130,6 +129,9 @@ export default class Page {
     };
 
     const contentButtons = [this.textButton, this.audioButton, this.videoButton];
+    // Before rendering a wss connection is created.
+    // Only one user can connect, others are disconnected
+    // Connected user gets full access, others are read-only
     const isSubscribed = await subscribeOnNotifications(this.serverHost, this.notesList);
 
     // At first, fetched notes must be rendered
@@ -220,7 +222,15 @@ export default class Page {
         });
 
         this.store.setState((previous) => ({ ...previous, form: previous.form + 1 }));
-        this.form = new Form(this.serverHost, this.notesList, this.store, masonry, button.name, this.deleteListener, this.previewListener);
+        this.form = new Form(
+          this.serverHost,
+          this.notesList,
+          this.store,
+          masonry,
+          button.name,
+          this.deleteListener,
+          this.previewListener,
+        );
       };
       button.addEventListener('click', listener);
     });
