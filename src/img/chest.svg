@@ -1,0 +1,24 @@
+<svg height="100%" stroke-miterlimit="10" style="fill-rule:nonzero;clip-rule:evenodd;stroke-linecap:round;stroke-linejoin:round;" version="1.1" viewBox="0 0 64 64" width="100%" xml:space="preserve" xmlns="http://www.w3.org/2000/svg">
+<defs/>
+<g id="Icons">
+<g opacity="1">
+<path d="M60 48L60 52C60 52.55 59.78 53.05 59.41 53.41C59.05 53.78 58.55 54 58 54L6 54C5.45 54 4.95 53.78 4.59 53.41C4.22 53.05 4 52.55 4 52L4 48L60 48Z" fill="#dc9600" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M60 28L60 52C60 52.55 59.78 53.05 59.41 53.41L54 48L54 28L60 28Z" fill="#fab400" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M60 24L4 24L4 20C4 14.477 8.477 10 14 10L50 10C55.523 10 60 14.477 60 20L60 24Z" fill="#a00027" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M28 10L36 10L36 24L28 24L28 10Z" fill="#82000a" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M16 10L22 10L22 24L16 24L16 10Z" fill="#fab400" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M42 10L48 10L48 24L42 24L42 10Z" fill="#fab400" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M10 28L10 48L4.59 53.41C4.22 53.05 4 52.55 4 52L4 28L10 28Z" fill="#fab400" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M4 28L10 28L10 31L4 31L4 28Z" fill="#be7800" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M54 28L60 28L60 31L54 31L54 28Z" fill="#be7800" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M60 24L60 30L4 30L4 24L60 24Z" fill="#dc9600" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M10 30L54 30L54 36L10 36L10 30Z" fill="#a00027" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M10 30L54 30L54 31L10 31L10 30Z" fill="#82000a" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M36 30L36 31C36 32.1 35.1 33 34 33L30 33C28.9 33 28 32.1 28 31L28 30L36 30Z" fill="#82000a" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M10 36L54 36L54 42L10 42L10 36Z" fill="#82000a" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M10 42L54 42L54 48L10 48L10 42Z" fill="#a00027" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M34 32L30 32C28.895 32 28 31.105 28 30L28 24C28 22.895 28.895 22 30 22L34 22C35.105 22 36 22.895 36 24L36 30C36 31.105 35.105 32 34 32Z" fill="#fab400" fill-rule="nonzero" opacity="1" stroke="none"/>
+<path d="M34 26C34 24.895 33.105 24 32 24C30.895 24 30 24.895 30 26C30 26.738 30.405 27.376 31 27.723L31 29C31 29.552 31.448 30 32 30C32.552 30 33 29.552 33 29L33 27.723C33.595 27.376 34 26.738 34 26Z" fill="#01143b" fill-rule="nonzero" opacity="1" stroke="none"/>
+</g>
+</g>
+</svg>
