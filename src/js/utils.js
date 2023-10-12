@@ -1,82 +1,167 @@
 /* eslint-disable no-param-reassign */
+/* eslint-disable prefer-promise-reject-errors */
 import uniqid from 'uniqid';
-import AudioRecorder from 'audio-recorder-polyfill';
 
 /**
- * A function to format raw time to hh-mm-ss
- * @param rawTime
- * @returns {string}
+ * Custom modal window
+ * Buttons: - Server connection lost: yes, sure (primary); not now (without)
+ *          - Deleting: yes, sure (danger, outline); no, leave it (primary)
+ *          - Error: ok (primary)
  */
-export function formatTime(rawTime) {
-  const time = Math.floor(rawTime);
-  const hours = Math.floor(time / 3600);
-  const minutes = Math.floor(time / 60);
-  const seconds = time % 60;
-  return (`${((hours < 10) && (hours > 0)) ? '0' : ''}${(hours > 0) ? `${hours}:` : ''}${(minutes < 10) ? '0' : ''}${minutes}:${(seconds < 10) ? '0' : ''}${seconds}`);
+export function showMessage(type, message) {
+  const modal = document.createElement('div');
+  modal.classList.add('modal', 'is-active');
+
+  const modalBackground = document.createElement('div');
+  modalBackground.classList.add('modal-background');
+
+  const modalCard = document.createElement('div');
+  modalCard.classList.add('modal-card');
+
+  const modalCardHead = document.createElement('header');
+  modalCardHead.classList.add('modal-card-head');
+
+  const modalCardTitle = document.createElement('p');
+  modalCardTitle.classList.add('modal-card-title', 'is-size-5-mobile');
+
+  const modalCardBody = document.createElement('section');
+  modalCardBody.classList.add('modal-card-body');
+
+  const modalCardBodyContent = document.createElement('p');
+  modalCardBodyContent.classList.add('modal-card-body-content');
+  modalCardBodyContent.textContent = message;
+
+  const modalCardFoot = document.createElement('footer');
+  modalCardFoot.classList.add('modal-card-foot');
+
+  const buttons = { confirm: document.createElement('button') };
+  buttons.confirm.classList.add('button', 'confirm', 'is-size-7-mobile');
+
+  if (type === 'error') {
+    modalCardTitle.textContent = 'Error';
+    buttons.confirm.classList.add('is-primary');
+    buttons.confirm.textContent = 'OK';
+  } else {
+    modalCardTitle.textContent = 'Confirmation';
+    buttons.confirm.textContent = 'Yes, sure';
+    buttons.decline = document.createElement('button');
+    buttons.decline.classList.add('button', 'decline', 'is-size-7-mobile');
+    if (type === 'delete') {
+      buttons.confirm.classList.add('is-danger', 'is-outlined');
+      buttons.decline.classList.add('is-primary');
+      buttons.decline.textContent = 'No, leave it';
+    } else if (type === 'reconnect') {
+      buttons.confirm.classList.add('is-primary');
+      buttons.decline.textContent = 'Not now';
+    }
+    modalCardFoot.append(buttons.decline);
+  }
+
+  const action = new Promise((resolve, reject) => {
+    buttons.confirm.addEventListener('click', () => {
+      modal.remove();
+      resolve();
+    }, { once: true });
+    if (buttons.decline) {
+      buttons.decline.addEventListener('click', () => {
+        modal.remove();
+        reject();
+      }, { once: true });
+    }
+  });
+
+  modalCardFoot.prepend(buttons.confirm);
+  modalCardBody.append(modalCardBodyContent);
+  modalCardHead.append(modalCardTitle);
+  modalCard.append(modalCardHead, modalCardBody, modalCardFoot);
+  modal.append(modalBackground, modalCard);
+  document.body.append(modal);
+  return action;
 }
 
-/**
- * A function to make an animation of appearing and disappearing
- * @param modal
- * @param background
- * @param action
- */
-export function animateModals(modal, background, action) {
-  switch (action) {
-    case 'open': {
-      const notNew = Array.from(background).find((item) => item.classList.contains('remove-blur'));
-      if (notNew && modal.classList.contains('modal-add')) {
-        background.forEach((item) => item.classList.toggle('blur'));
-        background.forEach((item) => item.classList.toggle('remove-blur'));
-        modal.classList.add('modal-active');
-        modal.classList.remove('modal-inactive');
-      } else {
-        if (notNew) {
-          background.forEach((item) => item.classList.remove('remove-blur'));
+// At first, it is needed to subscribe on server notifications
+// Without this feature, the app freezes when a big file is sent
+export async function subscribeOnNotifications(serverHost, notesList) {
+  return new Promise((resolve) => {
+    const client = new WebSocket(`${serverHost.replace('http', 'ws')}/chest-of-notes/`);
+
+    client.addEventListener('open', () => {
+      client.addEventListener('message', async (message) => {
+        const data = JSON.parse(message.data);
+        if (data.users) {
+          if (data.users > 1) {
+            const text = 'Server denied to subscribe on notifications: somebody has already connected.';
+            console.error(text);
+            client.close(1000, 'Somebody has already connected');
+            resolve('deny');
+            await new Promise((resolveIt) => {
+              const timeout = setTimeout(() => {
+                clearTimeout(timeout);
+                resolveIt();
+              }, 500);
+            });
+            await showMessage('error', text);
+          } else {
+            console.info('Subscribed on notifications!');
+            client.addEventListener('close', async () => {
+              console.info('Connection was closed!');
+              try {
+                await showMessage('reconnect', 'A server connection was lost. Do you want reload the page and try to connect again?');
+                window.location.reload();
+              } catch (e) {
+                document.body.dispatchEvent(new CustomEvent('disable'));
+              }
+            });
+            const timeout = setTimeout(() => { clearTimeout(timeout); resolve('allow'); }, 500);
+          }
         }
-        background.forEach((item) => item.classList.add('blur'));
-        if (modal.classList.contains('modal-inactive')) {
-          modal.classList.remove('modal-inactive');
+        if (data.event) {
+          if (data.event.name === 'uploaderror') {
+            const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
+            console.error(text);
+            await showMessage('error', text);
+            notesList.dispatchEvent(new CustomEvent('clearIncomplete', { detail: { id: data.event.id } }));
+          }
+          if (data.event.name === 'uploadsuccess') {
+            console.info(`Successfully saved a file from the note "${data.event.note}"!`);
+            const descriptionToEdit = notesList.querySelector(`[data-id="${data.event.id}"] .notes-list-item-description`);
+            const deleteNote = descriptionToEdit.closest('li').querySelector('.delete-note');
+            deleteNote.querySelector('i').style.color = '';
+            deleteNote.disabled = false;
+            descriptionToEdit.textContent = 'Click to open the media!';
+            descriptionToEdit.classList.add('media-content');
+            descriptionToEdit.disabled = false;
+          }
         }
-        modal.classList.add('modal-active');
-      }
-      break;
-    }
-    case 'close': {
-      background.forEach((item) => item.classList.toggle('blur'));
-      background.forEach((item) => item.classList.toggle('remove-blur'));
-      modal.classList.toggle('modal-active');
-      modal.classList.toggle('modal-inactive');
-      break;
-    }
-    default: {
-      console.log('Hmm, something else happened with your animation!');
-    }
-  }
+      });
+      client.addEventListener('error', async () => {
+        const text = 'An error occurred with a notifications\' subscription.';
+        console.error(text);
+        await showMessage('error', text);
+        resolve('deny');
+      });
+    });
+  });
 }
 
 /**
  * A function, which collects data, puts it to FormData & sends to a server
- * @param serverHost
- * @param modalFormName
- * @param type
- * @param pipeBlob
- * @param modalFormTextArea
+ * @param serverHost - needed to resolve url correctly
+ * @param name - a header string
+ * @param type - 'text', 'audio', 'video'
+ * @param pipeBlob - media file if an audio/video note is provided
+ * @param textArea - if a text note is provided
  * @returns {Promise<{name, id: *, type}>} - a data object (without a file - for notes with media)
  */
-export async function sendData(serverHost, modalFormName, type, pipeBlob, modalFormTextArea) {
+export async function sendData(serverHost, name, type, pipeBlob, textArea) {
   const id = uniqid();
-  const data = {
-    id,
-    name: modalFormName.value,
-    type,
-  };
+  const data = { id, name, type };
 
   const formData = new FormData();
   Object.entries(data).forEach((chunk) => formData.set(chunk[0], chunk[1]));
   if (data.type === 'text') {
-    formData.set('content', modalFormTextArea.value);
-    data.content = modalFormTextArea.value;
+    formData.set('content', textArea.value);
+    data.content = textArea.value;
   } else {
     formData.set('content', pipeBlob);
     data.content = 'media';
@@ -88,7 +173,6 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
       body: formData,
     });
     const result = await res.json();
-    console.log(result);
     if (result.status.includes('Error')) {
       throw Error(result.data);
     }
@@ -97,14 +181,14 @@ export async function sendData(serverHost, modalFormName, type, pipeBlob, modalF
     }
     return data;
   } catch (e) {
-    console.log(e);
+    console.error(e);
     return e.message;
   }
 }
 
 /**
  * A function, which initiates media recording
- * @param media
+ * @param media an <audio> / <video> element
  * @returns {Promise<{pipeline: *[], mediaRecorder: MediaRecorder}>}
  */
 export async function recordSomeMedia(media) {
@@ -112,11 +196,8 @@ export async function recordSomeMedia(media) {
   try {
     const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: (tag === 'video') });
     if (!window.MediaRecorder) {
-      alert('A polyfill is active. You can record only audio files. If you\'re using Safari on iOS you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
-      window.MediaRecorder = AudioRecorder;
-      if (tag === 'video') {
-        return null;
-      }
+      await showMessage('error', 'MediaRecorder API is not active in your browser! If you\'re using iOS 12.1-14 you can enable this functionality in its settings (MediaRecorder). Then reload the page.');
+      return null;
     }
     const mediaRecorder = new MediaRecorder(stream);
     const pipeline = [];
@@ -128,129 +209,182 @@ export async function recordSomeMedia(media) {
     }
     return { mediaRecorder, pipeline };
   } catch (e) {
-    alert('You didn\'t allow to record media. You can make only text notes!');
+    await showMessage('error', 'You didn\'t allow to record media. You can make only text notes!');
     return null;
   }
 }
 
 /**
- * A function for rendering new notes. Adds listeners for 'Delete' buttons & for preview links
+ * A function for rendering new notes
+ * @param type
  * @param notesList
  * @param data
  * @param pipeBlob
- * @param deleteListener
- * @param previewListener
  * @param masonry
  */
-export function renderNewNote(notesList, data, pipeBlob, deleteListener, previewListener, masonry) {
-  const isText = (data.type === 'text');
-  const hasDescription = !!data.content;
-  // Level 1 <li.notes-list-item></li>
+export function render(type, notesList, data, pipeBlob, masonry) {
+  // Level 1 <li className="column notes-list-item">
   const notesListItem = document.createElement('li');
-  notesListItem.classList.add('notes-list-item');
-  // Level 2 <input type="checkbox" id="{data.id}" class="checkbox">
-  const checkbox = document.createElement('input');
-  checkbox.classList.add('checkbox');
-  checkbox.id = data.id;
-  checkbox.type = 'checkbox';
-  checkbox.tabIndex = -1;
-  // Level 2 <div.notes-list-item-header-wrapper></div>
-  const notesListItemHeaderWrapper = document.createElement('div');
-  notesListItemHeaderWrapper.classList.add('notes-list-item-header-wrapper');
-  // Level 3 <h3.notes-list-item-header>{data.name}</h3>
-  const notesListItemHeader = document.createElement('h3');
-  notesListItemHeader.classList.add('notes-list-item-header');
-  notesListItemHeader.textContent = data.name;
-  // Level 3 <div.notes-list-item-header-buttons></div>
-  const notesListItemHeaderButtons = document.createElement('div');
-  notesListItemHeaderButtons.classList.add('notes-list-item-header-buttons');
-  // Level 4 <label class="spoiler {condition}" for="{data.id}">{svg}</label>
-  const spoiler = document.createElement('label');
-  spoiler.classList.add('spoiler');
-  if (!hasDescription && isText) {
-    spoiler.classList.add('hidden');
-  }
-  spoiler.htmlFor = data.id;
-  spoiler.tabIndex = 0;
-  spoiler.insertAdjacentHTML(
-    'beforeend',
-    '<svg class="spoiler-svg" xmlns="http://www.w3.org/2000/svg" x="0px" y="0px" viewBox="0 0 490.656 490.656" xml:space="preserve">'
-    + '    <g><g>\n'
-    + '        <path d="M487.536,120.445c-4.16-4.16-10.923-4.16-15.083,0L245.339,347.581L18.203,120.467c-4.16-4.16-10.923-4.16-15.083,0    c-4.16,4.16-4.16,10.923,0,15.083l234.667,234.667c2.091,2.069,4.821,3.115,7.552,3.115s5.461-1.045,7.531-3.136l234.667-234.667    C491.696,131.368,491.696,124.605,487.536,120.445z"/>\n'
-    + '    </g></g>'
-    + '</svg>\n',
-  );
-  // Level 4 <div.delete-note>{svg}</div>
+  notesListItem.classList.add('column', 'notes-list-item');
+  // Level 2
+  let notesListItemWrapper;
+  // Level 3 <header className="card-header">
+  const notesListItemHeader = document.createElement('header');
+  notesListItemHeader.classList.add('card-header');
+  // Level 4 <p className="card-header-title">
+  const cardHeaderTitle = document.createElement('p');
+  cardHeaderTitle.classList.add('card-header-title');
+  // Level 4 <button className="card-header-icon delete-note" aria-label="delete" type="button">
   const deleteNote = document.createElement('button');
-  deleteNote.classList.add('delete-note');
+  deleteNote.classList.add('card-header-icon');
   deleteNote.type = 'button';
-  deleteNote.insertAdjacentHTML(
-    'beforeend',
-    '<svg class="delete-note-svg" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">\n'
-  + '    <g>\n'
-  + '        <path d="m424 64h-88v-16c0-26.467-21.533-48-48-48h-64c-26.467 0-48 21.533-48 48v16h-88c-22.056 0-40 17.944-40 40v56c0 8.836 7.164 16 16 16h8.744l13.823 290.283c1.221 25.636 22.281 45.717 47.945 45.717h242.976c25.665 0 46.725-20.081 47.945-45.717l13.823-290.283h8.744c8.836 0 16-7.164 16-16v-56c0-22.056-17.944-40-40-40zm-216-16c0-8.822 7.178-16 16-16h64c8.822 0 16 7.178 16 16v16h-96zm-128 56c0-4.411 3.589-8 8-8h336c4.411 0 8 3.589 8 8v40c-4.931 0-331.567 0-352 0zm313.469 360.761c-.407 8.545-7.427 15.239-15.981 15.239h-242.976c-8.555 0-15.575-6.694-15.981-15.239l-13.751-288.761h302.44z"/>\n'
-  + '        <path d="m256 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '        <path d="m336 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '        <path d="m176 448c8.836 0 16-7.164 16-16v-208c0-8.836-7.164-16-16-16s-16 7.164-16 16v208c0 8.836 7.163 16 16 16z"/>\n'
-  + '    </g>\n'
-  + '</svg>\n',
-  );
-  // Level 2 <p class="notes-list-item-description {condition}">{text}</p>
-  const notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
-  if (notesListItemDescription instanceof HTMLButtonElement) {
-    notesListItemDescription.type = 'button';
-  }
-  notesListItemDescription.classList.add('notes-list-item-description');
-  if (!hasDescription && isText) {
-    notesListItemDescription.classList.add('hidden');
+  // Level 5 <span className="icon">
+  const iconContainer = document.createElement('span');
+  iconContainer.classList.add('icon');
+  // Level 6 <i className="fa-solid fa-trash">
+  const icon = document.createElement('i');
+  // Level 3 <div className="card-content">
+  const cardContent = document.createElement('div');
+  cardContent.classList.add('card-content');
+  // Level 4
+  let notesListItemDescription;
+  // Level 5
+  let media;
+  // Level 5
+  let saveButton;
+  // Level 5
+  let startButton;
+  // Level 5
+  let input;
+
+  if (['text', 'audio', 'video'].includes(type)) {
+    notesListItem.classList.add('form');
+
+    // Level 2 <form className="card">
+    notesListItemWrapper = document.createElement('form');
+    notesListItemWrapper.classList.add('card');
+    notesListItemWrapper.name = uniqid();
+
+    // Level 5 <input class="input" type="text" placeholder="Type the note's name">
+    input = document.createElement('input');
+    input.classList.add('input');
+    input.type = type;
+    input.name = 'nameField';
+    input.required = true;
+    input.placeholder = 'Type the note\'s name';
+    cardHeaderTitle.append(input);
+
+    deleteNote.classList.add('cancel');
+    deleteNote.ariaLabel = 'cancel';
+
+    icon.classList.add('fa-solid', 'fa-circle-xmark');
+    // Level 4 <div className="content">
+    notesListItemDescription = document.createElement('div');
+    notesListItemDescription.classList.add('content');
+
+    // Level 4 <div class="control">
+    const control = document.createElement('div');
+    control.classList.add('control');
+
+    // Level 5 <button class="button save" type="submit">Save</button>
+    saveButton = document.createElement('button');
+    saveButton.classList.add('button', 'save');
+    saveButton.type = 'button';
+    saveButton.disabled = true;
+    saveButton.textContent = 'Save';
+
+    switch (type) {
+      case 'text': {
+        // Level 5 <textarea class="textarea" placeholder="Type the note's content">
+        const textarea = document.createElement('textarea');
+        textarea.classList.add('textarea', 'has-fixed-size');
+        textarea.name = 'content';
+        textarea.placeholder = 'Type the note\'s content';
+        notesListItemDescription.append(textarea);
+        break;
+      }
+      default: {
+        // Level 5 <video/audio class="media">Your browser...</video/audio>
+        media = document.createElement(`${type}`);
+        media.classList.add('media');
+        media.textContent = `Your browser does not support the &lt;code&gt;${type}&lt;/code&gt; element.`;
+        notesListItemDescription.append(media);
+
+        // Level 5 <button class="button start" type="button">Start</button>
+        startButton = document.createElement('button');
+        startButton.classList.add('button', 'start');
+        startButton.type = 'button';
+        startButton.textContent = 'Start';
+        control.append(startButton);
+
+        saveButton.classList.add('is-hidden');
+        break;
+      }
+    }
+
+    cardContent.insertAdjacentElement('beforeend', control).append(saveButton);
+  } else {
+    const isText = (data.type === 'text');
+    const hasDescription = !!data.content;
+    // Level 2 <div className="card notes-list-item-header-wrapper">
+    notesListItemWrapper = document.createElement('div');
+    notesListItemWrapper.classList.add('card', 'notes-list-item-header-wrapper');
+    notesListItemHeader.classList.add('notes-list-item-header');
+    cardHeaderTitle.textContent = data.name;
+    deleteNote.classList.add('delete-note');
+    deleteNote.ariaLabel = 'delete';
+    icon.classList.add('fa-solid', 'fa-trash');
+    // Level 4 <p/button className="content notes-list-item-description">
+    notesListItemDescription = document.createElement((isText) ? 'p' : 'button');
+    notesListItemDescription.classList.add('content', 'notes-list-item-description');
+
+    if (notesListItemDescription instanceof HTMLButtonElement) {
+      notesListItemDescription.type = 'button';
+      notesListItemDescription.classList.add('button');
+    }
+    if (!hasDescription && isText) {
+      cardContent.hidden = true;
+    }
+
+    if (isText) {
+      notesListItemDescription.textContent = data.content;
+    }
+
+    // New notes shouldn't be available to use before they are ready for it
+    if (data.uploadComplete !== undefined) {
+      cardContent.setAttribute('data-id', data.id);
+      if (data.uploadComplete === false) {
+        deleteNote.disabled = true;
+        icon.style.color = '#aaaaaa';
+        notesListItemDescription.textContent = 'File is uploading...';
+        notesListItemDescription.disabled = true;
+      } else {
+        notesListItemDescription.classList.add('media-content');
+        notesListItemDescription.textContent = 'Click to open the media!';
+      }
+    }
   }
 
-  if (isText) {
-    notesListItemDescription.textContent = data.content;
-  }
+  notesListItemWrapper.insertAdjacentElement('beforeend', cardContent)
+    .insertAdjacentElement('afterbegin', notesListItemDescription);
+  notesListItem.insertAdjacentElement('beforeend', notesListItemWrapper)
+    .insertAdjacentElement('afterbegin', notesListItemHeader)
+    .insertAdjacentElement('beforeend', cardHeaderTitle)
+    .insertAdjacentElement('afterend', deleteNote)
+    .insertAdjacentElement('beforeend', iconContainer)
+    .insertAdjacentElement('beforeend', icon);
 
-  notesListItem.insertAdjacentElement('beforeend', checkbox);
-  notesListItemHeaderWrapper.insertAdjacentElement('beforeend', notesListItemHeader);
-  notesListItemHeaderButtons.insertAdjacentElement('beforeend', spoiler);
-  notesListItemHeaderWrapper.insertAdjacentElement('beforeend', notesListItemHeaderButtons)
-    .insertAdjacentElement('beforeend', deleteNote);
-  notesListItem.insertAdjacentElement('beforeend', notesListItemHeaderWrapper)
-    .insertAdjacentElement('afterend', notesListItemDescription);
   notesList.append(notesListItem);
-  masonry.appended(notesListItem);
+  masonry.prepended(notesListItem);
 
-  const deleteButtonListener = () => {
-    deleteListener(data.id);
+  return {
+    notesListItemWrapper,
+    input,
+    deleteNote,
+    icon,
+    notesListItemDescription,
+    media,
+    saveButton,
+    startButton,
   };
-  deleteNote.addEventListener('click', deleteButtonListener, { once: true });
-
-  // New notes shouldn't be available to use before they are ready for it
-  if (data.uploadComplete !== undefined) {
-    if (data.uploadComplete === false) {
-      deleteNote.disabled = true;
-      deleteNote.querySelector('svg').style.fill = '#aaaaaa';
-      notesListItemDescription.textContent = 'Please, wait — your file is uploading...';
-      notesListItemDescription.disabled = true;
-    } else {
-      notesListItemDescription.classList.add('media-content');
-      notesListItemDescription.textContent = 'Click to open the media!';
-    }
-  }
-
-  // A listener for spoilers is needed to improve accessibility
-  spoiler.addEventListener('keyup', (event) => {
-    if (event.key === 'Enter' || event.key === ' ') {
-      checkbox.checked = !checkbox.checked;
-      const evt = new Event('click', { bubbles: true });
-      evt.fromKeyboard = true;
-      checkbox.dispatchEvent(evt);
-    }
-  });
-
-  if (!isText) {
-    const newNoteListener = () => {
-      previewListener(data.type, pipeBlob, data.id);
-    };
-    notesListItemDescription.addEventListener('click', newNoteListener);
-  }
 }

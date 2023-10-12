@@ -1,227 +1,236 @@
 /* eslint-disable no-param-reassign */
 import Masonry from 'masonry-layout';
-import Modal from './modal';
-import Preview from './preview';
-import { animateModals, renderNewNote } from './utils';
+import Form from './form';
+import { render, showMessage, subscribeOnNotifications } from './utils';
 
 export default class Page {
-  constructor(serverHost, fetchedData) {
+  constructor(serverHost, store) {
     this.serverHost = serverHost;
-    this.fetchedData = fetchedData;
+    this.store = store;
     this.page = document.body;
-    this.add = this.page.querySelector('.add');
-    this.notes = this.page.querySelector('.notes');
+    this.logo = this.page.querySelector('.logo');
+    this.burger = this.page.querySelector('.navbar-burger');
+    this.burgerMenu = this.page.querySelector('.navbar-menu');
+    this.menuButton = this.page.querySelector('.menu-button');
+    this.notesLoading = this.page.querySelector('.notes-loading');
     this.emptyList = this.page.querySelector('.notes-empty-list');
     this.notesList = this.page.querySelector('.notes-list');
-    this.addButton = this.page.querySelector('button.notes-go-to-add-button');
-    this.backButton = this.page.querySelector('button.back-button');
     this.audioButton = this.page.querySelector('button.audio-button');
     this.videoButton = this.page.querySelector('button.video-button');
     this.textButton = this.page.querySelector('button.text-button');
-    this.background = this.page.querySelectorAll('section, footer');
+  }
 
+  async init() {
     const masonry = new Masonry(this.notesList, {
-      gutter: 10,
       itemSelector: '.notes-list-item',
-      percentPosition: true,
       columnWidth: '.notes-list-item',
     });
 
-    this.modal = new Modal(this.page, masonry);
-    this.footerLogo = this.page.querySelector('.footer-logo');
-    this.about = this.page.querySelector('.about');
+    // Easter egg logic
+    const animateIt = () => {
+      const easterEgg = this.page.querySelector('.name-easter-egg');
+      easterEgg.classList.add('animate-it');
+      const animationTimeout = setTimeout(() => {
+        easterEgg.classList.remove('animate-it');
+        clearTimeout(animationTimeout);
+      }, 2000);
+    };
+    let firstTouch;
 
-    // At first, it is needed to subscribe on server notifications
-    // Without this feature, the app freezes when a big file is sent
-    const client = new WebSocket(`${serverHost.replace('http', 'ws')}/chest-of-notes/`);
-
-    client.addEventListener('open', () => {
-      client.addEventListener('message', (message) => {
-        const data = JSON.parse(message.data);
-        if (data.users) {
-          if (data.users > 1) {
-            const text = 'Server denied to subscribe on notifications: somebody has already connected.';
-            console.log(text);
-            client.close(1000, 'Somebody has already connected');
-            [this.textButton, this.audioButton, this.videoButton].forEach((button) => {
-              button.disabled = true;
-              button.parentElement.classList.add('hidden');
-            });
-            this.notesList.querySelectorAll('.delete-note').forEach((deleteButton) => {
-              deleteButton.disabled = true;
-              deleteButton.querySelector('svg').style.fill = '#aaaaaa';
-            });
-            const timeout = setTimeout(() => { clearTimeout(timeout); alert(text); }, 500);
-          } else {
-            console.log('Subscribed on notifications!');
-            client.addEventListener('close', () => {
-              console.log('Connection was closed!');
-              const confirmation = window.confirm('A server connection was lost. Do you want reload the page and try to connect again?');
-              if (confirmation) window.location.reload();
-            });
-          }
+    ['mousedown', 'touchstart'].forEach((eventType) => {
+      this.logo.addEventListener(eventType, (event) => {
+        event.preventDefault();
+        if (!firstTouch || (Date.now() - firstTouch >= 1000)) {
+          firstTouch = Date.now();
+        } else {
+          animateIt();
+          firstTouch = undefined;
         }
-        if (data.event) {
-          if (data.event.name === 'uploaderror') {
-            const text = `An error occurred with a file from the note "${data.event.note}". ${data.event.message}`;
-            console.log(text);
-            alert(text);
-          }
-          if (data.event.name === 'uploadsuccess') {
-            console.log(`Successfully saved a file from the note "${data.event.note}"!`);
-            const descriptionToEdit = this.notes.querySelector(`#${data.event.id} ~ .notes-list-item-description`);
-            const deleteNote = this.notes.querySelector(`#${data.event.id} ~ .notes-list-item-header-wrapper .delete-note`);
-            deleteNote.querySelector('svg').style.fill = '';
-            deleteNote.disabled = false;
-            descriptionToEdit.textContent = 'Click to open the media!';
-            descriptionToEdit.classList.add('media-content');
-            descriptionToEdit.disabled = false;
-          }
-        }
-      });
-      client.addEventListener('error', () => {
-        const text = 'An error occurred with a notifications\' subscription.';
-        console.log(text);
-        alert(text);
       });
     });
 
+    // This will run each time store changes
+    // eslint-disable-next-line no-unused-vars
+    const unsubscribe = this.store.subscribe(() => {
+      const storeData = this.store.getState();
+      console.info('store:', storeData);
+      if (storeData.form > 0 || storeData.items.length > 0) {
+        this.notesList.classList.remove('is-hidden');
+        this.emptyList.classList.add('is-hidden');
+      } else {
+        this.notesList.classList.add('is-hidden');
+        this.emptyList.classList.remove('is-hidden');
+      }
+      masonry.layout();
+    });
+
+    // Some logic to clear layout from notes
+    const deleteFromInterface = (itemToDelete, dataId) => {
+      masonry.remove(itemToDelete);
+      this.store.setState((previous) => ({
+        ...previous,
+        items: previous.items.filter((item) => item.id !== dataId),
+      }));
+    };
+
     // Listener functions are initiated in a constructor and are given as callbacks
-    this.deleteListener = async (dataId) => {
-      const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
-      const result = await res.json();
-      console.log(result);
-      if (result.status.includes('Error')) {
-        alert(`Cannot delete! Server response: ${result.data}`);
-      }
-      if (result.status === 'Deleted') {
-        const itemToDelete = this.notesList.querySelector(`.notes-list-item #${result.data}`).parentElement;
-        itemToDelete.remove();
-        masonry.layout();
-      }
-      if (!this.notesList.children.length) {
-        [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
-        this.emptyList.style.visibility = 'visible';
-      }
+    this.deleteListener = async (event, dataId) => {
+      try {
+        await showMessage('delete', 'Are you sure?');
+        try {
+          const res = await fetch(`${this.serverHost}/chest-of-notes/mongo/delete/${dataId}`);
+          const result = await res.json();
+          if (result.status.includes('Error')) {
+            await showMessage('error', `Cannot delete! Server response: ${result.data}`);
+          }
+          if (result.status === 'Deleted') {
+            const itemToDelete = event.target.closest('.notes-list-item');
+            deleteFromInterface(itemToDelete, dataId);
+          }
+        } catch (e) {
+          console.error(e);
+        }
+      } catch (e) { /* do nothing */ }
     };
 
-    this.previewListener = (dataType, dataContent, dataId) => {
-      const previewWrapper = this.page.querySelector('.preview');
-      const preview = new Preview(this.serverHost, previewWrapper, dataId, dataType, dataContent);
-      animateModals(previewWrapper, this.background, 'open');
-
-      const closeListener = (event) => {
-        if (event.target.classList.contains('preview')) {
-          preview.closeModal(this.background);
-          previewWrapper.removeEventListener('click', closeListener);
-        }
+    this.previewListener = (id, button, type, pipeBlob) => {
+      const { opened } = this.store.getState();
+      const close = (idToClose) => {
+        const previousMediaContainer = this.notesList.querySelector(`[data-id="${idToClose}"]`);
+        const previousDescription = previousMediaContainer.querySelector('.notes-list-item-description');
+        const previousMedia = previousMediaContainer.querySelector('.media');
+        previousMedia.remove();
+        previousDescription.textContent = 'Click to open the media!';
       };
-      previewWrapper.addEventListener('click', closeListener);
-      // A way to close without a mouse
-      previewWrapper.addEventListener('keyup', (event) => {
-        if (event.key === 'Escape') {
-          previewWrapper.dispatchEvent(new Event('click'));
+
+      if (opened !== id) {
+        if (opened !== null) {
+          close(opened);
         }
-      }, { once: true });
+        button.textContent = 'Click to close the media!';
+        const media = document.createElement(type);
+        if (pipeBlob) {
+          media.src = URL.createObjectURL(pipeBlob);
+        } else {
+          media.src = `${this.serverHost}/chest-of-notes/mongo/fetch/${id}`;
+        }
+
+        media.className = 'media';
+        media.controls = true;
+        media.style.width = '100%';
+        media.style.borderRadius = '4px';
+        button.insertAdjacentElement('afterend', media);
+        this.store.setState((previous) => ({ ...previous, opened: id }));
+        const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
+      } else {
+        close(opened);
+        this.store.setState((previous) => ({ ...previous, opened: null }));
+      }
     };
+
+    const contentButtons = [this.textButton, this.audioButton, this.videoButton];
+    // Before rendering a wss connection is created.
+    // Only one user can connect, others are disconnected
+    // Connected user gets full access, others are read-only
+    const isSubscribed = await subscribeOnNotifications(this.serverHost, this.notesList);
 
     // At first, fetched notes must be rendered
-    if (this.fetchedData.length) {
-      [this.emptyList, this.notesList].forEach((item) => item.classList.toggle('hidden'));
-      this.fetchedData.forEach((note) => {
-        renderNewNote(
+    const fetchedData = this.store.getState().items;
+    let deleteButtonsAndIcons;
+    this.notesLoading.classList.add('is-hidden');
+    if (fetchedData.length) {
+      this.notesList.classList.remove('is-hidden');
+      deleteButtonsAndIcons = fetchedData.map((note) => {
+        const { deleteNote: deleteButton, notesListItemDescription: previewButton, icon } = render(
+          'note',
           this.notesList,
           note,
           null,
-          this.deleteListener,
-          this.previewListener,
           masonry,
         );
+        if (isSubscribed === 'allow') {
+          deleteButton.addEventListener('click', (event) => this.deleteListener(event, note.id));
+        }
+        if (previewButton instanceof HTMLButtonElement) {
+          previewButton.addEventListener('click', () => this.previewListener(note.id, previewButton, note.type, null));
+        }
+        return { button: deleteButton, icon };
       });
       masonry.layout();
+      const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 500);
     } else {
-      this.emptyList.style.visibility = 'visible';
+      this.emptyList.classList.remove('is-hidden');
     }
 
-    // Then, add functionality to spoilers
-    this.page.addEventListener('click', (event) => {
-      if (event.target.classList.contains('checkbox')) {
-        const spoiler = event.target;
-        const description = spoiler.closest('li').querySelector('.notes-list-item-description');
-        if (!event.isTrusted && !event.fromKeyboard) {
-          spoiler.checked = false;
-        }
-        if (spoiler.checked) {
-          description.style.maxHeight = `${description.scrollHeight}px`;
-          Array.from(this.page.querySelectorAll('.checkbox'))
-            .filter((item) => item.checked && item !== spoiler)
-            .forEach((item) => { item.dispatchEvent(new Event('click', { bubbles: true })); });
-        } else {
-          description.style.maxHeight = '';
-        }
-        const timeout = setTimeout(() => { masonry.layout(); clearTimeout(timeout); }, 600);
-      }
-    });
+    const disableAll = () => {
+      contentButtons.forEach((button) => {
+        button.disabled = true;
+        button.parentElement.classList.add('hidden');
+      });
+      deleteButtonsAndIcons.forEach((buttonAndIcon) => {
+        buttonAndIcon.button.disabled = true;
+        buttonAndIcon.icon.style.color = '#aaaaaa';
+      });
+      this.burger.disabled = true;
+      this.menuButton.disabled = true;
+    };
 
-    // Expanded notes should adapt if layout changes
-    window.addEventListener('resize', () => {
-      const timeout = setTimeout(() => {
-        Array.from(this.page.querySelectorAll('.checkbox'))
-          .filter((spoiler) => spoiler.checked)
-          .forEach((spoiler) => {
-            const description = spoiler.closest('li').querySelector('.notes-list-item-description');
-            description.style.maxHeight = `${description.scrollHeight}px`;
-          });
-        masonry.layout();
-        clearTimeout(timeout);
-      }, 1000);
-    });
+    if (isSubscribed !== 'allow') {
+      disableAll();
+    } else {
+      this.addEventListeners(masonry, contentButtons);
+    }
 
-    this.notes.scrollIntoView();
+    document.body.addEventListener('disable', disableAll);
+
+    // A listener for deleting incomplete notes (see 'uploaderror' in utils.js)
+    this.notesList.addEventListener('clearIncomplete', (event) => {
+      const itemToDelete = this.notesList.querySelector(`[data-id="${event.detail.id}"]`).closest('li');
+      deleteFromInterface(itemToDelete, event.detail.id);
+    });
   }
 
-  addEventListeners() {
+  addEventListeners(masonry, contentButtons) {
     /**
-     * A listener for showing an 'about' modal
+     * A listener for showing adding options (desktop)
      */
-    this.footerLogo.addEventListener('click', () => this.about.classList.add('active'));
-
-    /**
-     * A listener for hiding an 'about' modal after the animation end
-     */
-    this.about.addEventListener('animationend', () => this.about.classList.remove('active'));
-
-    /**
-     * A listener for an 'add' button
-     */
-    this.addButton.addEventListener('click', (event) => {
+    this.menuButton.addEventListener('click', (event) => {
       event.preventDefault();
-      this.add.scrollIntoView({ behavior: 'smooth' });
+      event.target.parentElement.classList.toggle('is-active');
     });
 
     /**
-     * A listener for a 'back' button
+     * A listener for showing adding options (mobile)
      */
-    this.backButton.addEventListener('click', (event) => {
+    this.burger.addEventListener('click', (event) => {
       event.preventDefault();
-      this.notes.scrollIntoView({ behavior: 'smooth' });
+      this.burger.classList.toggle('is-active');
+      this.burgerMenu.classList.toggle('is-active');
     });
 
     /**
      * A listener to open the content modal
      */
-    const contentButtons = [this.audioButton, this.videoButton, this.textButton];
     contentButtons.forEach((button) => {
       // Make a listener for each button
       const listener = (event) => {
         event.preventDefault();
-        // Resolve a modal view according to a clicked button
-        // eslint-disable-next-line max-len
-        const { modalAdd, type } = this.modal.openModal(this.serverHost, button, contentButtons, this.deleteListener, this.previewListener);
-        animateModals(modalAdd, this.background, 'open');
-        if (type !== 'text') {
-          this.modal.addModalButtonListeners();
-        }
+        [this.burger, this.menuButton].forEach((btn) => {
+          if (btn.classList.contains('is-active') || (btn.parentElement.classList.contains('is-active'))) {
+            btn.dispatchEvent(new Event('click'));
+          }
+        });
+
+        this.store.setState((previous) => ({ ...previous, form: previous.form + 1 }));
+        this.form = new Form(
+          this.serverHost,
+          this.notesList,
+          this.store,
+          masonry,
+          button.name,
+          this.deleteListener,
+          this.previewListener,
+        );
       };
       button.addEventListener('click', listener);
     });

@@ -1,0 +1,262 @@
+@charset "utf-8";
+
+$primary: #2fa693;
+$danger: #9c1428;
+
+$fa-font-path: "~@fortawesome/fontawesome-free/webfonts";
+@import "~@fortawesome/fontawesome-free/scss/fontawesome";
+@import "~@fortawesome/fontawesome-free/scss/solid";
+@import "~bulma/bulma";
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+SC&family=IBM+Plex+Sans:wght@400;500&display=swap');
+
+html {
+  background-color: $primary;
+}
+
+button {
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  max-width: 2000px;
+  height: 100dvh;
+  margin: 0 auto;
+  font-family: 'IBM Plex Sans', sans-serif;
+  font-weight: 400;
+}
+
+.navbar.spaced, .hero.spaced {
+  padding: 1rem 1.75rem;
+  &.hero {
+    padding: 1rem 1rem 1.75rem 1rem;
+  }
+}
+
+.navbar-menu {
+  align-items: center;
+  padding: 0;
+  border-radius: 4px;
+  @include until(1023px) {
+    margin: 1rem 0;
+  }
+}
+
+.button.add {
+  padding: 0;
+  aspect-ratio: 1;
+}
+
+.logo {
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  filter: drop-shadow(0 0 5px #fab400);
+  touch-action: manipulation;
+  @include from(770px) {
+    width: 48px;
+    height: 48px;
+  }
+}
+
+.title.name {
+  position: relative;
+  margin-bottom: 0;
+  font-family: 'Cormorant SC', serif;
+  font-weight: 400;
+  font-size: 1.5rem;
+  @include until(400px) {
+    font-size: 1.2rem;
+  }
+  @include from(770px) {
+    font-size: 2rem;
+  }
+  text-transform: uppercase;
+}
+
+@keyframes appear {
+  0% {
+    visibility: hidden;
+    opacity: 0;
+  }
+  1% {
+    visibility: visible;
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.name-easter-egg {
+  position: absolute;
+  width: 100%;
+  background-color: $danger;
+  opacity: 0;
+  visibility: hidden;
+  & a {
+    color: #fab400;
+  }
+}
+
+.animate-it {
+  animation: appear 1s alternate linear 2;
+}
+
+.navbar.is-danger .navbar-item.has-dropdown .button.navbar-link {
+  border: 0;
+  background-color: #fab400;
+  &:focus-visible {
+    outline-color: hsl(0, 0%, 98%);;
+    outline-width: 2px;
+    outline-style: solid;
+  }
+}
+
+.navbar-dropdown {
+  top: 110%;
+  border-top: 0;
+  border-radius: 4px;
+  @include until(1023px) {
+    display: flex;
+    justify-content: space-evenly;
+  }
+  @include until(550px) {
+    display: block;
+    & .navbar-item {
+      margin: 0 auto;
+    }
+  }
+  & .navbar-item {
+    text-align: center;
+    &:hover {
+      color: $primary;
+    }
+  }
+}
+
+.media-button {
+  border: 0;
+  background-color: unset;
+  &:hover {
+    background-color: hsl(0, 0%, 98%);
+  }
+}
+
+.navbar-burger {
+  &:hover:disabled {
+    background-color: unset;
+    cursor: not-allowed;
+  }
+  &:hover:not(:disabled) {
+    background-color: unset;
+    & span {
+      background-color: rgba(0, 0, 0, 0.5);
+    }
+  }
+  &.is-active {
+    & span {
+      &:nth-child(2) {
+        opacity: unset;
+        transform: rotate(-45deg);
+      }
+      width: 24px;
+      @include from(770px) {
+        width: 32px;
+      }
+    }
+  }
+  & span {
+    left: unset;
+    right: 0;
+    width: 20px;
+    @include from(770px) {
+      width: 28px;
+    }
+    &:nth-child(1) {
+      transform: translateY(5px) rotate(90deg);
+    }
+  }
+}
+
+.hero {
+  min-height: unset;
+  flex-basis: 100vh;
+  overflow-y: scroll;
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
+    width: 0;
+  }
+}
+
+.hero-body.columns {
+  padding: 0;
+  margin: 0;
+}
+
+.column {
+  width: 100%;
+  @include from(600px) {
+    width: 50%;
+  }
+  @include from(900px) {
+    width: 33.33%;
+  }
+  @include from(1200px) {
+    width: 25%;
+  }
+  @include from(1500px) {
+    width: 20%;
+    max-width: 400px;
+  }
+}
+
+form .card-content div.content {
+  margin-bottom: 0.5rem;
+}
+
+.card-header-title {
+  font-weight: 500;
+}
+
+.card-header-icon:hover {
+  opacity: 0.7;
+  &:disabled {
+    opacity: 1;
+    cursor: not-allowed;
+  }
+}
+
+.card-content {
+  padding: 1rem;
+}
+
+.media {
+  width: 100%;
+  border-radius: 4px;
+  background: #000000;
+}
+
+.modal-background {
+  background-color: rgba(10, 10, 10, 0.6);
+}
+
+.modal-card {
+  $padding: 1.75rem;
+  max-width: 540px;
+  margin: 0 auto;
+  @include until(769px) {
+    width: calc(100% - 2 * $padding);
+    max-width: 540px;
+    margin: 0 auto;
+
+    .modal-card-head, .modal-card-body, .modal-card-foot {
+      padding: 1rem;
+    }
+  }
+}
