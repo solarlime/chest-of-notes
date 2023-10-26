@@ -51,7 +51,7 @@
     "masonry-layout": "^4.2.2",
     "uniqid": "^5.4.0",
     "validator": "^13.11.0",
-    "zustand": "^4.4.3"
+    "zustand": "^4.4.4"
   },
   "browserslist": [
     "defaults"
