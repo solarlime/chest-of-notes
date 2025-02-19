@@ -22,14 +22,14 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/cli@npm:^7.23.0":
-  version: 7.23.0
-  resolution: "@babel/cli@npm:7.23.0"
+"@babel/cli@npm:^7.26.4":
+  version: 7.26.4
+  resolution: "@babel/cli@npm:7.26.4"
   dependencies:
-    "@jridgewell/trace-mapping": ^0.3.17
+    "@jridgewell/trace-mapping": ^0.3.25
     "@nicolo-ribaudo/chokidar-2": 2.1.8-no-fsevents.3
-    chokidar: ^3.4.0
-    commander: ^4.0.1
+    chokidar: ^3.6.0
+    commander: ^6.2.0
     convert-source-map: ^2.0.0
     fs-readdir-recursive: ^1.1.0
     glob: ^7.2.0
@@ -45,7 +45,7 @@ __metadata:
   bin:
     babel: ./bin/babel.js
     babel-external-helpers: ./bin/babel-external-helpers.js
-  checksum: beeb189560bf9c4ea951ef637eefa5214654678fb09c4aaa6695921037059c1e1553c610fe95fbd19a9cdfd9f5598a812fc13df40a6b9a9ea899e43fc6c42052
+  checksum: 759814fcb262545f787fad33456ffaef0cf282c6bc6a6fa610acf0f04457c300c0c880737e396e4c0303a9082cc9102123f8018111de5f60474365e32bf70300
   languageName: node
   linkType: hard
 
@@ -2714,7 +2714,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "chest-of-notes@workspace:."
   dependencies:
-    "@babel/cli": ^7.23.0
+    "@babel/cli": ^7.26.4
     "@babel/core": ^7.23.2
     "@babel/eslint-parser": ^7.22.15
     "@babel/preset-env": ^7.23.2
@@ -2749,7 +2749,7 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"chokidar@npm:>=3.0.0 <4.0.0, chokidar@npm:^3.4.0, chokidar@npm:^3.5.3":
+"chokidar@npm:>=3.0.0 <4.0.0, chokidar@npm:^3.5.3":
   version: 3.5.3
   resolution: "chokidar@npm:3.5.3"
   dependencies:
@@ -2765,6 +2765,25 @@ __metadata:
     fsevents:
       optional: true
   checksum: b49fcde40176ba007ff361b198a2d35df60d9bb2a5aab228279eb810feae9294a6b4649ab15981304447afe1e6ffbf4788ad5db77235dc770ab777c6e771980c
+  languageName: node
+  linkType: hard
+
+"chokidar@npm:^3.6.0":
+  version: 3.6.0
+  resolution: "chokidar@npm:3.6.0"
+  dependencies:
+    anymatch: ~3.1.2
+    braces: ~3.0.2
+    fsevents: ~2.3.2
+    glob-parent: ~5.1.2
+    is-binary-path: ~2.1.0
+    is-glob: ~4.0.1
+    normalize-path: ~3.0.0
+    readdirp: ~3.6.0
+  dependenciesMeta:
+    fsevents:
+      optional: true
+  checksum: d2f29f499705dcd4f6f3bbed79a9ce2388cf530460122eed3b9c48efeab7a4e28739c6551fd15bec9245c6b9eeca7a32baa64694d64d9b6faeb74ddb8c4a413d
   languageName: node
   linkType: hard
 
@@ -2932,10 +2951,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"commander@npm:^4.0.1":
-  version: 4.1.1
-  resolution: "commander@npm:4.1.1"
-  checksum: d7b9913ff92cae20cb577a4ac6fcc121bd6223319e54a40f51a14740a681ad5c574fd29a57da478a5f234a6fa6c52cbf0b7c641353e03c648b1ae85ba670b977
+"commander@npm:^6.2.0":
+  version: 6.2.1
+  resolution: "commander@npm:6.2.1"
+  checksum: d7090410c0de6bc5c67d3ca41c41760d6d268f3c799e530aafb73b7437d1826bbf0d2a3edac33f8b57cc9887b4a986dce307fa5557e109be40eadb7c43b21742
   languageName: node
   linkType: hard
 
