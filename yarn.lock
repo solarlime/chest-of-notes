@@ -89,17 +89,17 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@babel/eslint-parser@npm:^7.22.15":
-  version: 7.22.15
-  resolution: "@babel/eslint-parser@npm:7.22.15"
+"@babel/eslint-parser@npm:^7.26.8":
+  version: 7.26.8
+  resolution: "@babel/eslint-parser@npm:7.26.8"
   dependencies:
     "@nicolo-ribaudo/eslint-scope-5-internals": 5.1.1-v1
     eslint-visitor-keys: ^2.1.0
     semver: ^6.3.1
   peerDependencies:
     "@babel/core": ^7.11.0
-    eslint: ^7.5.0 || ^8.0.0
-  checksum: efdc749164a40de1b68e3ed395f441dfb7864c85d0a2ee3e4bc4f06dd0b7f675acb9be97cdc9025b88b3e80d38749a2b30e392ce7f6a79313c3aaf82ba8ccd68
+    eslint: ^7.5.0 || ^8.0.0 || ^9.0.0
+  checksum: a434da9e3099e5f77911baa4eaa21f2ec64768703be1fde2858e8ffdb8be6cb78ff67c611c8c17fe1ece54d925b65487a7455cca93103b017443a51b76320751
   languageName: node
   linkType: hard
 
@@ -2716,7 +2716,7 @@ __metadata:
   dependencies:
     "@babel/cli": ^7.23.0
     "@babel/core": ^7.23.2
-    "@babel/eslint-parser": ^7.22.15
+    "@babel/eslint-parser": ^7.26.8
     "@babel/preset-env": ^7.23.2
     "@fortawesome/fontawesome-free": ^6.4.2
     "@playwright/test": ^1.39.0
