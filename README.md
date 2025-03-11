@@ -1,4 +1,4 @@
-![CI](https://github.com/solarlime/chest-of-notes/workflows/CI/badge.svg?branch=master)
+[![CI](https://github.com/solarlime/chest-of-notes/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/solarlime/chest-of-notes/actions/workflows/main.yml)
 
 # Chest of notes
 A frontend side of a project (backend is [here](https://github.com/solarlime/chest-of-notes-server)).

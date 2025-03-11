@@ -5,7 +5,7 @@ updates:
     schedule:
       interval: "weekly"
       day: "wednesday"
-    target-branch: "night-builds"
+    target-branch: "preview"
     # Labels on pull requests for version updates only
     labels:
       - "npm dependencies"
