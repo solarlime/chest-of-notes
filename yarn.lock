@@ -2552,7 +2552,7 @@ __metadata:
     babel-loader: ^9.1.3
     bulma: ^0.9.4
     clean-webpack-plugin: ^4.0.0
-    core-js: ^3.33.0
+    core-js: ^3.43.0
     css-loader: ^6.8.1
     css-minimizer-webpack-plugin: ^5.0.1
     dotenv-webpack: ^8.0.1
@@ -2878,10 +2878,10 @@ __metadata:
   languageName: node
   linkType: hard
 
-"core-js@npm:^3.33.0":
-  version: 3.33.0
-  resolution: "core-js@npm:3.33.0"
-  checksum: dd62217935ac281faf6f833bb306fb891162919fcf9c1f0c975b1b91e82ac09a940f5deb5950bbb582739ceef716e8bd7e4f9eab8328932fb029d3bc2ecb2881
+"core-js@npm:^3.43.0":
+  version: 3.43.0
+  resolution: "core-js@npm:3.43.0"
+  checksum: b6da4099d9556ce23f8ada331c8cdc4a6803089a4de837126d52058ec05b74be1c6019e00ff2cf17635989d16562ddddf13cc6fa189d254914b4a42eb4960322
   languageName: node
   linkType: hard
 
