@@ -47,7 +47,7 @@
     "webpack-cli": "^5.1.4",
     "webpack-dev-server": "^5.2.2",
     "webpack-merge": "^5.10.0",
-    "ws": "^8.14.2"
+    "ws": "^8.18.3"
   },
   "dependencies": {
     "masonry-layout": "^4.2.2",
